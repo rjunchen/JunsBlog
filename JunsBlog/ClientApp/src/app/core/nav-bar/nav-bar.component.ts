@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
+import { User } from 'src/app/models/user';
 
 @Component({
   selector: 'app-nav-bar',
@@ -10,7 +11,7 @@ import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/fo
 export class NavBarComponent implements OnInit {
   imageUrl = './assets/avatar.png';
   logoUrl = './assets/logo.png';
-  currentUser: any;
+  currentUser: User;
   showSearchBar: boolean;
   searchForm: FormGroup;
 

@@ -1,1 +1,22 @@
-<p>login works!</p>
+<div class="login-container">
+    <form class="login-form" [formGroup]="loginForm">
+      <span class="form-title">User Login</span>
+      <mat-form-field class="form-item" appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput placeholder="Enter your email" formControlName="email"/>
+        <mat-icon matSuffix>account_box</mat-icon>  
+      </mat-form-field>
+      <mat-form-field class="form-item" appearance="outline">
+        <mat-label>Password</mat-label>
+        <input matInput placeholder="Enter your password" formControlName="password" [type]="hidePassword ? 'password' : 'text'"/>
+        <mat-icon (click)="hidePassword = !hidePassword" matSuffix>{{ hidePassword ? "visibility_off" : "visibility" }}</mat-icon>
+      </mat-form-field>
+      <span class="reset-link">
+        <a href="/reset">Forgot password?</a>
+      </span>
+      <button class="form-item" mat-raised-button color="warn" type="submit" [disabled]="loginForm.invalid"  (click)="onSubmit()">Sign in!</button>
+      <mat-divider class="divider"></mat-divider>
+      <a mat-flat-button class="form-item social-icon" color="warn" href="/api/auth/google"><i class="fa fa-google"></i>Login with Google</a>
+    </form>
+    <mat-divider class="divider"></mat-divider>
+</div>
