@@ -129,7 +129,7 @@ namespace JunsBlog
 
                 if (env.IsDevelopment())
                 {
-                     // spa.UseAngularCliServer(npmScript: "start");
+                    // spa.UseAngularCliServer(npmScript: "start");
 
                     // Use the Proxy when starting the angular ClientApp externally
                     spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
