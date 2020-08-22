@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 using System;
 
 namespace JunsBlog.Entities
@@ -19,6 +20,8 @@ namespace JunsBlog.Entities
         public string Type { get; set; }
         [BsonRequired]
         public DateTime CreationDate { get; set; }
+        public string Image { get; set; }
+        [JsonIgnore]
         public string Password { get; set; }
     }
 }

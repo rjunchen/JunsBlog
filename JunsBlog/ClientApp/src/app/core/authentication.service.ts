@@ -13,8 +13,15 @@ export class AuthenticationService {
   @Output() userInfoUpdated: EventEmitter<any> = new EventEmitter();
   private token: string;
   private currentUser: User;
-  
-  constructor(private http: HttpClient, private router: Router) { }
+
+  constructor(private http: HttpClient, private router: Router) { 
+    try{
+      this.token = localStorage.getItem('accessToken');
+      this.currentUser = JSON.parse(localStorage.getItem('user'));
+    }catch{
+      this.logout();
+    }
+  }
 
   public saveToken(tokenResponse: TokenResponse){
     if(tokenResponse){
@@ -24,6 +31,14 @@ export class AuthenticationService {
       localStorage.setItem('user', JSON.stringify(tokenResponse.user));
       this.userInfoUpdated.emit(tokenResponse.user);
     }
+  }
+
+  public getToken(): string{
+    return this.token;
+  }
+
+  public getCurrentUser(){
+    return this.currentUser;
   }
 
   public register(formData): Observable<any> {
@@ -40,5 +55,21 @@ export class AuthenticationService {
         this.saveToken(data);
       }
     }))
+  }
+
+  public isLoggedIn(): boolean{
+    if(this.currentUser){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  public logout(){
+    this.currentUser = null;
+    window.localStorage.removeItem('accessToken');
+    window.localStorage.removeItem('user');
+    this.userInfoUpdated.emit(null);
+    this.router.navigateByUrl('/login');
   }
 }

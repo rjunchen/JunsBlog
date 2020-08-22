@@ -8,17 +8,15 @@ namespace JunsBlog.Models.Authentication
 {
     public class AuthenticateResponse
     {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string Token { get; set; }
+        public User User { get; set; }
+        public string AccessToken { get; set; }
+        public string RefreshToken { get; set; }
 
-        public AuthenticateResponse(User user, string token)
+        public AuthenticateResponse(User user, string accessToken, string refreshToken)
         {
-            Id = user.Id;
-            Name = user.Name;
-            Email = user.Email;
-            Token = token;
+            this.User = user;
+            this.RefreshToken = refreshToken;
+            this.AccessToken = accessToken;
         }
     }
 }

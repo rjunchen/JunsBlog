@@ -49,8 +49,17 @@ namespace JunsBlog.Controllers
                 if (user == null) return BadRequest(new { message = "User doesn't exist" });
 
                 if (!Utilities.ValidatePassword(model.Password, user.Password)) return BadRequest(new { message = "Incorrect password" });
-        
-                var response = new AuthenticateResponse(user, jwtTokenHelper.GenerateJwtToken(user));
+
+                var userToken = new UserToken()
+                {
+                    RefreshToken = Utilities.GenerateToken(),
+                    RefreshExpiry = DateTime.UtcNow.AddDays(14),
+                    UserId = user.Id
+                };
+
+                var insertedUserToken = await databaseService.SaveUserTokenAsync(userToken);
+
+                var response = new AuthenticateResponse(user, jwtTokenHelper.GenerateJwtToken(user), insertedUserToken.RefreshToken);
 
                 return Ok(response);
             }
@@ -89,13 +98,13 @@ namespace JunsBlog.Controllers
                 var userToken = new UserToken()
                 {
                     RefreshToken = Utilities.GenerateToken(),
-                    RefreshExpiry = DateTime.UtcNow.AddDays(7),
+                    RefreshExpiry = DateTime.UtcNow.AddDays(14),
                     UserId = insertedUser.Id
                 };
 
-                await databaseService.SaveUserTokenAsync(userToken);
+                var insertedUserToken = await databaseService.SaveUserTokenAsync(userToken);
 
-                var response = new AuthenticateResponse(insertedUser, jwtTokenHelper.GenerateJwtToken(insertedUser));
+                var response = new AuthenticateResponse(insertedUser, jwtTokenHelper.GenerateJwtToken(insertedUser), insertedUserToken.RefreshToken);
 
                 notificationService.SendNotification(Notification.GenerateWelcomeNotification(newUser));
 

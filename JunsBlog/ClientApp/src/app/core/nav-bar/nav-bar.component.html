@@ -29,7 +29,7 @@
         <span class="icon-label">Post</span>
       </div>
       <button *ngIf="currentUser" mat-icon-button>
-        <span *ngIf="currentUser" class="profileImage"><img class="images" [src]="currentUser?.image"/></span>
+        <span *ngIf="currentUser" class="profileImage"><img class="images" [src]="currentUser.image ? currentUser.image : imageUrl"/></span>
       </button>
     </mat-toolbar>
   </div>
