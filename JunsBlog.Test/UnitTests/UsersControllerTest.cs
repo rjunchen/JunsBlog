@@ -13,16 +13,16 @@ namespace JunsBlog.Test.UnitTests
 {
     public class UsersControllerTest
     {
-        private readonly UsersController usersController; 
-
+        private readonly UsersController usersController;
+        private readonly DatabaseServiceFake databaseService;
         public UsersControllerTest()
         {
             var logFactory = LoggerFactory.Create(builder => builder.AddConsole());
             var logger = logFactory.CreateLogger<UsersController>();
-            var httpContextAccessFake = new HttpContextAccessorFake();
-            var databaseService = new DatabaseServiceFake();
+            var httpContextAccessFake = new HttpContextAccessorFake(); 
             var jwtTokenHelper = new JwtTokenHelper(new JwtSettingsFake());
             var notificationServiceFake = new NotificationServiceFake();
+            this.databaseService = new DatabaseServiceFake();
 
             usersController = new UsersController(httpContextAccessFake, databaseService, jwtTokenHelper, notificationServiceFake, logger);
         }
@@ -39,6 +39,44 @@ namespace JunsBlog.Test.UnitTests
 
            var result = await usersController.Register(model);
            Assert.IsType<OkObjectResult>(result);
+        }
+
+        [Fact]
+        public async void Register_New_User_Should_Create_A_Valid_UserToken()
+        {
+            var model = new RegisterRequest()
+            {
+                Email = "Test@gmail.com",
+                Name = "Tester",
+                Password = "123456"
+            };
+
+            var result = await usersController.Register(model) as OkObjectResult;
+            var user = (result.Value as AuthenticateResponse).User;
+            var userToken = await databaseService.FindUserTokenByIdAsync(user);
+            Assert.NotNull(userToken);
+            Assert.True(!String.IsNullOrEmpty(userToken.RefreshToken));
+            Assert.True(userToken.RefreshExpiry > DateTime.UtcNow.AddDays(13));
+            Assert.True(userToken.RefreshExpiry < DateTime.UtcNow.AddDays(15));
+        }
+
+        [Fact]
+        public async void Register_New_User_Should_Response_With_Valid_AuthenticationResponse()
+        {
+            var model = new RegisterRequest()
+            {
+                Email = "Test@gmail.com",
+                Name = "Tester",
+                Password = "123456"
+            };
+
+            var result = await usersController.Register(model) as OkObjectResult;
+            var authResponse = (result.Value as AuthenticateResponse);
+            Assert.NotNull(authResponse);
+
+            Assert.True(!String.IsNullOrEmpty(authResponse.RefreshToken));
+            Assert.True(!String.IsNullOrEmpty(authResponse.AccessToken));
+            Assert.NotNull(authResponse.User);
         }
 
 
@@ -81,6 +119,48 @@ namespace JunsBlog.Test.UnitTests
 
             var result = await usersController.Authenticate(request) as ObjectResult;
             Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
+        }
+
+
+        [Fact]
+        public async void Authentication_Should_Response_With_Valid_AuthenticationResponse()
+        {
+            var request = new AuthenticateRequest() { Email = "Test@gmail.com", Password = "123456" };
+            var testUserRegRequest = new RegisterRequest() { Email = "Test@gmail.com", Name = "Tester", Password = "123456" };
+
+            await usersController.Register(testUserRegRequest);
+
+            var result = await usersController.Authenticate(request) as ObjectResult;
+
+            var authResponse = (result.Value as AuthenticateResponse);
+            Assert.NotNull(authResponse);
+
+            Assert.True(!String.IsNullOrEmpty(authResponse.RefreshToken));
+            Assert.True(!String.IsNullOrEmpty(authResponse.AccessToken));
+            Assert.NotNull(authResponse.User);
+        }
+
+
+        [Fact]
+        public async void Authentication_Should_Renew_A_UserToken()
+        {
+            var request = new AuthenticateRequest() { Email = "Test@gmail.com", Password = "123456" };
+            var testUserRegRequest = new RegisterRequest() { Email = "Test@gmail.com", Name = "Tester", Password = "123456" };
+
+            var userResult = await usersController.Register(testUserRegRequest) as OkObjectResult;
+            var user = (userResult.Value as AuthenticateResponse).User;
+
+            var userToken = await databaseService.FindUserTokenByIdAsync(user);
+
+            userToken.ResetExpiry = DateTime.UtcNow.AddDays(-15); // expires the refresh token.
+
+            var result = await usersController.Authenticate(request) as OkObjectResult;
+
+            var renewedUserToken = await databaseService.FindUserTokenByIdAsync(user);
+            Assert.NotNull(renewedUserToken);
+            Assert.True(!String.IsNullOrEmpty(renewedUserToken.RefreshToken));
+            Assert.True(renewedUserToken.RefreshExpiry > DateTime.UtcNow.AddDays(13));
+            Assert.True(renewedUserToken.RefreshExpiry < DateTime.UtcNow.AddDays(15));
         }
 
 

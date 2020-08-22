@@ -1,0 +1,39 @@
+<div class="toolbar-container">
+    <div class="searchBar" *ngIf="showSearchBar">
+      <form class="user-info-form" [formGroup]="searchForm">
+        <mat-form-field>
+            <input matInput type="search" formControlName="searchKeyWord" placeholder="search here" class="search-input">
+            <mat-icon class="search-icon"  matSuffix (click)="search()">search</mat-icon>
+        </mat-form-field>   
+      </form>
+    </div>
+    <mat-toolbar class="tool-bar">
+      <img class="logo" [src]="logoUrl" (click)="goToPage('')"/>
+      <span class="app-title" (click)="goToPage('')">Juns Blog</span>
+      <span class="spacer"></span>
+    
+      <div class="action-button" (click)="showSearchBar = !showSearchBar">
+        <mat-icon>search</mat-icon>
+        <span class="icon-label">Search</span>
+     </div>
+      <div class="action-button" *ngIf="!currentUser" (click)="goToPage('login')">
+          <mat-icon>login</mat-icon>
+          <span class="icon-label">Login</span>
+      </div>
+      <div class="action-button" *ngIf="!currentUser"  (click)="goToPage('register')">
+        <mat-icon>how_to_reg</mat-icon>
+        <span class="icon-label">Register</span>
+      </div>
+      <div class="action-button" *ngIf="currentUser" (click)="goToPage('editor')"mat-icon-button >
+        <mat-icon >post_add</mat-icon>
+        <span class="icon-label">Post</span>
+      </div>
+      <div class="action-button" *ngIf="currentUser" (click)="goToPage('profile')"mat-icon-button >
+        <mat-icon >person</mat-icon>
+        <span class="icon-label">Me</span>
+      </div>
+      <!-- <button *ngIf="currentUser" mat-icon-button>
+        <span *ngIf="currentUser" class="profileImage"><img class="images" [src]="currentUser.image ? currentUser.image : imageUrl"/></span>
+      </button> -->
+    </mat-toolbar>
+  </div>

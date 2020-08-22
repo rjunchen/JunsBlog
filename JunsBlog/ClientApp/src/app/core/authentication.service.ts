@@ -1,0 +1,75 @@
+import { Injectable, Output, EventEmitter } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { TokenResponse } from '../models/TokenResponse';
+import { User } from '../models/user';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthenticationService {
+  @Output() userInfoUpdated: EventEmitter<any> = new EventEmitter();
+  private token: string;
+  private currentUser: User;
+
+  constructor(private http: HttpClient, private router: Router) { 
+    try{
+      this.token = localStorage.getItem('accessToken');
+      this.currentUser = JSON.parse(localStorage.getItem('user'));
+    }catch{
+      this.logout();
+    }
+  }
+
+  public saveToken(tokenResponse: TokenResponse){
+    if(tokenResponse){
+      this.token = tokenResponse.accessToken;
+      this.currentUser = tokenResponse.user;
+      localStorage.setItem('accessToken', this.token);
+      localStorage.setItem('user', JSON.stringify(tokenResponse.user));
+      this.userInfoUpdated.emit(tokenResponse.user);
+    }
+  }
+
+  public getToken(): string{
+    return this.token;
+  }
+
+  public getCurrentUser(){
+    return this.currentUser;
+  }
+
+  public register(formData): Observable<any> {
+    return this.http.post('/api/register', formData).pipe(map((data: TokenResponse)=>{
+        if(data){
+          this.saveToken(data);
+        }
+    }))
+  }
+
+  public login(formData): Observable<any> {
+    return this.http.post('/api/authenticate', formData).pipe(map((data: TokenResponse)=>{
+      if(data){
+        this.saveToken(data);
+      }
+    }))
+  }
+
+  public isLoggedIn(): boolean{
+    if(this.currentUser){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  public logout(){
+    this.currentUser = null;
+    window.localStorage.removeItem('accessToken');
+    window.localStorage.removeItem('user');
+    this.userInfoUpdated.emit(null);
+    this.router.navigateByUrl('/login');
+  }
+}
