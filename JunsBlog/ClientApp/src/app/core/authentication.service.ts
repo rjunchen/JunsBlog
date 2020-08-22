@@ -50,7 +50,7 @@ export class AuthenticationService {
   }
 
   public login(formData): Observable<any> {
-    return this.http.post('/api/login', formData).pipe(map((data: TokenResponse)=>{
+    return this.http.post('/api/authenticate', formData).pipe(map((data: TokenResponse)=>{
       if(data){
         this.saveToken(data);
       }

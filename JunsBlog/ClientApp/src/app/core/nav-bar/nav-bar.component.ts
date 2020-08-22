@@ -31,12 +31,7 @@ export class NavBarComponent implements OnInit {
     const searchControl: AbstractControl = this.searchForm.controls['searchKeyWord']; 
   }
 
-
   goToPage(page: string) {
     this.router.navigateByUrl(`/${page}`);
-  }
-
-  logout(){
-    this.auth.logout()
   }
 }
