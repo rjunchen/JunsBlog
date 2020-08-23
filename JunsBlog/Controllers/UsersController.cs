@@ -48,18 +48,11 @@ namespace JunsBlog.Controllers
 
                 if (user == null) return BadRequest(new { message = "User doesn't exist" });
 
+                if (user.Type != AccountType.Local) return BadRequest(new { message = $"The email have been registered under your {user.Type} account" });
+
                 if (!Utilities.ValidatePassword(model.Password, user.Password)) return BadRequest(new { message = "Incorrect password" });
 
-                var userToken = new UserToken()
-                {
-                    RefreshToken = Utilities.GenerateToken(),
-                    RefreshExpiry = DateTime.UtcNow.AddDays(14),
-                    UserId = user.Id
-                };
-
-                var insertedUserToken = await databaseService.SaveUserTokenAsync(userToken);
-
-                var response = new AuthenticateResponse(user, jwtTokenHelper.GenerateJwtToken(user), insertedUserToken.RefreshToken);
+                var response =  await jwtTokenHelper.GenerateAuthenticationResponseAysnc(user);
 
                 return Ok(response);
             }
@@ -95,16 +88,7 @@ namespace JunsBlog.Controllers
                 var insertedUser = await databaseService.SaveUserAsync(newUser);
                 if (insertedUser == null) return BadRequest(new { message = "Failed to register user" });
 
-                var userToken = new UserToken()
-                {
-                    RefreshToken = Utilities.GenerateToken(),
-                    RefreshExpiry = DateTime.UtcNow.AddDays(14),
-                    UserId = insertedUser.Id
-                };
-
-                var insertedUserToken = await databaseService.SaveUserTokenAsync(userToken);
-
-                var response = new AuthenticateResponse(insertedUser, jwtTokenHelper.GenerateJwtToken(insertedUser), insertedUserToken.RefreshToken);
+                var response = await jwtTokenHelper.GenerateAuthenticationResponseAysnc(insertedUser);
 
                 notificationService.SendNotification(Notification.GenerateWelcomeNotification(newUser));
 

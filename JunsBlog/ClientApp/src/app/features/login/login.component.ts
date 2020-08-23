@@ -14,6 +14,7 @@ export class LoginComponent implements OnInit {
 
   hidePassword = true;
   loginForm: FormGroup;
+  googleAuthUrl: string;
 
   constructor(private auth: AuthenticationService, private router: Router, 
     private fb: FormBuilder, private toastr: ToastrService) { this.createForm() }
@@ -26,7 +27,11 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
+    this.auth.getGoogleAuthUrl().subscribe( x=>{
+      this.googleAuthUrl = x;
+    }, err =>{
+      console.log(err);
+    })
   }
 
   onSubmit(){
@@ -35,8 +40,8 @@ export class LoginComponent implements OnInit {
          this.router.navigateByUrl('/');
       },
       (err) => {
-        if (err.status === 401) {     
-          this.toastr.warning(err.error, 'Unauthorized', {positionClass:'toast-top-full-width', timeOut:10000});
+        if (err.status === 400) {     
+          this.toastr.warning(err.error.message, err.statusText,  {positionClass:'toast-top-full-width', timeOut:10000});
         } else {
           this.toastr.error('Unknown error occurred, please try again later', '', {positionClass:'toast-top-full-width', timeOut:10000});
         }
