@@ -1,21 +1,26 @@
 ﻿using JunsBlog.Entities;
 using JunsBlog.Interfaces;
+using JunsBlog.Interfaces.Services;
 using JunsBlog.Interfaces.Settings;
+using JunsBlog.Models.Authentication;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace JunsBlog.Helpers
 {
     public class JwtTokenHelper : IJwtTokenHelper
     {
         private readonly IJwtSettings jwtSettings;
+        private readonly IDatabaseService databaseService;
 
-        public JwtTokenHelper(IJwtSettings jwtSettings)
+        public JwtTokenHelper(IJwtSettings jwtSettings, IDatabaseService databaseService)
         {
             this.jwtSettings = jwtSettings;
+            this.databaseService = databaseService;
         }
 
         public string GenerateJwtToken(User user)
@@ -41,5 +46,47 @@ namespace JunsBlog.Helpers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
+        public async Task<AuthenticateResponse> GenerateAuthenticationResponseAysnc(User user)
+        {
+            var userToken = new UserToken()
+            {
+                RefreshToken = Utilities.GenerateToken(),
+                RefreshExpiry = DateTime.UtcNow.AddDays(14),
+                UserId = user.Id
+            };
+
+            var insertedUserToken = await databaseService.SaveUserTokenAsync(userToken);
+
+            return new AuthenticateResponse(user, GenerateJwtToken(user), insertedUserToken.RefreshToken);
+        }
+
+        public Claim ValidateToken(string accessToken)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            var tokenValidationParams = new TokenValidationParameters()
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSettings.Issuer,
+                ValidAudience = jwtSettings.Issuer,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.TokenSecret))
+            };
+
+            SecurityToken validatedToken;
+
+            var claims = tokenHandler.ValidateToken(accessToken, tokenValidationParams, out validatedToken);
+
+            if (claims.Identity.IsAuthenticated)
+            {
+                return claims.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            }
+
+            return null;
+        }
+
     }
 }

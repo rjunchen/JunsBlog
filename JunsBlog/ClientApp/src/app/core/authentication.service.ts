@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { TokenResponse } from '../models/TokenResponse';
 import { User } from '../models/user';
+import { of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,7 @@ export class AuthenticationService {
   @Output() userInfoUpdated: EventEmitter<any> = new EventEmitter();
   private token: string;
   private currentUser: User;
+  private googleAuthUrl: string;
 
   constructor(private http: HttpClient, private router: Router) { 
     try{
@@ -71,5 +73,22 @@ export class AuthenticationService {
     window.localStorage.removeItem('user');
     this.userInfoUpdated.emit(null);
     this.router.navigateByUrl('/login');
+  }
+
+  public getGoogleAuthUrl(): Observable<any> {
+    if(this.googleAuthUrl)
+      return of(this.googleAuthUrl);
+    return this.http.get('/api/auth/google/url',{responseType: 'text'}).pipe(map((data: string) => {
+       this.googleAuthUrl = data;
+       return data;
+     }));
+  }
+
+  public getAuthenticationInfo(accessToken: string): Observable<any> {
+    return this.http.post('/api/auth/info',{accessToken}).pipe(map((data: TokenResponse) => {
+      if(data){
+        this.saveToken(data);
+      }
+     }));
   }
 }

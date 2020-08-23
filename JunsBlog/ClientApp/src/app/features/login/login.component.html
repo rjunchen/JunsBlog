@@ -16,7 +16,7 @@
       </span>
       <button class="form-item" mat-raised-button color="warn" type="submit" [disabled]="loginForm.invalid"  (click)="onSubmit()">Sign in!</button>
       <mat-divider class="divider"></mat-divider>
-      <a mat-flat-button class="form-item social-icon" color="warn" href="/api/auth/google"><i class="fa fa-google"></i>Login with Google</a>
+      <a mat-flat-button class="form-item social-icon" *ngIf="googleAuthUrl" color="warn" href="{{googleAuthUrl}}"><i class="fa fa-google"></i>Login with Google</a>
     </form>
     <mat-divider class="divider"></mat-divider>
 </div>

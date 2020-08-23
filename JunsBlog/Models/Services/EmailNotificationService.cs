@@ -18,13 +18,11 @@ namespace JunsBlog.Models.Services
 
         public void SendNotification(Notification notification)
         {
-            using(var client = new SmtpClient())
-            {
-                client.Connect(emailSettings.Host, emailSettings.Port);
-                client.Authenticate(emailSettings.Username, emailSettings.Password);
-                client.Send(CreateEmailMessage(notification));
-                client.Disconnect(true);
-            }
+            using var client = new SmtpClient();
+            client.Connect(emailSettings.Host, emailSettings.Port);
+            client.Authenticate(emailSettings.Username, emailSettings.Password);
+            client.Send(CreateEmailMessage(notification));
+            client.Disconnect(true);
         }
 
         private MimeMessage CreateEmailMessage(Notification notification)

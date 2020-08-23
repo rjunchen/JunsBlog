@@ -43,7 +43,7 @@ namespace JunsBlog.Test.UnitTests
         [MemberData(nameof(GetBadUsers))]
         public void GenerateJwtToken_Should_Return_Null_With_Missing_Or_Empty_User_Info(User user)
         {
-            JwtTokenHelper helper = new JwtTokenHelper(new JwtSettingsFake());
+            JwtTokenHelper helper = new JwtTokenHelper(new JwtSettingsFake(), new DatabaseServiceFake());
 
             var token = helper.GenerateJwtToken(user);
 
@@ -60,7 +60,7 @@ namespace JunsBlog.Test.UnitTests
         [MemberData(nameof(GetBadJwtSettings))]
         public void GenerateJwtToken_Should_Return_Null_With_Missing_Or_Empty_JwtSettings_Info(IJwtSettings settings)
         {
-            JwtTokenHelper helper = new JwtTokenHelper(settings);
+            JwtTokenHelper helper = new JwtTokenHelper(settings, new DatabaseServiceFake());
             var token = helper.GenerateJwtToken(sampleUser);
 
             Assert.Null(token);
@@ -69,7 +69,7 @@ namespace JunsBlog.Test.UnitTests
         [Fact]
         public void GenerateJwtToken_Should_Return_Not_Null_Token()
         {
-            JwtTokenHelper helper = new JwtTokenHelper(new JwtSettingsFake());
+            JwtTokenHelper helper = new JwtTokenHelper(new JwtSettingsFake(), new DatabaseServiceFake());
             var token = helper.GenerateJwtToken(sampleUser);
 
             Assert.NotNull(token);
@@ -79,7 +79,7 @@ namespace JunsBlog.Test.UnitTests
         public void GenerateJwtToken_Should_Return_Token_With_Correct_Info()
         {
             var jwtSettings = new JwtSettingsFake();
-            var helper = new JwtTokenHelper(jwtSettings);
+            var helper = new JwtTokenHelper(jwtSettings, new DatabaseServiceFake());
             var token = helper.GenerateJwtToken(sampleUser);
 
             var tokenHandler = new JwtSecurityTokenHandler();

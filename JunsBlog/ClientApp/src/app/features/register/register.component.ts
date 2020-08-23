@@ -49,8 +49,8 @@ export class RegisterComponent implements OnInit {
     this.auth.register(this.regForm.value).subscribe( res =>{
         this.router.navigateByUrl("/");
     }, err => {
-      if(err.status === 409){
-        this.toastr.warning('The email have already been registered by other user.', '', {positionClass:'toast-top-full-width', timeOut:8000});
+      if(err.status === 400){
+        this.toastr.warning(err.error.message, err.statusText, {positionClass:'toast-top-full-width', timeOut:8000});
       }
       else{
         this.toastr.error('Unknown error occurred, please try again later', '', {positionClass:'toast-top-full-width', timeOut:10000});

@@ -20,9 +20,9 @@ namespace JunsBlog.Test.UnitTests
             var logFactory = LoggerFactory.Create(builder => builder.AddConsole());
             var logger = logFactory.CreateLogger<UsersController>();
             var httpContextAccessFake = new HttpContextAccessorFake(); 
-            var jwtTokenHelper = new JwtTokenHelper(new JwtSettingsFake());
             var notificationServiceFake = new NotificationServiceFake();
             this.databaseService = new DatabaseServiceFake();
+            var jwtTokenHelper = new JwtTokenHelper(new JwtSettingsFake(), this.databaseService);
 
             usersController = new UsersController(httpContextAccessFake, databaseService, jwtTokenHelper, notificationServiceFake, logger);
         }
@@ -154,7 +154,7 @@ namespace JunsBlog.Test.UnitTests
 
             userToken.ResetExpiry = DateTime.UtcNow.AddDays(-15); // expires the refresh token.
 
-            var result = await usersController.Authenticate(request) as OkObjectResult;
+            await usersController.Authenticate(request);
 
             var renewedUserToken = await databaseService.FindUserTokenByIdAsync(user);
             Assert.NotNull(renewedUserToken);
