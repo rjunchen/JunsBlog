@@ -1,5 +1,6 @@
 ﻿using JunsBlog.Entities;
 using JunsBlog.Interfaces.Services;
+using JunsBlog.Models.Articles;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -77,6 +78,11 @@ namespace JunsBlog.Test.Mockups
                 };
                 return userToken;
             });
+        }
+
+        public Task<SearchResponse> SearchArticlesAsyc(int page, int pageSize, string searchKey, string sortOrder, string sortBy)
+        {
+            throw new NotImplementedException();
         }
     }
 }

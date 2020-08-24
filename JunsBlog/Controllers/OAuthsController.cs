@@ -112,7 +112,7 @@ namespace JunsBlog.Controllers
                     Image = userInfo.picture
                 };
 
-                var googleUser = await databaseService.FindUserAsync( x=> x.Email.Equals(userInfo.email, StringComparison.OrdinalIgnoreCase));
+                var googleUser = await databaseService.FindUserAsync( x=> x.Email.ToLower() == userInfo.email.ToLower());
 
                 if(googleUser == null)
                 {
@@ -168,7 +168,7 @@ namespace JunsBlog.Controllers
             {
                 var claim = jwtTokenHelper.ValidateToken(request.AccessToken);
 
-                var user = await databaseService.FindUserAsync(x=>x.Id.Equals(claim.Value));
+                var user = await databaseService.FindUserAsync(x=>x.Id == claim.Value);
 
                 var response = await jwtTokenHelper.GenerateAuthenticationResponseAysnc(user);
     

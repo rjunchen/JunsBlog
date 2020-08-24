@@ -3,6 +3,7 @@ import { Article } from '../models/article';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { ArticleDetails } from '../models/articleDetails';
+import { ArticlePagingResult } from '../models/articlePagingResult';
 
 @Injectable({
   providedIn: 'root'
@@ -18,4 +19,10 @@ export class ArticleService {
   public GetArticle(articleId: string){
     return this.http.get(`/api/article/get?articleId=${articleId}`).pipe(map(data => { return <ArticleDetails>data}));
   }
+
+  public SearchArticle(page: number, pageSize: number, searchKey: string = null, sortOrder: string = "desc", sortBy: string = "lastModifiedDate"){
+    return this.http.get(`/api/article/search?page=${page}&pageSize=${pageSize}&searchKey=${searchKey}
+      &sortOrder=${sortOrder}&sortBy=${sortBy}`).pipe(map(data => { return <ArticlePagingResult>data}));
+  }
+
 }

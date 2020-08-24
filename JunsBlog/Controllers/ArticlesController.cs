@@ -68,9 +68,25 @@ namespace JunsBlog.Controllers
                 if (String.IsNullOrWhiteSpace(articleId))
                     return BadRequest(new { message = "Invalid articleId" });
 
-                var artile = await databaseService.FindArticAsync(x=> x.Id.Equals(articleId));
+                var artile = await databaseService.FindArticAsync(x=> x.Id == articleId);
 
                 return Ok(artile);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet("Search")]
+        public async Task<IActionResult> SearchArticles(int page = 1, int pageSize = 10, string searchKey = null, string sortOrder = "desc", string sortBy = "creationDate")
+        {
+            try
+            {
+                var searchResponse = await databaseService.SearchArticlesAsyc(page, pageSize, searchKey, sortOrder, sortBy);
+
+                return Ok(searchResponse);
             }
             catch (Exception ex)
             {
