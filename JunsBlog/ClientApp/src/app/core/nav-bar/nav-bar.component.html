@@ -9,31 +9,28 @@
     </div>
     <mat-toolbar class="tool-bar">
       <img class="logo" [src]="logoUrl" (click)="goToPage('')"/>
-      <span class="app-title" (click)="goToPage('')">Juns Blog</span>
+      <span class="app-title" (click)="goToPage('')">Jun's Blog</span>
       <span class="spacer"></span>
     
       <div class="action-button" (click)="showSearchBar = !showSearchBar">
         <mat-icon>search</mat-icon>
         <span class="icon-label">Search</span>
      </div>
-      <div class="action-button" *ngIf="!currentUser" (click)="goToPage('login')">
+      <div class="action-button" *ngIf="!currentUser" [routerLink]="['/login']" [routerLinkActive]="['is-active']">
           <mat-icon>login</mat-icon>
           <span class="icon-label">Login</span>
       </div>
-      <div class="action-button" *ngIf="!currentUser"  (click)="goToPage('register')">
+      <div class="action-button" *ngIf="!currentUser"  [routerLink]="['/register']" [routerLinkActive]="['is-active']">
         <mat-icon>how_to_reg</mat-icon>
         <span class="icon-label">Register</span>
       </div>
-      <div class="action-button" *ngIf="currentUser" (click)="goToPage('editor')"mat-icon-button >
+      <div class="action-button" *ngIf="currentUser" [routerLink]="['/editor']" [routerLinkActive]="['is-active']">
         <mat-icon >post_add</mat-icon>
         <span class="icon-label">Post</span>
       </div>
-      <div class="action-button" *ngIf="currentUser" (click)="goToPage('profile')"mat-icon-button >
+      <div class="action-button" *ngIf="currentUser" [routerLink]="['/profile']" [routerLinkActive]="['is-active']">
         <mat-icon >person</mat-icon>
         <span class="icon-label">Me</span>
       </div>
-      <!-- <button *ngIf="currentUser" mat-icon-button>
-        <span *ngIf="currentUser" class="profileImage"><img class="images" [src]="currentUser.image ? currentUser.image : imageUrl"/></span>
-      </button> -->
     </mat-toolbar>
   </div>

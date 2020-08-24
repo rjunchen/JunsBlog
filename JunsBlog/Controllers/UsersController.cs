@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Org.BouncyCastle.Crypto.Tls;
 using System;
 using System.Net;
 using System.Security.Claims;
@@ -44,7 +45,7 @@ namespace JunsBlog.Controllers
                 if (String.IsNullOrWhiteSpace(model.Email) || String.IsNullOrWhiteSpace(model.Password))
                     return BadRequest(new { message = "Incomplete user authentication information" });
 
-                var user = await databaseService.FindUserByEmailAsync(model.Email);
+                var user = await databaseService.FindUserAsync(x=> x.Email.ToLower() == model.Email.ToLower());
 
                 if (user == null) return BadRequest(new { message = "User doesn't exist" });
 
@@ -71,7 +72,7 @@ namespace JunsBlog.Controllers
                 if(String.IsNullOrWhiteSpace(model.Name) || String.IsNullOrWhiteSpace(model.Email) || String.IsNullOrWhiteSpace(model.Password))
                     return BadRequest(new { message = "Incomplete user registration information" });
 
-                var existingUser = await databaseService.FindUserByEmailAsync(model.Email);
+                var existingUser = await databaseService.FindUserAsync(x=> x.Email.ToLower() == model.Email.ToLower());
 
                 if(existingUser != null) return BadRequest(new { message = "Email has been already registered" });
 
@@ -111,11 +112,11 @@ namespace JunsBlog.Controllers
                     String.IsNullOrWhiteSpace(model.Password))
                     return BadRequest(new { message = "Incomplete password reset information" });
 
-                var user = await databaseService.FindUserByEmailAsync(model.Email);
+                var user = await databaseService.FindUserAsync(x=> x.Email.ToLower() ==  model.Email.ToLower());
 
                 if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "User not found");
 
-                var userToken = await databaseService.FindUserTokenByIdAsync(user);
+                var userToken = await databaseService.FindUserTokenAsync(x=> x.UserId == user.Id);
 
                 if(model.ResetToken != userToken.ResetToken || userToken.ResetExpiry < DateTime.UtcNow) 
                     return StatusCode(StatusCodes.Status400BadRequest, "Invalid or expired reset token");
@@ -140,11 +141,11 @@ namespace JunsBlog.Controllers
             {
                 if (String.IsNullOrWhiteSpace(email)) return StatusCode(StatusCodes.Status400BadRequest);
 
-                var user = await databaseService.FindUserByEmailAsync(email);
+                var user = await databaseService.FindUserAsync(x=> x.Email.ToLower() ==  email.ToLower());
 
                 if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "User not found");
 
-                var userToken = await databaseService.FindUserTokenByIdAsync(user);
+                var userToken = await databaseService.FindUserTokenAsync(x=> x.UserId == user.Id);
 
                 userToken.ResetToken = Utilities.GenerateToken();
                 userToken.ResetExpiry = DateTime.UtcNow.AddMinutes(10);

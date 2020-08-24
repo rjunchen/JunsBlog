@@ -15,6 +15,7 @@ export class LoginComponent implements OnInit {
   hidePassword = true;
   loginForm: FormGroup;
   googleAuthUrl: string;
+  inProcess: boolean;
 
   constructor(private auth: AuthenticationService, private router: Router, 
     private fb: FormBuilder, private toastr: ToastrService) { this.createForm() }
@@ -35,15 +36,18 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit(){
+    this.inProcess = true;
     this.auth.login(this.loginForm.value).subscribe(
       () => {
+        this.inProcess = false;
          this.router.navigateByUrl('/');
       },
       (err) => {
+        this.inProcess = false;
         if (err.status === 400) {     
-          this.toastr.warning(err.error.message, err.statusText,  {positionClass:'toast-top-full-width', timeOut:10000});
+          this.toastr.warning(err.error.message, err.statusText);
         } else {
-          this.toastr.error('Unknown error occurred, please try again later', '', {positionClass:'toast-top-full-width', timeOut:10000});
+          this.toastr.error('Unknown error occurred, please try again later');
         }
       }
     );

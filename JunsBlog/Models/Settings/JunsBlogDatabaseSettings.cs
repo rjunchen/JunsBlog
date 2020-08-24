@@ -10,6 +10,7 @@ namespace JunsBlog.Models.Settings
     {
         public string UsersCollectionName { get; set; }
         public string UserTokensCollectionName { get; set; }
+        public string ArticleCollectionName { get; set; }
         public string ConnectionString { get; set; }
         public string DatabaseName { get; set; }
     }

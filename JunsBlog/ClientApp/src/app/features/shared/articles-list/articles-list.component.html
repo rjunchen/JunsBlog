@@ -1,0 +1,27 @@
+<div class="articles-container">
+    <div class="article-item"  *ngFor="let article of articles">
+        <div class="images-container">
+            <img class="images" (error)="article.hideImage = true" [hidden]="article.hideImage" [src]="article.coverImage"/>
+        </div>
+        <div class="article-info-box">
+            <a class="article-title link" routerLink="{{'/article/' + article.id}}">{{article.title}}</a>
+            <div class="article-status-container">
+                <div>
+                    <img class="images profileImage" [src]="article.author.image ? article.author.image : defaultAvatarUrl"/>
+                </div>
+                <div class="article-status-block">
+                    <span >{{article.author.name}}</span>
+                    <div>
+                        <mat-icon>visibility</mat-icon>
+                        <span>{{article.views}}</span>
+                        <mat-icon>comment</mat-icon>
+                        <span>{{article.comments? article.comments.length : 0}}</span>
+                        <mat-icon>schedule</mat-icon>
+                        <span>{{article.lastModifiedDate | timeAgo}}</span>
+                    </div>
+                </div>
+            </div> 
+            <div class="article-abstract">{{article.abstract}}</div>
+        </div>
+    </div>
+</div>

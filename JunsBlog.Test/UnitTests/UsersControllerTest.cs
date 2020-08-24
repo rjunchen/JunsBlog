@@ -53,7 +53,7 @@ namespace JunsBlog.Test.UnitTests
 
             var result = await usersController.Register(model) as OkObjectResult;
             var user = (result.Value as AuthenticateResponse).User;
-            var userToken = await databaseService.FindUserTokenByIdAsync(user);
+            var userToken = await databaseService.FindUserTokenAsync(x=> x.UserId.Equals(user.Id));
             Assert.NotNull(userToken);
             Assert.True(!String.IsNullOrEmpty(userToken.RefreshToken));
             Assert.True(userToken.RefreshExpiry > DateTime.UtcNow.AddDays(13));
@@ -150,13 +150,13 @@ namespace JunsBlog.Test.UnitTests
             var userResult = await usersController.Register(testUserRegRequest) as OkObjectResult;
             var user = (userResult.Value as AuthenticateResponse).User;
 
-            var userToken = await databaseService.FindUserTokenByIdAsync(user);
+            var userToken = await databaseService.FindUserTokenAsync( x=>x.UserId.Equals(user.Id));
 
             userToken.ResetExpiry = DateTime.UtcNow.AddDays(-15); // expires the refresh token.
 
             await usersController.Authenticate(request);
 
-            var renewedUserToken = await databaseService.FindUserTokenByIdAsync(user);
+            var renewedUserToken = await databaseService.FindUserTokenAsync(x=> x.UserId.Equals(user.Id));
             Assert.NotNull(renewedUserToken);
             Assert.True(!String.IsNullOrEmpty(renewedUserToken.RefreshToken));
             Assert.True(renewedUserToken.RefreshExpiry > DateTime.UtcNow.AddDays(13));

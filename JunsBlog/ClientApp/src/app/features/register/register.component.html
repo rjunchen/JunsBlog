@@ -22,5 +22,8 @@
             <mat-icon (click)="hideConfirmPassword = !hideConfirmPassword" matSuffix>{{ hideConfirmPassword ? "visibility_off" : "visibility" }}</mat-icon>
         </mat-form-field>
         <button class="form-item" mat-raised-button color="warn" type="submit" [disabled]="regForm.invalid">Register!</button>
+        <div class="overlay" *ngIf="inProcess">
+            <mat-spinner color="warn"></mat-spinner>
+          </div>
     </form>
 </div>
