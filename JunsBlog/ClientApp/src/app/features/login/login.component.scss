@@ -6,7 +6,7 @@ $color-orange: #f44336;
 .login-container{
     display: flex;
     justify-content: center;
-
+    
     .login-form{
         display: flex;
         justify-content: center;
@@ -19,6 +19,21 @@ $color-orange: #f44336;
 
         box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
         padding: 30px;
+
+        position: relative;
+
+        .overlay{
+            position: absolute;
+            background-color: black;
+            opacity: 0.5;
+            height: 100%;
+            width: 100%;
+            z-index: 900;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
 
         .form-title{
             color: $color-orange;

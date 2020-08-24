@@ -16,7 +16,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
-
+import { QuillModule } from 'ngx-quill'
 
 
 @NgModule({
@@ -29,7 +29,14 @@ import { MatIconModule } from '@angular/material/icon';
     FormsModule, ReactiveFormsModule,
     AppRoutingModule, HttpClientModule,
     MatInputModule, MatButtonModule, MatFormFieldModule, MatToolbarModule, MatTooltipModule, MatIconModule,
-    ToastrModule.forRoot()
+    QuillModule.forRoot(),
+    ToastrModule.forRoot({
+      maxOpened: 3,
+      autoDismiss: true,
+      preventDuplicates: true,
+      timeOut: 8000,
+      positionClass: 'toast-top-full-width'
+    })
   ],
   providers: [
     {

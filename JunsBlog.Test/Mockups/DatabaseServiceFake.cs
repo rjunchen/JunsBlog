@@ -2,6 +2,7 @@
 using JunsBlog.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace JunsBlog.Test.Mockups
@@ -10,25 +11,36 @@ namespace JunsBlog.Test.Mockups
     {
         private readonly List<User> users;
         private readonly List<UserToken> userTokens;
+        private readonly List<Article> articles;
         public DatabaseServiceFake()
         {
             users = new List<User>();
             userTokens = new List<UserToken>();
+            articles = new List<Article>();
         }
 
-        public async Task<User> FindUserByEmailAsync(string email)
+        public async Task<Article> FindArticAsync(Expression<Func<Article, bool>> filter)
         {
-           return await Task.Run(() => users.Find(x => x.Email == email));
+            var predic = new Predicate<Article>(filter.Compile());
+            return await Task.Run(() => articles.Find(predic));
         }
 
-        public async Task<User> FindUserByIdAsync(string userId)
+        public async Task<User> FindUserAsync(Expression<Func<User, bool>> filter)
         {
-            return await Task.Run(() => users.Find(x => x.Id == userId));
+            var predic = new Predicate<User>(filter.Compile());
+            return await Task.Run(() => users.Find(predic));
         }
 
-        public async Task<UserToken> FindUserTokenByIdAsync(User user)
+ 
+        public async Task<UserToken> FindUserTokenAsync(Expression<Func<UserToken, bool>> filter)
         {
-            return await Task.Run(() => userTokens.Find(x => x.UserId == user.Id));
+            var predic = new Predicate<UserToken>(filter.Compile());
+            return await Task.Run(() => userTokens.Find(predic));
+        }
+
+        public Task<Article> SaveArticleAsync(Article article)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<User> SaveUserAsync(User user)

@@ -9,6 +9,7 @@ namespace JunsBlog.Interfaces.Settings
     {
         string UsersCollectionName { get; set; }
         string UserTokensCollectionName { get; set; }
+        string ArticleCollectionName { get; set; }
         string ConnectionString { get; set; }
         string DatabaseName { get; set; }
     }

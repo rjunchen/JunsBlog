@@ -14,6 +14,7 @@ export class RegisterComponent implements OnInit {
   regForm: FormGroup;
   hidePassword = true;
   hideConfirmPassword = true;
+  inProcess: boolean;
 
   constructor(private auth: AuthenticationService, private router: Router, 
     private fb: FormBuilder, private toastr: ToastrService) { this.createForm()}
@@ -45,15 +46,17 @@ export class RegisterComponent implements OnInit {
   }
 
   onSubmit(){
-    
+    this.inProcess = true;
     this.auth.register(this.regForm.value).subscribe( res =>{
+      this.inProcess = false;
         this.router.navigateByUrl("/");
     }, err => {
+      this.inProcess = false;
       if(err.status === 400){
-        this.toastr.warning(err.error.message, err.statusText, {positionClass:'toast-top-full-width', timeOut:8000});
+        this.toastr.warning(err.error.message, err.statusText);
       }
       else{
-        this.toastr.error('Unknown error occurred, please try again later', '', {positionClass:'toast-top-full-width', timeOut:10000});
+        this.toastr.error('Unknown error occurred, please try again later');
       }
     })
   }

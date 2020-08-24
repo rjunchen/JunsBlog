@@ -1,0 +1,26 @@
+.editor-container{
+    background-color: white;
+    box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    height: 100%;
+    .full-width{
+        width: 100%;
+    }
+
+    .action-buttons{
+        display: flex;
+        flex-direction: row;
+        margin-top: 10px;
+        .spacer{
+            flex: 1 1 auto;
+        }
+        button{
+            margin-right: 10px;
+        }
+    }
+ 
+}
+
+:host ::ng-deep .ql-container {
+    height: 200px;
+}
