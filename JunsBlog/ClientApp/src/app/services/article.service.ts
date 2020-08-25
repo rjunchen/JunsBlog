@@ -4,6 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { ArticleDetails } from '../models/articleDetails';
 import { ArticlePagingResult } from '../models/articlePagingResult';
+import { RankingRequest } from '../models/RankingRequest';
+import { RankingResponse } from '../models/rankingResponse';
 
 @Injectable({
   providedIn: 'root'
@@ -25,4 +27,11 @@ export class ArticleService {
       &sortOrder=${sortOrder}&sortBy=${sortBy}`).pipe(map(data => { return <ArticlePagingResult>data}));
   }
 
+  public rankArticle(rankRequest: RankingRequest){
+    return this.http.post('/api/article/rank', rankRequest).pipe(map(data => { return <RankingResponse>data}));
+  }
+
+  public GetArticleRanking(articleId: string){
+    return this.http.get(`/api/article/rank?articleId=${articleId}`).pipe(map(data => { return <RankingResponse>data}));
+  }
 }

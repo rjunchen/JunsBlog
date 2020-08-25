@@ -1,4 +1,9 @@
-<div class="articles-container">
+<div class="articles-container"
+    infiniteScroll
+    [infiniteScrollDistance]="scrollDistance"
+    [infiniteScrollUpDistance]="scrollUpDistance"
+    [infiniteScrollThrottle]="throttle"
+    (scrolled)="onScrollDown()">
     <div class="article-item"  *ngFor="let article of articles">
         <div class="images-container">
             <img class="images" (error)="article.hideImage = true" [hidden]="article.hideImage" [src]="article.coverImage"/>

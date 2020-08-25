@@ -16,17 +16,26 @@ export class ArticlesListComponent implements OnInit {
   articles: Article[];
   articlePagingResult: ArticlePagingResult;
   defaultAvatarUrl = './assets/avatar.png';
+
+  
+  throttle = 300;
+  scrollDistance = 1;
+  scrollUpDistance = 2;
+  loading = false;
+
   constructor(private articleService: ArticleService, private toastr: ToastrService) { }
 
   ngOnInit(): void {
     const intiPage: number = 1;
     const pageSize: number = 10;
-
+    this.loading = true;
     this.articleService.searchArticle(intiPage, pageSize).subscribe(x=>{
       console.log(x);
       this.articles = x.documents;
       this.articlePagingResult = x;
+      this.loading = false;
     }, err =>{
+      this.loading = false;
       if(err.status === 400){
         this.toastr.warning(err.error.message, err.statusText);
       }
@@ -35,4 +44,25 @@ export class ArticlesListComponent implements OnInit {
       }
     });
   }
+
+
+  onScrollDown () {
+    if(this.articlePagingResult.hasNextPage && !this.loading){
+      this.loading = true;
+      this.articleService.searchArticle(this.articlePagingResult.currentPage + 1 , this.articlePagingResult.pageSize).subscribe(
+        data => {        
+            data.documents.forEach(doc => {
+              this.articles.push(doc);
+            });
+            this.articlePagingResult = data;
+            this.loading = false;
+          },
+        err => {
+          this.loading = false;  
+          this.toastr.error('Unknown error occurred, please try again later');
+        }
+      )
+    }
+  }
+
 }

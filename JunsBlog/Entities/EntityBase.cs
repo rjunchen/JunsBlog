@@ -12,8 +12,5 @@ namespace JunsBlog.Entities
         [BsonIgnoreIfDefault]
         [BsonRepresentation(BsonType.ObjectId)]  // Convert MongoDB ObjectId type to string type
         public string Id { get; set; }
-        [BsonRequired]
-        public DateTime UpdatedOn { get; set; }
-        public DateTime CreatedOn { get; set; }
     }
 }

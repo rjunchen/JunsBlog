@@ -19,5 +19,9 @@ namespace JunsBlog.Entities
         public string Image { get; set; }
         [JsonIgnore]
         public string Password { get; set; }
+        [BsonRequired]
+        public DateTime UpdatedOn { get; set; }
+        [BsonRequired]
+        public DateTime CreatedOn { get; set; }
     }
 }

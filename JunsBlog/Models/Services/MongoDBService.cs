@@ -19,6 +19,8 @@ namespace JunsBlog.Models.Services
         private readonly IMongoCollection<User> users;
         private readonly IMongoCollection<Article> articles;
         private readonly IMongoCollection<UserToken> userTokens;
+        private readonly IMongoCollection<ArticleRanking> rankings;
+        private readonly IMongoCollection<Comment> comments;
 
         public MongoDBService(IJunsBlogDatabaseSettings settings)
         {
@@ -27,6 +29,8 @@ namespace JunsBlog.Models.Services
             users = database.GetCollection<User>(settings.UsersCollectionName);
             userTokens = database.GetCollection<UserToken>(settings.UserTokensCollectionName);
             articles = database.GetCollection<Article>(settings.ArticleCollectionName);
+            rankings = database.GetCollection<ArticleRanking>(settings.RankingCollectionName);
+            comments = database.GetCollection<Comment>(settings.CommentCollectionName);
         }
 
         public async Task<User> FindUserAsync(Expression<Func<User, bool>> filter)
@@ -69,7 +73,9 @@ namespace JunsBlog.Models.Services
 
         public async Task<Article> FindArticAsync(Expression<Func<Article, bool>> filter)
         {
-            return await articles.Find<Article>(filter).FirstOrDefaultAsync();
+            var updateDef = Builders<Article>.Update.Inc(x => x.Views, 1);
+            return await articles.FindOneAndUpdateAsync<Article>(filter, updateDef, 
+                new FindOneAndUpdateOptions<Article, Article> { ReturnDocument = ReturnDocument.After });
         }
 
         public async Task<SearchResponse> SearchArticlesAsyc(int page, int pageSize, string searchKey, string sortBy, SortOrderEnum sortOrder)
@@ -97,6 +103,7 @@ namespace JunsBlog.Models.Services
                 articleDetails.CoverImage = document.CoverImage;
                 articleDetails.Id = document.Id;
                 articleDetails.UpdatedOn = document.UpdatedOn;
+                articleDetails.Views = document.Views;
                 articleDetails.Author = await FindUserAsync(x => x.Id == document.AuthorId);
 
                 articleDetailsList.Add(articleDetails);
@@ -105,6 +112,25 @@ namespace JunsBlog.Models.Services
             var searchResponse = new SearchResponse(articleDetailsList, (int)totalDocuments, page, pageSize, searchKey, sortBy, sortOrder);
 
             return searchResponse;
+        }
+
+        public async Task<List<ArticleRanking>> FindRankingsAsync(Expression<Func<ArticleRanking, bool>> filter)
+        {
+            return await rankings.Find<ArticleRanking>(filter).ToListAsync();
+        }
+
+        public async Task<ArticleRanking> FindRankingAsync(Expression<Func<ArticleRanking, bool>> filter)
+        {
+            return await rankings.Find<ArticleRanking>(filter).FirstOrDefaultAsync();
+        }
+
+        public async Task<ArticleRanking> SaveRankingAsync(ArticleRanking ranking)
+        {
+            if (String.IsNullOrWhiteSpace(ranking.Id))
+                ranking.Id = ObjectId.GenerateNewId().ToString();
+
+            await rankings.ReplaceOneAsync(s => s.Id == ranking.Id, ranking, new ReplaceOptions { IsUpsert = true });
+            return ranking;
         }
     }
 }

@@ -27,6 +27,16 @@ namespace JunsBlog.Test.Mockups
             return await Task.Run(() => articles.Find(predic));
         }
 
+        public Task<ArticleRanking> FindRankingAsync(Expression<Func<ArticleRanking, bool>> filter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<ArticleRanking>> FindRankingsAsync(Expression<Func<ArticleRanking, bool>> filter)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<User> FindUserAsync(Expression<Func<User, bool>> filter)
         {
             var predic = new Predicate<User>(filter.Compile());
@@ -41,6 +51,11 @@ namespace JunsBlog.Test.Mockups
         }
 
         public Task<Article> SaveArticleAsync(Article article)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ArticleRanking> SaveRankingAsync(ArticleRanking ranking)
         {
             throw new NotImplementedException();
         }

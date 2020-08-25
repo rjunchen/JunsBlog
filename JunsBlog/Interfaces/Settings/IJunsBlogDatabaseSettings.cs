@@ -12,5 +12,7 @@ namespace JunsBlog.Interfaces.Settings
         string ArticleCollectionName { get; set; }
         string ConnectionString { get; set; }
         string DatabaseName { get; set; }
+        string RankingCollectionName { get; set; }
+        string CommentCollectionName { get; set; }
     }
 }
