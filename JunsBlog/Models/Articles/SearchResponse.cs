@@ -1,4 +1,5 @@
 ﻿using JunsBlog.Entities;
+using JunsBlog.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +17,10 @@ namespace JunsBlog.Models.Articles
         public bool HasNextPage { get; set; }
         public bool HasPreviousPage { get; set; }
         public string SearchKey { get; set; }
-        public string SortOrder { get; set; }
+        public SortOrderEnum SortOrder { get; set; }
         public string SortBy { get; set; }
 
-        public SearchResponse(List<ArticleDetails> articleDetailsList, int totalDocument, int currentPage, int pageSize, string searchKey, string sortOrder, string sortBy)
+        public SearchResponse(List<ArticleDetails> articleDetailsList, int totalDocument, int currentPage, int pageSize, string searchKey, string sortBy, SortOrderEnum sortOrder)
         {
             Documents = articleDetailsList;
             TotalDocuments = totalDocument;

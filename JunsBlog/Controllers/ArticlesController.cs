@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using JunsBlog.Entities;
 using JunsBlog.Interfaces.Services;
 using JunsBlog.Models.Articles;
+using JunsBlog.Models.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -43,7 +44,8 @@ namespace JunsBlog.Controllers
                     AuthorId = currentUserId,
                     Content = model.Content,
                     CoverImage = model.CoverImage,
-                    CreationDate = DateTime.UtcNow,
+                    CreatedOn = DateTime.UtcNow,
+                    UpdatedOn = DateTime.UtcNow,
                     IsPrivate = model.IsPrivate,
                     Title = model.Title,
                     Categories = model.Categories
@@ -70,7 +72,18 @@ namespace JunsBlog.Controllers
 
                 var artile = await databaseService.FindArticAsync(x=> x.Id == articleId);
 
-                return Ok(artile);
+                var articleDetails = new ArticleDetails();
+                articleDetails.Title = artile.Title;
+                articleDetails.Content = artile.Content;
+                articleDetails.Abstract = artile.Abstract;
+                articleDetails.CoverImage = artile.CoverImage;
+                articleDetails.Id = artile.Id;
+                articleDetails.UpdatedOn = artile.UpdatedOn;
+                articleDetails.Views = artile.Views;
+                articleDetails.Author = await databaseService.FindUserAsync(x => x.Id == artile.AuthorId);
+                articleDetails.Ranking = await GetArticleRanking(articleId);
+
+                return Ok(articleDetails);
             }
             catch (Exception ex)
             {
@@ -80,13 +93,87 @@ namespace JunsBlog.Controllers
         }
 
         [HttpGet("Search")]
-        public async Task<IActionResult> SearchArticles(int page = 1, int pageSize = 10, string searchKey = null, string sortOrder = "desc", string sortBy = "creationDate")
+        public async Task<IActionResult> SearchArticles(int page = 1, int pageSize = 10, string searchKey = null, string sortBy = "UpdatedOn", SortOrderEnum sortOrder =SortOrderEnum.Descending)
         {
             try
             {
-                var searchResponse = await databaseService.SearchArticlesAsyc(page, pageSize, searchKey, sortOrder, sortBy);
+                var searchResponse = await databaseService.SearchArticlesAsyc(page, pageSize, searchKey, sortBy, sortOrder);
 
                 return Ok(searchResponse);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        private async Task<ArticleRankingResponse> GetArticleRanking(string articleId)
+        {
+            try
+            {
+                if (String.IsNullOrWhiteSpace(articleId))
+                    return null;
+
+                var rankings = await databaseService.FindRankingsAsync(x => x.ArticleId == articleId);
+
+                var rankingResponse = new ArticleRankingResponse() { ArticleId = articleId };
+
+                foreach (var item in rankings)
+                {
+                    if (item.DidIDislike) rankingResponse.Dislikes++;
+                    if (item.DidILike) rankingResponse.Likes++;
+                    rankingResponse.DidIFavor = item.DidIFavor;
+
+                    if(item.UserId == currentUserId)
+                    {
+                        rankingResponse.DidIDislike = item.DidIDislike;
+                        rankingResponse.DidILike = item.DidILike;
+                        rankingResponse.DidIFavor = item.DidIFavor;
+                    }
+                }
+
+                return rankingResponse;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return null;
+            }
+        }
+
+        [Authorize(Roles = Role.User)]
+        [HttpPost("rank")]
+        public async Task<IActionResult> RankArticle(ArticleRankingRequest model)
+        {
+            try
+            {
+                if (model == null || String.IsNullOrWhiteSpace(model.ArticleId))
+                    return BadRequest(new { message = "Incomplete ranking information" });
+
+                var ranking = await databaseService.FindRankingAsync(x => x.ArticleId == model.ArticleId && x.UserId == currentUserId);
+
+                if (ranking == null) ranking = new ArticleRanking() { ArticleId = model.ArticleId, UserId = currentUserId };
+
+                switch (model.Rank)
+                {
+                    case RankEnum.Like:
+                        ranking.DidILike = !ranking.DidILike;
+                        if (ranking.DidILike) ranking.DidIDislike = false;
+                        break;
+                    case RankEnum.Dislike:
+                        ranking.DidIDislike = !ranking.DidIDislike;
+                        if(ranking.DidIDislike) ranking.DidILike = false;
+                        break;
+                    case RankEnum.Favor:
+                        ranking.DidIFavor = !ranking.DidIFavor;
+                        break;
+                }
+                await databaseService.SaveRankingAsync(ranking);
+
+                var rankingResponse = await GetArticleRanking(model.ArticleId);
+
+                return Ok(rankingResponse);
             }
             catch (Exception ex)
             {

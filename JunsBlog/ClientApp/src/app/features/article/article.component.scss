@@ -1,0 +1,77 @@
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+@import url("https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap");
+
+$color-orange: #f44336;
+
+.article-container{
+    padding: 10px 0px 0px 0px;
+    .article-display-box{
+        padding: 20px;
+        background-color: white;
+        box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
+        .header-info-box{ 
+            margin-left: 15px;
+            .article-title{
+                font-size: 28px;
+                font-weight: bold;
+                word-break: break-word;
+            }
+            .article-stats-box{
+                color: #999;
+                .profileImage{
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                }
+                span{
+                    margin-right: 20px;
+                    margin: 0px 20px 0px 5px;
+                    vertical-align: super;
+                }
+            }
+        } 
+        .rank-box{
+            button{
+                margin-left: 15px;;
+            }
+            span{
+                margin-left: 5px;
+                color: $color-orange;
+                font-weight: bold;
+                vertical-align: sub;
+            }
+            .mat-success {
+                background-color: white;
+                color: $color-orange;
+            }
+            
+            .mat-unrated {
+                background-color: white;
+                color: #999;
+            }
+        } 
+    }
+}
+
+@media only screen and (max-width: 768px){
+    .article-container{
+        padding: 0px;  
+        margin-bottom: 50px;
+        .article-display-box{
+            padding: 5px 5px 10px 0px;
+
+            .header-info-box{ 
+                .article-title{
+                    font-size: 18px;
+                }
+                .article-stats-box{
+                    .profileImage{
+                        width: 30px;
+                        height: 30px;
+                    }
+                }
+            }
+        }
+    }
+}

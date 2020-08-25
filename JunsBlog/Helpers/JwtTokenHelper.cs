@@ -47,20 +47,6 @@ namespace JunsBlog.Helpers
             return tokenHandler.WriteToken(token);
         }
 
-        public async Task<AuthenticateResponse> GenerateAuthenticationResponseAysnc(User user)
-        {
-            var userToken = new UserToken()
-            {
-                RefreshToken = Utilities.GenerateToken(),
-                RefreshExpiry = DateTime.UtcNow.AddDays(14),
-                UserId = user.Id
-            };
-
-            var insertedUserToken = await databaseService.SaveUserTokenAsync(userToken);
-
-            return new AuthenticateResponse(user, GenerateJwtToken(user), insertedUserToken.RefreshToken);
-        }
-
         public Claim ValidateToken(string accessToken)
         {
             var tokenHandler = new JwtSecurityTokenHandler();

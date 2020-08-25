@@ -11,6 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TimeAgoPipe } from 'src/app/services/time-ago.pipe';
 import { RouterModule } from '@angular/router';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 @NgModule({
   declarations: [ArticlesListComponent, TimeAgoPipe],
@@ -18,7 +19,8 @@ import { RouterModule } from '@angular/router';
     CommonModule,
     RouterModule,
     FormsModule, ReactiveFormsModule, 
-    MatDividerModule, MatIconModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatProgressSpinnerModule
+    MatDividerModule, MatIconModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatProgressSpinnerModule,
+    InfiniteScrollModule
   ],
   exports:[ArticlesListComponent]
 })

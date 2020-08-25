@@ -2,6 +2,7 @@
 using JunsBlog.Interfaces.Services;
 using JunsBlog.Interfaces.Settings;
 using JunsBlog.Models.Articles;
+using JunsBlog.Models.Enums;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json.Converters;
@@ -18,6 +19,8 @@ namespace JunsBlog.Models.Services
         private readonly IMongoCollection<User> users;
         private readonly IMongoCollection<Article> articles;
         private readonly IMongoCollection<UserToken> userTokens;
+        private readonly IMongoCollection<ArticleRanking> rankings;
+        private readonly IMongoCollection<Comment> comments;
 
         public MongoDBService(IJunsBlogDatabaseSettings settings)
         {
@@ -26,6 +29,8 @@ namespace JunsBlog.Models.Services
             users = database.GetCollection<User>(settings.UsersCollectionName);
             userTokens = database.GetCollection<UserToken>(settings.UserTokensCollectionName);
             articles = database.GetCollection<Article>(settings.ArticleCollectionName);
+            rankings = database.GetCollection<ArticleRanking>(settings.RankingCollectionName);
+            comments = database.GetCollection<Comment>(settings.CommentCollectionName);
         }
 
         public async Task<User> FindUserAsync(Expression<Func<User, bool>> filter)
@@ -35,15 +40,19 @@ namespace JunsBlog.Models.Services
 
         public async Task<User> SaveUserAsync(User user)
         {
-            // Need to compare with emails, when comparing with Id the id is not generated on insert
-            await users.ReplaceOneAsync(s => s.Email == user.Email, user, new ReplaceOptions { IsUpsert = true });
+            if (String.IsNullOrWhiteSpace(user.Id))
+                user.Id = ObjectId.GenerateNewId().ToString();
+
+            await users.ReplaceOneAsync(s => s.Id == user.Id, user, new ReplaceOptions { IsUpsert = true });
             return user;
         }
 
         public async Task<UserToken> SaveUserTokenAsync(UserToken userToken)
         {
-            // Need to compare with UserId, when comparing with Id the id is not generated on insert
-            await userTokens.ReplaceOneAsync(s => s.UserId == userToken.UserId, userToken, new ReplaceOptions { IsUpsert = true });
+            if (String.IsNullOrWhiteSpace(userToken.Id))
+                userToken.Id = ObjectId.GenerateNewId().ToString();
+
+            await userTokens.ReplaceOneAsync(s => s.Id == userToken.Id, userToken, new ReplaceOptions { IsUpsert = true });
             return userToken;
         }
 
@@ -54,32 +63,33 @@ namespace JunsBlog.Models.Services
 
         public async Task<Article> SaveArticleAsync(Article article)
         {
-           var existingArticle = await FindArticAsync(x => x.Id == article.Id);
-            if (existingArticle == null)
-                await articles.InsertOneAsync(article); 
-            else
-                await articles.ReplaceOneAsync(s => s.Id == article.Id, article, new ReplaceOptions { IsUpsert = true });
+            if (String.IsNullOrWhiteSpace(article.Id))
+                article.Id = ObjectId.GenerateNewId().ToString();
+
+            await articles.ReplaceOneAsync(s => s.Id == article.Id, article, new ReplaceOptions { IsUpsert = true });
 
             return article;
         }
 
         public async Task<Article> FindArticAsync(Expression<Func<Article, bool>> filter)
         {
-            return await articles.Find<Article>(filter).FirstOrDefaultAsync();
+            var updateDef = Builders<Article>.Update.Inc(x => x.Views, 1);
+            return await articles.FindOneAndUpdateAsync<Article>(filter, updateDef, 
+                new FindOneAndUpdateOptions<Article, Article> { ReturnDocument = ReturnDocument.After });
         }
 
-        public async Task<SearchResponse> SearchArticlesAsyc(int page, int pageSize, string searchKey, string sortOrder, string sortBy)
+        public async Task<SearchResponse> SearchArticlesAsyc(int page, int pageSize, string searchKey, string sortBy, SortOrderEnum sortOrder)
         {
             var filterDefinition = String.IsNullOrEmpty(searchKey)
-                ? FilterDefinition<Article>.Empty : Builders<Article>.Filter.Where(x => true);
+                ? FilterDefinition<Article>.Empty : Builders<Article>.Filter.Where(x => x.Content.Contains(searchKey));
 
-            Article article;
-
-            var sortDefintion = Builders<Article>.Sort.Ascending(nameof(article.CreationDate));
+            var sortDefintion = sortOrder == SortOrderEnum.Ascending
+                ? Builders<Article>.Sort.Ascending(sortBy)
+                : Builders<Article>.Sort.Descending(sortBy);
 
             var totalDocuments = await articles.CountDocumentsAsync(filterDefinition);
 
-            var documents = await articles.Find(x => true).Skip((page - 1) * pageSize).Limit(pageSize).Sort(sortDefintion).ToListAsync();
+            var documents = await articles.Find(filterDefinition).Skip((page - 1) * pageSize).Limit(pageSize).Sort(sortDefintion).ToListAsync();
 
             var articleDetailsList = new List<ArticleDetails>();
 
@@ -92,15 +102,35 @@ namespace JunsBlog.Models.Services
                 articleDetails.Abstract = document.Abstract;
                 articleDetails.CoverImage = document.CoverImage;
                 articleDetails.Id = document.Id;
-                articleDetails.LastModifiedDate = document.CreationDate;
+                articleDetails.UpdatedOn = document.UpdatedOn;
+                articleDetails.Views = document.Views;
                 articleDetails.Author = await FindUserAsync(x => x.Id == document.AuthorId);
 
                 articleDetailsList.Add(articleDetails);
             }
 
-            var searchResponse = new SearchResponse(articleDetailsList, (int)totalDocuments, page, pageSize, searchKey, sortOrder, sortBy);
+            var searchResponse = new SearchResponse(articleDetailsList, (int)totalDocuments, page, pageSize, searchKey, sortBy, sortOrder);
 
             return searchResponse;
+        }
+
+        public async Task<List<ArticleRanking>> FindRankingsAsync(Expression<Func<ArticleRanking, bool>> filter)
+        {
+            return await rankings.Find<ArticleRanking>(filter).ToListAsync();
+        }
+
+        public async Task<ArticleRanking> FindRankingAsync(Expression<Func<ArticleRanking, bool>> filter)
+        {
+            return await rankings.Find<ArticleRanking>(filter).FirstOrDefaultAsync();
+        }
+
+        public async Task<ArticleRanking> SaveRankingAsync(ArticleRanking ranking)
+        {
+            if (String.IsNullOrWhiteSpace(ranking.Id))
+                ranking.Id = ObjectId.GenerateNewId().ToString();
+
+            await rankings.ReplaceOneAsync(s => s.Id == ranking.Id, ranking, new ReplaceOptions { IsUpsert = true });
+            return ranking;
         }
     }
 }

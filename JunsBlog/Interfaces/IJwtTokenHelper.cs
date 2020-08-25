@@ -11,7 +11,6 @@ namespace JunsBlog.Interfaces
     public interface IJwtTokenHelper
     {
         string GenerateJwtToken(User user);
-        Task<AuthenticateResponse> GenerateAuthenticationResponseAysnc(User user);
         Claim ValidateToken(string accessToken);
     }
 }

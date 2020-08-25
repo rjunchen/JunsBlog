@@ -1,15 +1,14 @@
 import { User } from './user';
 import { Article } from './article';
+import { RankingRequest } from './RankingRequest';
+import { RankingResponse } from './rankingResponse';
 
 export class ArticleDetails extends Article{
-    didILike: boolean;
-    likesCount: number;
-    didIDislike: boolean;
-    didIFavored: boolean;
+    ranking: RankingResponse;
     author: User;
-    lastModifiedDate: string;
+    updatedOn: string;
     views: number;
     content: string;
-    _id: string;
+    id: string;
     comments: Array<string>;
 }

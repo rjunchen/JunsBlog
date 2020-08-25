@@ -11,11 +11,9 @@ namespace JunsBlog.Models.Articles
         public string Title { get; set; }
         public string CoverImage { get; set; }
         public string Abstract { get; set; }
-        public int LikesCount { get; set; }
-        public bool DidILike { get; set; }
-        public bool DidIFavored { get; set; }
+        public ArticleRankingResponse Ranking { get; set; }
         public User Author { get; set; }
-        public DateTime LastModifiedDate { get; set; }
+        public DateTime UpdatedOn { get; set; }
         public int Views { get; set; }
         public string Content { get; set; }
         public string Id { get; set; }

@@ -7,11 +7,8 @@ using System.Threading.Tasks;
 
 namespace JunsBlog.Entities
 {
-    public class Article
+    public class Article : EntityBase
     {
-        [BsonIgnoreIfDefault]
-        [BsonRepresentation(BsonType.ObjectId)]  // Convert MongoDB ObjectId type to string type
-        public string Id { get; set; }
         [BsonRequired]
         public string Title { get; set; }
         [BsonRequired]
@@ -21,12 +18,18 @@ namespace JunsBlog.Entities
         [BsonRequired]
         public string Abstract { get; set; }
         [BsonRequired]
-        public DateTime CreationDate { get; set; }
-        [BsonRequired]
         public string AuthorId { get; set; }
         [BsonRequired]
         public string[] Categories { get; set; }
         [BsonRequired]
         public bool IsPrivate { get; set; }
+        [BsonRequired]
+        public bool IsAproved { get; set; }
+        [BsonRequired]
+        public int Views { get; set; }
+        [BsonRequired]
+        public DateTime UpdatedOn { get; set; }
+        [BsonRequired]
+        public DateTime CreatedOn { get; set; }
     }
 }

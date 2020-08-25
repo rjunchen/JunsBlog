@@ -53,7 +53,10 @@ namespace JunsBlog.Controllers
 
                 if (!Utilities.ValidatePassword(model.Password, user.Password)) return BadRequest(new { message = "Incorrect password" });
 
-                var response =  await jwtTokenHelper.GenerateAuthenticationResponseAysnc(user);
+
+                var userToken = await databaseService.FindUserTokenAsync(x => x.UserId == user.Id);
+
+                var response = new AuthenticateResponse(user, jwtTokenHelper.GenerateJwtToken(user), userToken.RefreshToken);
 
                 return Ok(response);
             }
@@ -80,7 +83,8 @@ namespace JunsBlog.Controllers
                 {
                     Name = model.Name,
                     Email = model.Email,
-                    CreationDate = DateTime.UtcNow,
+                    CreatedOn = DateTime.UtcNow,
+                    UpdatedOn = DateTime.UtcNow,
                     Role = Role.User,
                     Password = Utilities.HashPassword(model.Password),
                     Type = AccountType.Local
@@ -89,9 +93,18 @@ namespace JunsBlog.Controllers
                 var insertedUser = await databaseService.SaveUserAsync(newUser);
                 if (insertedUser == null) return BadRequest(new { message = "Failed to register user" });
 
-                var response = await jwtTokenHelper.GenerateAuthenticationResponseAysnc(insertedUser);
+                var userToken = new UserToken()
+                {
+                    RefreshToken = Utilities.GenerateToken(),
+                    RefreshExpiry = DateTime.UtcNow.AddDays(14),
+                    UserId = insertedUser.Id
+                };
 
-                notificationService.SendNotification(Notification.GenerateWelcomeNotification(newUser));
+                var insertedUserToken = await databaseService.SaveUserTokenAsync(userToken);
+
+                var response = new AuthenticateResponse(insertedUser, jwtTokenHelper.GenerateJwtToken(insertedUser), insertedUserToken.RefreshToken);
+
+                notificationService.SendNotification(Notification.GenerateWelcomeNotification(insertedUser));
 
                 return Ok(response);
             }

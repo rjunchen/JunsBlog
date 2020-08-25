@@ -30,3 +30,17 @@
         }
     }
 }
+
+
+@media only screen and (max-width: 768px){
+    .articles-container{
+        margin-bottom: 64px;
+        .article-info-box{
+            margin-top: 0px;
+            margin-bottom: 10px;
+        }
+        .article-title{
+            font-size: 16px !important;
+        }
+    }
+}
