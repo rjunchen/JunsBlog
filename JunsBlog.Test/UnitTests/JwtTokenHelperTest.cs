@@ -24,18 +24,18 @@ namespace JunsBlog.Test.UnitTests
                 Password = "123456",
                 Id = "8DB7FE3D-E5AE-4762-9A24-0E8651363CE4",
                 Role = Role.User,
-                CreationDate = DateTime.UtcNow
+                CreatedOn = DateTime.UtcNow
             };
         }
 
         public static IEnumerable<Object[]> GetBadUsers()
         {
             yield return new object[] { new User() { Email = "Tester@gmail.com", Name = String.Empty, Password = "123456",
-                Id= "8DB7FE3D-E5AE-4762-9A24-0E8651363CE4", Role= Role.User, CreationDate=DateTime.UtcNow } };
+                Id= "8DB7FE3D-E5AE-4762-9A24-0E8651363CE4", Role= Role.User, CreatedOn=DateTime.UtcNow } };
             yield return new object[] { new User() { Email = "Tester@gmail.com", Name = "Tester", Password = "123456",
-                Id= String.Empty, Role= Role.User, CreationDate=DateTime.UtcNow } };
+                Id= String.Empty, Role= Role.User, CreatedOn=DateTime.UtcNow } };
             yield return new object[] { new User() { Email = "Tester@gmail.com", Name = "Tester", Password = "123456",
-                Id= "8DB7FE3D-E5AE-4762-9A24-0E8651363CE4", Role= String.Empty, CreationDate=DateTime.UtcNow } };
+                Id= "8DB7FE3D-E5AE-4762-9A24-0E8651363CE4", Role= String.Empty, CreatedOn=DateTime.UtcNow } };
             yield return new object[] { null };
         }
 

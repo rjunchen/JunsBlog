@@ -7,7 +7,7 @@ export class ArticleDetails extends Article{
     didIDislike: boolean;
     didIFavored: boolean;
     author: User;
-    lastModifiedDate: string;
+    updatedOn: string;
     views: number;
     content: string;
     _id: string;

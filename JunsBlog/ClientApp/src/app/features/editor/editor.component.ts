@@ -35,7 +35,7 @@ export class EditorComponent implements OnInit {
   }
 
   summit(){
-    this.articleService.CreateArticle(this.article).subscribe( x=>{
+    this.articleService.createArticle(this.article).subscribe( x=>{
 
     }, err=>{
 

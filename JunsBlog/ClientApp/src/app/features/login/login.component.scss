@@ -1,7 +1,8 @@
-$color-orange: #f44336;
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
 @import url("https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap");
+
+$color-orange: #f44336;
 
 .login-container{
     display: flex;

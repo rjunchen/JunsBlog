@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using JunsBlog.Entities;
+using JunsBlog.Helpers;
 using JunsBlog.Interfaces;
 using JunsBlog.Interfaces.Services;
 using JunsBlog.Interfaces.Settings;
@@ -94,8 +95,7 @@ namespace JunsBlog.Controllers
         public async Task<IActionResult> GoogleSingin(string code)
         {
             try
-            {
-               
+            {    
                 var tokenResponse = await GetGoogleTokenAsync(code);
 
                 if(tokenResponse == null) return StatusCode(StatusCodes.Status400BadRequest);
@@ -106,7 +106,7 @@ namespace JunsBlog.Controllers
                 {
                     Name = userInfo.name,
                     Email = userInfo.email,
-                    CreationDate = DateTime.UtcNow,
+                    CreatedOn = DateTime.UtcNow,
                     Role = Role.User,
                     Type = AccountType.Google,
                     Image = userInfo.picture
@@ -114,12 +114,27 @@ namespace JunsBlog.Controllers
 
                 var googleUser = await databaseService.FindUserAsync( x=> x.Email.ToLower() == userInfo.email.ToLower());
 
+                UserToken userToken;
+
                 if(googleUser == null)
                 {
                     googleUser = await databaseService.SaveUserAsync(newUser);
+
+                    userToken = new UserToken()
+                    {
+                        RefreshToken = Utilities.GenerateToken(),
+                        RefreshExpiry = DateTime.UtcNow.AddDays(14),
+                        UserId = googleUser.Id
+                    };
+
+                    userToken = await databaseService.SaveUserTokenAsync(userToken);
+                }
+                else
+                {
+                    userToken = await databaseService.FindUserTokenAsync(x => x.UserId == googleUser.Id);
                 }
 
-                var response = await jwtTokenHelper.GenerateAuthenticationResponseAysnc(googleUser);
+                var response = new AuthenticateResponse(googleUser, jwtTokenHelper.GenerateJwtToken(googleUser), userToken.RefreshToken);
 
                 var baseUrl = $"{httpContextAccessor.HttpContext.Request.Scheme}://{httpContextAccessor.HttpContext.Request.Host.Value}";
 
@@ -133,7 +148,7 @@ namespace JunsBlog.Controllers
         }
 
         [HttpGet("google/url")]
-        public async Task<IActionResult> GoogleUrl()
+        public IActionResult GoogleUrl()
         {
             try
             {
@@ -170,8 +185,10 @@ namespace JunsBlog.Controllers
 
                 var user = await databaseService.FindUserAsync(x=>x.Id == claim.Value);
 
-                var response = await jwtTokenHelper.GenerateAuthenticationResponseAysnc(user);
-    
+                var userToken = await databaseService.FindUserTokenAsync(x => x.UserId == user.Id);
+
+                var response = new AuthenticateResponse(user, jwtTokenHelper.GenerateJwtToken(user), userToken.RefreshToken);
+
                 return Ok(response);
             }
             catch (Exception ex)

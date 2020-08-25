@@ -1,5 +1,6 @@
 ﻿using JunsBlog.Entities;
 using JunsBlog.Models.Articles;
+using JunsBlog.Models.Enums;
 using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -14,6 +15,6 @@ namespace JunsBlog.Interfaces.Services
         Task<UserToken> SaveUserTokenAsync(UserToken userToken);
         Task<Article> SaveArticleAsync(Article article);
         Task<Article> FindArticAsync(Expression<Func<Article, bool>> filter);
-        Task<SearchResponse> SearchArticlesAsyc(int page, int pageSize, string searchKey, string sortOrder, string sortBy);
+        Task<SearchResponse> SearchArticlesAsyc(int page, int pageSize, string sortBy, string searchKey, SortOrderEnum sortOrder);
     }
 }

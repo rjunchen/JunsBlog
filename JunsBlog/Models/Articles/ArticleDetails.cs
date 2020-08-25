@@ -15,7 +15,7 @@ namespace JunsBlog.Models.Articles
         public bool DidILike { get; set; }
         public bool DidIFavored { get; set; }
         public User Author { get; set; }
-        public DateTime LastModifiedDate { get; set; }
+        public DateTime UpdatedOn { get; set; }
         public int Views { get; set; }
         public string Content { get; set; }
         public string Id { get; set; }

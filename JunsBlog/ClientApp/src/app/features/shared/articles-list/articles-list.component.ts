@@ -22,7 +22,7 @@ export class ArticlesListComponent implements OnInit {
     const intiPage: number = 1;
     const pageSize: number = 10;
 
-    this.articleService.SearchArticle(intiPage, pageSize).subscribe(x=>{
+    this.articleService.searchArticle(intiPage, pageSize).subscribe(x=>{
       console.log(x);
       this.articles = x.documents;
       this.articlePagingResult = x;

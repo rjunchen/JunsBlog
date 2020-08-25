@@ -4,11 +4,8 @@ using System;
 
 namespace JunsBlog.Entities
 {
-    public class UserToken
+    public class UserToken : EntityBase
     {
-        [BsonIgnoreIfDefault]
-        [BsonRepresentation(BsonType.ObjectId)]  // Convert MongoDB ObjectId type to string type
-        public string Id { get; set; }
         [BsonRequired]
         public string RefreshToken { get; set; }
         [BsonRequired]

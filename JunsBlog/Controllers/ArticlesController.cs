@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using JunsBlog.Entities;
 using JunsBlog.Interfaces.Services;
 using JunsBlog.Models.Articles;
+using JunsBlog.Models.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -43,7 +44,8 @@ namespace JunsBlog.Controllers
                     AuthorId = currentUserId,
                     Content = model.Content,
                     CoverImage = model.CoverImage,
-                    CreationDate = DateTime.UtcNow,
+                    CreatedOn = DateTime.UtcNow,
+                    UpdatedOn = DateTime.UtcNow,
                     IsPrivate = model.IsPrivate,
                     Title = model.Title,
                     Categories = model.Categories
@@ -70,7 +72,16 @@ namespace JunsBlog.Controllers
 
                 var artile = await databaseService.FindArticAsync(x=> x.Id == articleId);
 
-                return Ok(artile);
+                var articleDetails = new ArticleDetails();
+                articleDetails.Title = artile.Title;
+                articleDetails.Content = artile.Content;
+                articleDetails.Abstract = artile.Abstract;
+                articleDetails.CoverImage = artile.CoverImage;
+                articleDetails.Id = artile.Id;
+                articleDetails.UpdatedOn = artile.UpdatedOn;
+                articleDetails.Author = await databaseService.FindUserAsync(x => x.Id == artile.AuthorId);
+
+                return Ok(articleDetails);
             }
             catch (Exception ex)
             {
@@ -80,11 +91,11 @@ namespace JunsBlog.Controllers
         }
 
         [HttpGet("Search")]
-        public async Task<IActionResult> SearchArticles(int page = 1, int pageSize = 10, string searchKey = null, string sortOrder = "desc", string sortBy = "creationDate")
+        public async Task<IActionResult> SearchArticles(int page = 1, int pageSize = 10, string searchKey = null, string sortBy = "UpdatedOn", SortOrderEnum sortOrder =SortOrderEnum.Descending)
         {
             try
             {
-                var searchResponse = await databaseService.SearchArticlesAsyc(page, pageSize, searchKey, sortOrder, sortBy);
+                var searchResponse = await databaseService.SearchArticlesAsyc(page, pageSize, searchKey, sortBy, sortOrder);
 
                 return Ok(searchResponse);
             }

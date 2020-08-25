@@ -1,6 +1,7 @@
 ﻿using JunsBlog.Entities;
 using JunsBlog.Interfaces.Services;
 using JunsBlog.Models.Articles;
+using JunsBlog.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -81,6 +82,11 @@ namespace JunsBlog.Test.Mockups
         }
 
         public Task<SearchResponse> SearchArticlesAsyc(int page, int pageSize, string searchKey, string sortOrder, string sortBy)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<SearchResponse> SearchArticlesAsyc(int page, int pageSize, string sortBy, string searchKey, SortOrderEnum sortOrder)
         {
             throw new NotImplementedException();
         }
