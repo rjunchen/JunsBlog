@@ -13,6 +13,7 @@ namespace JunsBlog.Interfaces.Settings
         string ConnectionString { get; set; }
         string DatabaseName { get; set; }
         string RankingCollectionName { get; set; }
+        string CommentRankingCollectionName { get; set; }
         string CommentCollectionName { get; set; }
     }
 }

@@ -20,6 +20,7 @@ namespace JunsBlog.Models.Services
         private readonly IMongoCollection<Article> articles;
         private readonly IMongoCollection<UserToken> userTokens;
         private readonly IMongoCollection<ArticleRanking> rankings;
+        private readonly IMongoCollection<CommentRanking> commentRanking;
         private readonly IMongoCollection<Comment> comments;
 
         public MongoDBService(IJunsBlogDatabaseSettings settings)
@@ -31,6 +32,7 @@ namespace JunsBlog.Models.Services
             articles = database.GetCollection<Article>(settings.ArticleCollectionName);
             rankings = database.GetCollection<ArticleRanking>(settings.RankingCollectionName);
             comments = database.GetCollection<Comment>(settings.CommentCollectionName);
+            commentRanking = database.GetCollection<CommentRanking>(settings.CommentRankingCollectionName);
         }
 
         public async Task<User> FindUserAsync(Expression<Func<User, bool>> filter)
@@ -131,6 +133,31 @@ namespace JunsBlog.Models.Services
 
             await rankings.ReplaceOneAsync(s => s.Id == ranking.Id, ranking, new ReplaceOptions { IsUpsert = true });
             return ranking;
+        }
+
+        public async Task<Comment> SaveCommentAsync(Comment comment)
+        {
+            if (String.IsNullOrWhiteSpace(comment.Id))
+            {
+                comment.Id = ObjectId.GenerateNewId().ToString();
+                comment.CreatedOn = DateTime.UtcNow;
+            }
+
+            comment.UpdatedOn = DateTime.UtcNow;
+
+            await comments.ReplaceOneAsync(s => s.Id == comment.Id, comment, new ReplaceOptions { IsUpsert = true });
+
+            return comment;
+        }
+
+        public async Task<List<Comment>> GetCommentsAsync(string targetId)
+        {
+            return await comments.Find<Comment>(x=> x.TargetId == targetId).ToListAsync();
+        }
+
+        public async Task<List<CommentRanking>> FindCommentRankingsAsync(Expression<Func<CommentRanking, bool>> filter)
+        {
+            return await commentRanking.Find<CommentRanking>(filter).ToListAsync();
         }
     }
 }

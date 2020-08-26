@@ -15,5 +15,6 @@ namespace JunsBlog.Models.Settings
         public string DatabaseName { get; set; }
         public string RankingCollectionName { get; set; }
         public string CommentCollectionName { get; set; }
+        public string CommentRankingCollectionName { get; set; }
     }
 }

@@ -20,5 +20,8 @@ namespace JunsBlog.Interfaces.Services
         Task<ArticleRanking> SaveRankingAsync(ArticleRanking ranking);
         Task<List<ArticleRanking>> FindRankingsAsync(Expression<Func<ArticleRanking, bool>> filter);
         Task<ArticleRanking> FindRankingAsync(Expression<Func<ArticleRanking, bool>> filter);
+        Task<Comment> SaveCommentAsync(Comment comment);
+        Task<List<Comment>> GetCommentsAsync(string targetId);
+        Task<List<CommentRanking>> FindCommentRankingsAsync(Expression<Func<CommentRanking, bool>> filter);
     }
 }
