@@ -9,11 +9,11 @@ namespace JunsBlog.Entities
 {
     public class ArticleRanking : EntityBase
     {
-        [BsonRepresentation(BsonType.ObjectId)]
         [BsonRequired]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string ArticleId { get; set; }
-        [BsonRepresentation(BsonType.ObjectId)]
         [BsonRequired]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string UserId { get; set; }
         [BsonRequired]
         [BsonDefaultValue(false)]
@@ -24,5 +24,11 @@ namespace JunsBlog.Entities
         [BsonRequired]
         [BsonDefaultValue(false)]
         public bool DidIFavor { get; set; }  
+
+        public ArticleRanking(string articleId, string userId)
+        {
+            UserId = userId;
+            ArticleId = articleId;
+        }
     }
 }

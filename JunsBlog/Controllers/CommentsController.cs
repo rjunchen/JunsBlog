@@ -36,22 +36,15 @@ namespace JunsBlog.Controllers
         {
             try
             {
-                if (String.IsNullOrWhiteSpace(model.TargetId) || String.IsNullOrWhiteSpace(model.Content))
+                if (String.IsNullOrWhiteSpace(model.TargetId) || String.IsNullOrWhiteSpace(model.CommentText))
                     return BadRequest(new { message = "Incomplete comment information" });
 
-                var comment = new Comment()
-                {
-                    Content = model.Content,
-                    TargetId = model.TargetId,
-                    CommenterId = currentUserId,
-                };
-
-                var insertedComment = await databaseService.SaveCommentAsync(comment);
+                var insertedComment = await databaseService.SaveCommentAsync(new Comment(model, currentUserId));
 
                 var commentDetails = new CommentDetails()
                 {
                     Commenter = await databaseService.FindUserAsync(x => x.Id == insertedComment.CommenterId),
-                    Content = insertedComment.Content,
+                    Content = insertedComment.CommentText,
                     CreatedOn = insertedComment.CreatedOn,
                     Ranking = await GetCommentRanking(insertedComment.Id),
                     Id = insertedComment.Id
@@ -119,7 +112,7 @@ namespace JunsBlog.Controllers
                     var commentDetails = new CommentDetails()
                     {
                         Commenter = await databaseService.FindUserAsync(x => x.Id == item.CommenterId),
-                        Content = item.Content,
+                        Content = item.CommentText,
                         CreatedOn = item.CreatedOn,
                         Ranking = await GetCommentRanking(item.Id),
                         Id = item.Id,

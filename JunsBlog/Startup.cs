@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -55,6 +56,8 @@ namespace JunsBlog
             services.AddScoped<INotificationService, EmailNotificationService>();
             services.AddScoped<IDatabaseService, MongoDBService>();
 
+            services.AddLogging(configure => configure.AddConsole());
+
             services.AddHttpContextAccessor();
 
             var jwtSettings = jwtSettingSection.Get<JwtSettings>();
@@ -78,6 +81,7 @@ namespace JunsBlog
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.TokenSecret))
                 };
             });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,16 +1,20 @@
-﻿using System;
+﻿using JunsBlog.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace JunsBlog.Models.Authentication.Google
 {
-    public class GoogleUserInfo
+    public class GoogleUserInfo : SocialUserAbstract
     {
-        public string id { get; set; }
-        public string name { get; set; }
-        public string given_name { get; set; }
-        public string email { get; set; }
-        public string picture { get; set; }
+        public GoogleUserInfo(GoogleUserMaping userMapping)
+        {
+            Name = userMapping.name;
+            Email = userMapping.email;
+            Role = Entities.Role.User;
+            Type = AccountType.Google;
+            Image = userMapping.picture;
+        }
     }
 }

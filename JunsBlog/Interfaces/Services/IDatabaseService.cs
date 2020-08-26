@@ -17,11 +17,13 @@ namespace JunsBlog.Interfaces.Services
         Task<Article> SaveArticleAsync(Article article);
         Task<Article> FindArticAsync(Expression<Func<Article, bool>> filter);
         Task<SearchResponse> SearchArticlesAsyc(int page, int pageSize, string sortBy, string searchKey, SortOrderEnum sortOrder);
-        Task<ArticleRanking> SaveRankingAsync(ArticleRanking ranking);
-        Task<List<ArticleRanking>> FindRankingsAsync(Expression<Func<ArticleRanking, bool>> filter);
-        Task<ArticleRanking> FindRankingAsync(Expression<Func<ArticleRanking, bool>> filter);
+        Task<ArticleRanking> SaveArticleRankingAsync(ArticleRanking ranking);
+        Task<List<ArticleRanking>> FindArticleRankingsAsync(Expression<Func<ArticleRanking, bool>> filter);
+        Task<ArticleRanking> FindArticleRankingAsync(Expression<Func<ArticleRanking, bool>> filter);
         Task<Comment> SaveCommentAsync(Comment comment);
         Task<List<Comment>> GetCommentsAsync(string targetId);
         Task<List<CommentRanking>> FindCommentRankingsAsync(Expression<Func<CommentRanking, bool>> filter);
+        Task<ArticleDetails> GetArticleDetailsAsync(string articleId);
+        Task<ArticleRankingDetails> GetArticleRankingDetailsAsync(string articleId, string userId);
     }
 }

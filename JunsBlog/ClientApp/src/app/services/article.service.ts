@@ -15,7 +15,7 @@ export class ArticleService {
   constructor(private http: HttpClient) { }
 
   public createArticle(article: Article){
-    return this.http.post('/api/article/post', article).pipe(map(data => { return <ArticleDetails>data}));
+    return this.http.post('/api/article/create', article).pipe(map(data => { return <ArticleDetails>data}));
   }
 
   public getArticle(articleId: string){

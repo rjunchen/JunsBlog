@@ -3,16 +3,12 @@ using JunsBlog.Entities;
 using JunsBlog.Helpers;
 using JunsBlog.Interfaces;
 using JunsBlog.Interfaces.Services;
-using JunsBlog.Models;
 using JunsBlog.Models.Authentication;
 using JunsBlog.Models.Notifications;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Org.BouncyCastle.Crypto.Tls;
 using System;
-using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -53,7 +49,6 @@ namespace JunsBlog.Controllers
 
                 if (!Utilities.ValidatePassword(model.Password, user.Password)) return BadRequest(new { message = "Incorrect password" });
 
-
                 var userToken = await databaseService.FindUserTokenAsync(x => x.UserId == user.Id);
 
                 var response = new AuthenticateResponse(user, jwtTokenHelper.GenerateJwtToken(user), userToken.RefreshToken);
@@ -79,28 +74,10 @@ namespace JunsBlog.Controllers
 
                 if(existingUser != null) return BadRequest(new { message = "Email has been already registered" });
 
-                var newUser = new User()
-                {
-                    Name = model.Name,
-                    Email = model.Email,
-                    CreatedOn = DateTime.UtcNow,
-                    UpdatedOn = DateTime.UtcNow,
-                    Role = Role.User,
-                    Password = Utilities.HashPassword(model.Password),
-                    Type = AccountType.Local
-                };
-
-                var insertedUser = await databaseService.SaveUserAsync(newUser);
+                var insertedUser = await databaseService.SaveUserAsync(new User(model));
                 if (insertedUser == null) return BadRequest(new { message = "Failed to register user" });
 
-                var userToken = new UserToken()
-                {
-                    RefreshToken = Utilities.GenerateToken(),
-                    RefreshExpiry = DateTime.UtcNow.AddDays(14),
-                    UserId = insertedUser.Id
-                };
-
-                var insertedUserToken = await databaseService.SaveUserTokenAsync(userToken);
+                var insertedUserToken = await databaseService.SaveUserTokenAsync(new UserToken(insertedUser.Id));
 
                 var response = new AuthenticateResponse(insertedUser, jwtTokenHelper.GenerateJwtToken(insertedUser), insertedUserToken.RefreshToken);
 
@@ -160,8 +137,7 @@ namespace JunsBlog.Controllers
 
                 var userToken = await databaseService.FindUserTokenAsync(x=> x.UserId == user.Id);
 
-                userToken.ResetToken = Utilities.GenerateToken();
-                userToken.ResetExpiry = DateTime.UtcNow.AddMinutes(10);
+                userToken.CreateResetToken();
 
                 var updatedUserToken = await databaseService.SaveUserTokenAsync(userToken);
 

@@ -3,9 +3,8 @@ using JunsBlog.Interfaces.Services;
 using JunsBlog.Interfaces.Settings;
 using JunsBlog.Models.Articles;
 using JunsBlog.Models.Enums;
-using MongoDB.Bson;
 using MongoDB.Driver;
-using Newtonsoft.Json.Converters;
+using MongoDB.Driver.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +18,7 @@ namespace JunsBlog.Models.Services
         private readonly IMongoCollection<User> users;
         private readonly IMongoCollection<Article> articles;
         private readonly IMongoCollection<UserToken> userTokens;
-        private readonly IMongoCollection<ArticleRanking> rankings;
+        private readonly IMongoCollection<ArticleRanking> articleRankings;
         private readonly IMongoCollection<CommentRanking> commentRanking;
         private readonly IMongoCollection<Comment> comments;
 
@@ -30,7 +29,7 @@ namespace JunsBlog.Models.Services
             users = database.GetCollection<User>(settings.UsersCollectionName);
             userTokens = database.GetCollection<UserToken>(settings.UserTokensCollectionName);
             articles = database.GetCollection<Article>(settings.ArticleCollectionName);
-            rankings = database.GetCollection<ArticleRanking>(settings.RankingCollectionName);
+            articleRankings = database.GetCollection<ArticleRanking>(settings.RankingCollectionName);
             comments = database.GetCollection<Comment>(settings.CommentCollectionName);
             commentRanking = database.GetCollection<CommentRanking>(settings.CommentRankingCollectionName);
         }
@@ -42,18 +41,14 @@ namespace JunsBlog.Models.Services
 
         public async Task<User> SaveUserAsync(User user)
         {
-            if (String.IsNullOrWhiteSpace(user.Id))
-                user.Id = ObjectId.GenerateNewId().ToString();
-
+            user.UpdatedOn = DateTime.UtcNow;
             await users.ReplaceOneAsync(s => s.Id == user.Id, user, new ReplaceOptions { IsUpsert = true });
             return user;
         }
 
         public async Task<UserToken> SaveUserTokenAsync(UserToken userToken)
         {
-            if (String.IsNullOrWhiteSpace(userToken.Id))
-                userToken.Id = ObjectId.GenerateNewId().ToString();
-
+            userToken.UpdatedOn = DateTime.UtcNow;
             await userTokens.ReplaceOneAsync(s => s.Id == userToken.Id, userToken, new ReplaceOptions { IsUpsert = true });
             return userToken;
         }
@@ -65,11 +60,8 @@ namespace JunsBlog.Models.Services
 
         public async Task<Article> SaveArticleAsync(Article article)
         {
-            if (String.IsNullOrWhiteSpace(article.Id))
-                article.Id = ObjectId.GenerateNewId().ToString();
-
+            article.UpdatedOn = DateTime.UtcNow;
             await articles.ReplaceOneAsync(s => s.Id == article.Id, article, new ReplaceOptions { IsUpsert = true });
-
             return article;
         }
 
@@ -78,6 +70,28 @@ namespace JunsBlog.Models.Services
             var updateDef = Builders<Article>.Update.Inc(x => x.Views, 1);
             return await articles.FindOneAndUpdateAsync<Article>(filter, updateDef, 
                 new FindOneAndUpdateOptions<Article, Article> { ReturnDocument = ReturnDocument.After });
+        }
+
+
+        public async Task<ArticleDetails> GetArticleDetailsAsync(string articleId)
+        {
+            var query = from p in articles.AsQueryable()
+                       where p.Id == articleId
+                       join o in users.AsQueryable() on p.AuthorId equals o.Id into userJoined
+                       select new ArticleDetails()
+                       {
+                           Abstract = p.Abstract,
+                           Content = p.Content,
+                           CoverImage = p.CoverImage,
+                           Id = p.Id,
+                           Title = p.Title,
+                           UpdatedOn = p.UpdatedOn,
+                           CreatedOn = p.CreatedOn,
+                           Views = p.Views,
+                           Author = userJoined.First()
+                       };
+
+            return await query.FirstOrDefaultAsync();
         }
 
         public async Task<SearchResponse> SearchArticlesAsyc(int page, int pageSize, string searchKey, string sortBy, SortOrderEnum sortOrder)
@@ -116,33 +130,47 @@ namespace JunsBlog.Models.Services
             return searchResponse;
         }
 
-        public async Task<List<ArticleRanking>> FindRankingsAsync(Expression<Func<ArticleRanking, bool>> filter)
+        public async Task<List<ArticleRanking>> FindArticleRankingsAsync(Expression<Func<ArticleRanking, bool>> filter)
         {
-            return await rankings.Find<ArticleRanking>(filter).ToListAsync();
+            return await articleRankings.Find<ArticleRanking>(filter).ToListAsync();
         }
 
-        public async Task<ArticleRanking> FindRankingAsync(Expression<Func<ArticleRanking, bool>> filter)
+        public async Task<ArticleRanking> FindArticleRankingAsync(Expression<Func<ArticleRanking, bool>> filter)
         {
-            return await rankings.Find<ArticleRanking>(filter).FirstOrDefaultAsync();
+            return await articleRankings.Find<ArticleRanking>(filter).FirstOrDefaultAsync();
         }
 
-        public async Task<ArticleRanking> SaveRankingAsync(ArticleRanking ranking)
+        public async Task<ArticleRanking> SaveArticleRankingAsync(ArticleRanking ranking)
         {
-            if (String.IsNullOrWhiteSpace(ranking.Id))
-                ranking.Id = ObjectId.GenerateNewId().ToString();
-
-            await rankings.ReplaceOneAsync(s => s.Id == ranking.Id, ranking, new ReplaceOptions { IsUpsert = true });
+            ranking.UpdatedOn = DateTime.UtcNow;
+            await articleRankings.ReplaceOneAsync(s => s.Id == ranking.Id, ranking, new ReplaceOptions { IsUpsert = true });
             return ranking;
+        }
+
+        public async Task<ArticleRankingDetails> GetArticleRankingDetailsAsync(string articleId, string userId)
+        {
+            var rankings = await articleRankings.Find(x => x.ArticleId == articleId).ToListAsync();
+
+            var rankingResponse = new ArticleRankingDetails() { ArticleId = articleId };
+
+            foreach (var item in rankings)
+            {
+                if (item.DidIDislike) rankingResponse.DislikesCount++;
+                if (item.DidILike) rankingResponse.LikesCount++;
+                rankingResponse.DidIFavor = item.DidIFavor;
+
+                if (item.UserId == userId)
+                {
+                    rankingResponse.DidIDislike = item.DidIDislike;
+                    rankingResponse.DidILike = item.DidILike;
+                    rankingResponse.DidIFavor = item.DidIFavor;
+                }
+            }
+            return rankingResponse;
         }
 
         public async Task<Comment> SaveCommentAsync(Comment comment)
         {
-            if (String.IsNullOrWhiteSpace(comment.Id))
-            {
-                comment.Id = ObjectId.GenerateNewId().ToString();
-                comment.CreatedOn = DateTime.UtcNow;
-            }
-
             comment.UpdatedOn = DateTime.UtcNow;
 
             await comments.ReplaceOneAsync(s => s.Id == comment.Id, comment, new ReplaceOptions { IsUpsert = true });

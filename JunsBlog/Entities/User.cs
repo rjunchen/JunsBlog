@@ -1,4 +1,6 @@
-﻿using MongoDB.Bson;
+﻿using JunsBlog.Helpers;
+using JunsBlog.Models.Authentication;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Text.Json.Serialization;
@@ -19,9 +21,24 @@ namespace JunsBlog.Entities
         public string Image { get; set; }
         [JsonIgnore]
         public string Password { get; set; }
-        [BsonRequired]
-        public DateTime UpdatedOn { get; set; }
-        [BsonRequired]
-        public DateTime CreatedOn { get; set; }
+
+        public User(RegisterRequest model)
+        {
+            Name = model.Name;
+            Email = model.Email;
+            Role = Entities.Role.User;
+            Password = Utilities.HashPassword(model.Password);
+            Type = AccountType.Local;
+        }
+
+        public User(SocialUserAbstract model)
+        {
+            Name = model.Name;
+            Email = model.Email;
+            Role = Entities.Role.User;
+            Password = null;
+            Type = model.Type;
+            Image = model.Image;
+        }
     }
 }

@@ -32,12 +32,12 @@ namespace JunsBlog.Test.Mockups
             throw new NotImplementedException();
         }
 
-        public Task<ArticleRanking> FindRankingAsync(Expression<Func<ArticleRanking, bool>> filter)
+        public Task<ArticleRanking> FindArticleRankingAsync(Expression<Func<ArticleRanking, bool>> filter)
         {
             throw new NotImplementedException();
         }
 
-        public Task<List<ArticleRanking>> FindRankingsAsync(Expression<Func<ArticleRanking, bool>> filter)
+        public Task<List<ArticleRanking>> FindArticleRankingsAsync(Expression<Func<ArticleRanking, bool>> filter)
         {
             throw new NotImplementedException();
         }
@@ -70,7 +70,7 @@ namespace JunsBlog.Test.Mockups
             throw new NotImplementedException();
         }
 
-        public Task<ArticleRanking> SaveRankingAsync(ArticleRanking ranking)
+        public Task<ArticleRanking> SaveArticleRankingAsync(ArticleRanking ranking)
         {
             throw new NotImplementedException();
         }
