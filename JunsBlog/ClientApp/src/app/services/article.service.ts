@@ -3,9 +3,12 @@ import { Article } from '../models/article';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { ArticleDetails } from '../models/articleDetails';
-import { ArticlePagingResult } from '../models/articlePagingResult';
+import { ArticleSearchPagingResult } from '../models/articleSearchPagingResult';
 import { RankingRequest } from '../models/RankingRequest';
-import { RankingResponse } from '../models/rankingResponse';
+import { ArticleRankingDetails } from '../models/articleRankingDetails';
+import { SortByEnum } from '../models/sortByEnum';
+import { SortOrderEnum } from '../models/sortOrderEnum';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -14,24 +17,25 @@ export class ArticleService {
 
   constructor(private http: HttpClient) { }
 
-  public createArticle(article: Article){
-    return this.http.post('/api/article/post', article).pipe(map(data => { return <ArticleDetails>data}));
+  public createArticle(article: Article): Observable<ArticleDetails>{
+    return this.http.post('/api/article/create', article).pipe(map(data => { return <ArticleDetails>data}));
   }
 
-  public getArticle(articleId: string){
+  public getArticle(articleId: string): Observable<ArticleDetails>{
     return this.http.get(`/api/article/get?articleId=${articleId}`).pipe(map(data => { return <ArticleDetails>data}));
   }
 
-  public searchArticle(page: number, pageSize: number, searchKey: string = "", sortBy: string = "updatedOn", sortOrder: number = 1){
+  public searchArticle(page: number, pageSize: number, searchKey: string = "", 
+    sortBy: SortByEnum = SortByEnum.CreatedOn, sortOrder: SortOrderEnum = SortOrderEnum.descending) : Observable<ArticleSearchPagingResult> {
     return this.http.get(`/api/article/search?page=${page}&pageSize=${pageSize}&searchKey=${searchKey}
-      &sortOrder=${sortOrder}&sortBy=${sortBy}`).pipe(map(data => { return <ArticlePagingResult>data}));
+      &sortOrder=${sortOrder}&sortBy=${sortBy}`).pipe(map(data => { return <ArticleSearchPagingResult>data}));
   }
 
-  public rankArticle(rankRequest: RankingRequest){
-    return this.http.post('/api/article/rank', rankRequest).pipe(map(data => { return <RankingResponse>data}));
+  public rankArticle(rankRequest: RankingRequest): Observable<ArticleRankingDetails>{
+    return this.http.post('/api/article/rank', rankRequest).pipe(map(data => { return <ArticleRankingDetails>data}));
   }
 
-  public GetArticleRanking(articleId: string){
-    return this.http.get(`/api/article/rank?articleId=${articleId}`).pipe(map(data => { return <RankingResponse>data}));
+  public GetArticleRanking(articleId: string): Observable<ArticleRankingDetails>{
+    return this.http.get(`/api/article/rank?articleId=${articleId}`).pipe(map(data => { return <ArticleRankingDetails>data}));
   }
 }

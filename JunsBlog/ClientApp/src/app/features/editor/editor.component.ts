@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Article } from 'src/app/models/article';
 import { ArticleService } from 'src/app/services/article.service';
-import {MatChipInputEvent} from '@angular/material/chips';
-import {COMMA, ENTER} from '@angular/cdk/keycodes';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 
 export interface Category {
   name: string;
@@ -23,7 +25,7 @@ export class EditorComponent implements OnInit {
   addOnBlur = true;
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
 
-  constructor(private articleService: ArticleService) { }
+  constructor(private articleService: ArticleService, private toastr: ToastrService, private router: Router) { }
 
   ngOnInit(): void {
     this.article = new Article();
@@ -36,9 +38,13 @@ export class EditorComponent implements OnInit {
 
   summit(){
     this.articleService.createArticle(this.article).subscribe( x=>{
-
+      this.router.navigateByUrl(`/article/${x.id}`);
     }, err=>{
-
+      if (err.status === 400) {     
+        this.toastr.warning(err.error.message, err.statusText);
+      } else {
+        this.toastr.error('Unknown error occurred, please try again later');
+      }
     })
   }
 
@@ -57,9 +63,8 @@ export class EditorComponent implements OnInit {
     }
   }
 
-  remove(fruit: string): void {
-    const index = this.article.categories.indexOf(fruit);
-
+  remove(category: string): void {
+    const index = this.article.categories.indexOf(category);
     if (index >= 0) {
       this.article.categories.splice(index, 1);
     }

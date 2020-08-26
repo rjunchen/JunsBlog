@@ -1,4 +1,7 @@
-export interface InterfacePagingResult {
+import { SortOrderEnum } from './sortOrderEnum';
+import { SortByEnum } from './sortByEnum';
+
+export interface InterfaceSearchPagingResult {
     hasNextPage: boolean;
     hasPrevPage: boolean;
     totalDocuments: number;
@@ -6,7 +9,7 @@ export interface InterfacePagingResult {
     currentPage: number;
     pageSize: number;
     searchKey: string;
-    sortOrder: string;
-    sortBy: string;
+    sortOrder: SortOrderEnum;
+    sortBy: SortByEnum;
     documents: Array<any>
 }

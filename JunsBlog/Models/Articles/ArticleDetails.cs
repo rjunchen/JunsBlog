@@ -11,11 +11,13 @@ namespace JunsBlog.Models.Articles
         public string Title { get; set; }
         public string CoverImage { get; set; }
         public string Abstract { get; set; }
-        public ArticleRankingResponse Ranking { get; set; }
         public User Author { get; set; }
         public DateTime UpdatedOn { get; set; }
+        public DateTime CreatedOn { get; set; }
         public int Views { get; set; }
         public string Content { get; set; }
         public string Id { get; set; }
+        public bool IsPrivate { get; set; }
+        public bool IsApproved { get; set; }
     }
 }

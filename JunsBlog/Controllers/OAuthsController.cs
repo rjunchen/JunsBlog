@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using JunsBlog.Entities;
-using JunsBlog.Helpers;
+﻿using JunsBlog.Entities;
 using JunsBlog.Interfaces;
 using JunsBlog.Interfaces.Services;
 using JunsBlog.Interfaces.Settings;
@@ -16,6 +9,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace JunsBlog.Controllers
 {
@@ -50,7 +47,9 @@ namespace JunsBlog.Controllers
 
                 string outputData = await output.Content.ReadAsStringAsync();
 
-                return JsonConvert.DeserializeObject<GoogleUserInfo>(outputData);
+                var googleUser = JsonConvert.DeserializeObject<GoogleUserMaping>(outputData);
+
+                return  new GoogleUserInfo(googleUser);
 
             }
             catch (Exception ex)
@@ -102,30 +101,15 @@ namespace JunsBlog.Controllers
 
                 var userInfo = await GetGoogleUserInfoAsync(tokenResponse.access_token);
 
-                User newUser = new User()
-                {
-                    Name = userInfo.name,
-                    Email = userInfo.email,
-                    CreatedOn = DateTime.UtcNow,
-                    Role = Role.User,
-                    Type = AccountType.Google,
-                    Image = userInfo.picture
-                };
-
-                var googleUser = await databaseService.FindUserAsync( x=> x.Email.ToLower() == userInfo.email.ToLower());
+                var googleUser = await databaseService.FindUserAsync( x=> x.Email.ToLower() == userInfo.Email.ToLower());
 
                 UserToken userToken;
 
                 if(googleUser == null)
                 {
-                    googleUser = await databaseService.SaveUserAsync(newUser);
+                    googleUser = await databaseService.SaveUserAsync(new User(userInfo));
 
-                    userToken = new UserToken()
-                    {
-                        RefreshToken = Utilities.GenerateToken(),
-                        RefreshExpiry = DateTime.UtcNow.AddDays(14),
-                        UserId = googleUser.Id
-                    };
+                    userToken = new UserToken(googleUser.Id);
 
                     userToken = await databaseService.SaveUserTokenAsync(userToken);
                 }

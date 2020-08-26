@@ -32,12 +32,12 @@ namespace JunsBlog.Test.Mockups
             throw new NotImplementedException();
         }
 
-        public Task<ArticleRanking> FindRankingAsync(Expression<Func<ArticleRanking, bool>> filter)
+        public Task<ArticleRanking> FindArticleRankingAsync(Expression<Func<ArticleRanking, bool>> filter)
         {
             throw new NotImplementedException();
         }
 
-        public Task<List<ArticleRanking>> FindRankingsAsync(Expression<Func<ArticleRanking, bool>> filter)
+        public Task<List<ArticleRanking>> FindArticleRankingsAsync(Expression<Func<ArticleRanking, bool>> filter)
         {
             throw new NotImplementedException();
         }
@@ -70,7 +70,7 @@ namespace JunsBlog.Test.Mockups
             throw new NotImplementedException();
         }
 
-        public Task<ArticleRanking> SaveRankingAsync(ArticleRanking ranking)
+        public Task<ArticleRanking> SaveArticleRankingAsync(ArticleRanking ranking)
         {
             throw new NotImplementedException();
         }
@@ -111,12 +111,27 @@ namespace JunsBlog.Test.Mockups
             });
         }
 
-        public Task<SearchResponse> SearchArticlesAsyc(int page, int pageSize, string searchKey, string sortOrder, string sortBy)
+        public Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string searchKey, string sortOrder, string sortBy)
         {
             throw new NotImplementedException();
         }
 
-        public Task<SearchResponse> SearchArticlesAsyc(int page, int pageSize, string sortBy, string searchKey, SortOrderEnum sortOrder)
+        public Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string sortBy, string searchKey, SortOrderEnum sortOrder)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string searchKey, SortByEnum sortBy, SortOrderEnum sortOrder)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ArticleDetails> GetArticleDetailsAsync(string articleId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ArticleRankingDetails> GetArticleRankingDetailsAsync(string articleId, string userId)
         {
             throw new NotImplementedException();
         }

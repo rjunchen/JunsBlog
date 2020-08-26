@@ -30,28 +30,15 @@ namespace JunsBlog.Controllers
         }
 
         [Authorize(Roles = Role.User)]
-        [HttpPost("post")]
-        public async Task<IActionResult> Post(ArticleRequest model)
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateArticle(ArticleRequest model)
         {
             try
             {
                 if (String.IsNullOrWhiteSpace(model.Title) || String.IsNullOrWhiteSpace(model.Content) || String.IsNullOrWhiteSpace(model.Abstract))
                     return BadRequest(new { message = "Incomplete article information" });
 
-                var newArticle = new Article()
-                {
-                    Abstract = model.Abstract,
-                    AuthorId = currentUserId,
-                    Content = model.Content,
-                    CoverImage = model.CoverImage,
-                    CreatedOn = DateTime.UtcNow,
-                    UpdatedOn = DateTime.UtcNow,
-                    IsPrivate = model.IsPrivate,
-                    Title = model.Title,
-                    Categories = model.Categories
-                };
-
-                var artile = await databaseService.SaveArticleAsync(newArticle);
+                var artile = await databaseService.SaveArticleAsync(new Article(model, currentUserId));
 
                 return Ok(artile);
             }
@@ -70,18 +57,7 @@ namespace JunsBlog.Controllers
                 if (String.IsNullOrWhiteSpace(articleId))
                     return BadRequest(new { message = "Invalid articleId" });
 
-                var artile = await databaseService.FindArticAsync(x=> x.Id == articleId);
-
-                var articleDetails = new ArticleDetails();
-                articleDetails.Title = artile.Title;
-                articleDetails.Content = artile.Content;
-                articleDetails.Abstract = artile.Abstract;
-                articleDetails.CoverImage = artile.CoverImage;
-                articleDetails.Id = artile.Id;
-                articleDetails.UpdatedOn = artile.UpdatedOn;
-                articleDetails.Views = artile.Views;
-                articleDetails.Author = await databaseService.FindUserAsync(x => x.Id == artile.AuthorId);
-                articleDetails.Ranking = await GetArticleRanking(articleId);
+                var articleDetails = await databaseService.GetArticleDetailsAsync(articleId);
 
                 return Ok(articleDetails);
             }
@@ -93,52 +69,18 @@ namespace JunsBlog.Controllers
         }
 
         [HttpGet("Search")]
-        public async Task<IActionResult> SearchArticles(int page = 1, int pageSize = 10, string searchKey = null, string sortBy = "UpdatedOn", SortOrderEnum sortOrder =SortOrderEnum.Descending)
+        public async Task<IActionResult> SearchArticles(int page = 1, int pageSize = 10, string searchKey = null, SortByEnum sortBy = SortByEnum.CreatedOn, SortOrderEnum sortOrder = SortOrderEnum.Descending)
         {
             try
             {
-                var searchResponse = await databaseService.SearchArticlesAsyc(page, pageSize, searchKey, sortBy, sortOrder);
+                var searchResult = await databaseService.SearchArticlesAsyc(page, pageSize, searchKey, sortBy, sortOrder);
 
-                return Ok(searchResponse);
+                return Ok(searchResult);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
-        private async Task<ArticleRankingResponse> GetArticleRanking(string articleId)
-        {
-            try
-            {
-                if (String.IsNullOrWhiteSpace(articleId))
-                    return null;
-
-                var rankings = await databaseService.FindRankingsAsync(x => x.ArticleId == articleId);
-
-                var rankingResponse = new ArticleRankingResponse() { ArticleId = articleId };
-
-                foreach (var item in rankings)
-                {
-                    if (item.DidIDislike) rankingResponse.Dislikes++;
-                    if (item.DidILike) rankingResponse.Likes++;
-                    rankingResponse.DidIFavor = item.DidIFavor;
-
-                    if(item.UserId == currentUserId)
-                    {
-                        rankingResponse.DidIDislike = item.DidIDislike;
-                        rankingResponse.DidILike = item.DidILike;
-                        rankingResponse.DidIFavor = item.DidIFavor;
-                    }
-                }
-
-                return rankingResponse;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, ex.Message);
-                return null;
             }
         }
 
@@ -151,9 +93,9 @@ namespace JunsBlog.Controllers
                 if (model == null || String.IsNullOrWhiteSpace(model.ArticleId))
                     return BadRequest(new { message = "Incomplete ranking information" });
 
-                var ranking = await databaseService.FindRankingAsync(x => x.ArticleId == model.ArticleId && x.UserId == currentUserId);
+                var ranking = await databaseService.FindArticleRankingAsync(x => x.ArticleId == model.ArticleId && x.UserId == currentUserId);
 
-                if (ranking == null) ranking = new ArticleRanking() { ArticleId = model.ArticleId, UserId = currentUserId };
+                if (ranking == null) ranking = new ArticleRanking(model.ArticleId, currentUserId);
 
                 switch (model.Rank)
                 {
@@ -169,11 +111,11 @@ namespace JunsBlog.Controllers
                         ranking.DidIFavor = !ranking.DidIFavor;
                         break;
                 }
-                await databaseService.SaveRankingAsync(ranking);
+                await databaseService.SaveArticleRankingAsync(ranking);
 
-                var rankingResponse = await GetArticleRanking(model.ArticleId);
+                var rankingDetails = await databaseService.GetArticleRankingDetailsAsync(model.ArticleId, currentUserId);
 
-                return Ok(rankingResponse);
+                return Ok(rankingDetails);
             }
             catch (Exception ex)
             {
@@ -181,5 +123,25 @@ namespace JunsBlog.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
+        [HttpGet("rank")]
+        public async Task<IActionResult> GetArticleRanking(string articleId)
+        {
+            try
+            {
+                if (String.IsNullOrWhiteSpace(articleId))
+                    return BadRequest(new { message = "Incomplete ranking information" });
+
+                var articleRankingDetails = await databaseService.GetArticleRankingDetailsAsync(articleId, currentUserId);
+
+                return Ok(articleRankingDetails);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
     }
 }

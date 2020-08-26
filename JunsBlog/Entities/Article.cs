@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using JunsBlog.Models.Articles;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
@@ -18,18 +19,26 @@ namespace JunsBlog.Entities
         [BsonRequired]
         public string Abstract { get; set; }
         [BsonRequired]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string AuthorId { get; set; }
         [BsonRequired]
         public string[] Categories { get; set; }
         [BsonRequired]
         public bool IsPrivate { get; set; }
         [BsonRequired]
-        public bool IsAproved { get; set; }
+        public bool IsApproved { get; set; }
         [BsonRequired]
         public int Views { get; set; }
-        [BsonRequired]
-        public DateTime UpdatedOn { get; set; }
-        [BsonRequired]
-        public DateTime CreatedOn { get; set; }
+
+        public Article(ArticleRequest model, string authorId)
+        {
+            Abstract = model.Abstract;
+            AuthorId = authorId;
+            Content = model.Content;
+            CoverImage = model.CoverImage;
+            IsPrivate = model.IsPrivate;
+            Title = model.Title;
+            Categories = model.Categories;
+        }
     }
 }
