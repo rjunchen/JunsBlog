@@ -120,5 +120,20 @@ namespace JunsBlog.Test.Mockups
         {
             throw new NotImplementedException();
         }
+
+        public Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string searchKey, SortByEnum sortBy, SortOrderEnum sortOrder)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ArticleDetails> GetArticleDetailsAsync(string articleId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ArticleRankingDetails> GetArticleRankingDetailsAsync(string articleId, string userId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

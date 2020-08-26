@@ -1,6 +1,7 @@
 ﻿using JunsBlog.Entities;
 using JunsBlog.Helpers;
 using JunsBlog.Interfaces.Settings;
+using JunsBlog.Models.Authentication;
 using JunsBlog.Models.Settings;
 using JunsBlog.Test.Mockups;
 using Microsoft.IdentityModel.Tokens;
@@ -17,25 +18,18 @@ namespace JunsBlog.Test.UnitTests
         private readonly User sampleUser;
         public JwtTokenHelperTest()
         {
-            sampleUser = new User()
+            var regRequest = new RegisterRequest()
             {
                 Email = "Tester@gmail.com",
                 Name = "Tester",
                 Password = "123456",
-                Id = "8DB7FE3D-E5AE-4762-9A24-0E8651363CE4",
-                Role = Role.User,
-                CreatedOn = DateTime.UtcNow
             };
+            sampleUser = new User(regRequest);        
         }
 
         public static IEnumerable<Object[]> GetBadUsers()
         {
-            yield return new object[] { new User() { Email = "Tester@gmail.com", Name = String.Empty, Password = "123456",
-                Id= "8DB7FE3D-E5AE-4762-9A24-0E8651363CE4", Role= Role.User, CreatedOn=DateTime.UtcNow } };
-            yield return new object[] { new User() { Email = "Tester@gmail.com", Name = "Tester", Password = "123456",
-                Id= String.Empty, Role= Role.User, CreatedOn=DateTime.UtcNow } };
-            yield return new object[] { new User() { Email = "Tester@gmail.com", Name = "Tester", Password = "123456",
-                Id= "8DB7FE3D-E5AE-4762-9A24-0E8651363CE4", Role= String.Empty, CreatedOn=DateTime.UtcNow } };
+            yield return new object[] { new User(new RegisterRequest() { Email = "Tester@gmail.com", Name = String.Empty, Password = "123456" }) };
             yield return new object[] { null };
         }
 
