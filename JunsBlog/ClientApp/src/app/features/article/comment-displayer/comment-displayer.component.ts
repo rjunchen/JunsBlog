@@ -31,10 +31,7 @@ export class CommentDisplayerComponent implements OnInit {
   }
 
   showCommentControl(comment: CommentDetails){
-    var commenterRequest = new CommenterRequest();
-    commenterRequest.callerId = comment.id;
-    commenterRequest.isCallerArticle = false;
-    commenterRequest.comments = comment.comments;
+    var commenterRequest = new CommenterRequest(comment.id, comment.comments, false);
     this.commentService.showCommentControl(commenterRequest);
   }
 

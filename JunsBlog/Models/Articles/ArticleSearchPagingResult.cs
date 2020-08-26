@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace JunsBlog.Models.Articles
 {
-    public class SearchResponse
+    public class ArticleSearchPagingResult
     {
         public List<ArticleDetails> Documents { get; set; }
         public int TotalDocuments { get; set; }
@@ -18,9 +18,9 @@ namespace JunsBlog.Models.Articles
         public bool HasPreviousPage { get; set; }
         public string SearchKey { get; set; }
         public SortOrderEnum SortOrder { get; set; }
-        public string SortBy { get; set; }
+        public SortByEnum SortBy { get; set; }
 
-        public SearchResponse(List<ArticleDetails> articleDetailsList, int totalDocument, int currentPage, int pageSize, string searchKey, string sortBy, SortOrderEnum sortOrder)
+        public ArticleSearchPagingResult(List<ArticleDetails> articleDetailsList, int totalDocument, int currentPage, int pageSize, string searchKey, SortByEnum sortBy, SortOrderEnum sortOrder)
         {
             Documents = articleDetailsList;
             TotalDocuments = totalDocument;

@@ -111,12 +111,12 @@ namespace JunsBlog.Test.Mockups
             });
         }
 
-        public Task<SearchResponse> SearchArticlesAsyc(int page, int pageSize, string searchKey, string sortOrder, string sortBy)
+        public Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string searchKey, string sortOrder, string sortBy)
         {
             throw new NotImplementedException();
         }
 
-        public Task<SearchResponse> SearchArticlesAsyc(int page, int pageSize, string sortBy, string searchKey, SortOrderEnum sortOrder)
+        public Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string sortBy, string searchKey, SortOrderEnum sortOrder)
         {
             throw new NotImplementedException();
         }

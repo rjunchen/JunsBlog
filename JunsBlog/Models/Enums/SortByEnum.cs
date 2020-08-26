@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace JunsBlog.Models.Enums
 {
-    public enum SortOrderEnum
+    public enum SortByEnum
     {
-        Descending,
-        Ascending
+        CreatedOn,
+        Views,
     }
 }

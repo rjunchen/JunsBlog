@@ -75,59 +75,68 @@ namespace JunsBlog.Models.Services
 
         public async Task<ArticleDetails> GetArticleDetailsAsync(string articleId)
         {
-            var query = from p in articles.AsQueryable()
-                       where p.Id == articleId
-                       join o in users.AsQueryable() on p.AuthorId equals o.Id into userJoined
+            var query = from a in articles.AsQueryable()
+                       where a.Id == articleId
+                       join u in users.AsQueryable() on a.AuthorId equals u.Id into userJoined
                        select new ArticleDetails()
                        {
-                           Abstract = p.Abstract,
-                           Content = p.Content,
-                           CoverImage = p.CoverImage,
-                           Id = p.Id,
-                           Title = p.Title,
-                           UpdatedOn = p.UpdatedOn,
-                           CreatedOn = p.CreatedOn,
-                           Views = p.Views,
+                           Abstract = a.Abstract,
+                           Content = a.Content,
+                           CoverImage = a.CoverImage,
+                           Id = a.Id,
+                           Title = a.Title,
+                           UpdatedOn = a.UpdatedOn,
+                           CreatedOn = a.CreatedOn,
+                           Views = a.Views,
+                           IsApproved = a.IsApproved,
+                           IsPrivate = a.IsPrivate,
                            Author = userJoined.First()
                        };
 
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<SearchResponse> SearchArticlesAsyc(int page, int pageSize, string searchKey, string sortBy, SortOrderEnum sortOrder)
+        public async Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string searchKey, SortByEnum sortBy, SortOrderEnum sortOrder)
         {
-            var filterDefinition = String.IsNullOrEmpty(searchKey)
-                ? FilterDefinition<Article>.Empty : Builders<Article>.Filter.Where(x => x.Content.Contains(searchKey));
+            var query = articles.AsQueryable();
 
-            var sortDefintion = sortOrder == SortOrderEnum.Ascending
-                ? Builders<Article>.Sort.Ascending(sortBy)
-                : Builders<Article>.Sort.Descending(sortBy);
-
-            var totalDocuments = await articles.CountDocumentsAsync(filterDefinition);
-
-            var documents = await articles.Find(filterDefinition).Skip((page - 1) * pageSize).Limit(pageSize).Sort(sortDefintion).ToListAsync();
-
-            var articleDetailsList = new List<ArticleDetails>();
-
-            foreach (Article document in documents)
+            if (!string.IsNullOrEmpty(searchKey)) query = query.Where(x => x.Content.Contains(searchKey));
+          
+            switch (sortBy)
             {
-                var articleDetails = new ArticleDetails();
-
-                articleDetails.Title = document.Title;
-                articleDetails.Content = document.Content;
-                articleDetails.Abstract = document.Abstract;
-                articleDetails.CoverImage = document.CoverImage;
-                articleDetails.Id = document.Id;
-                articleDetails.UpdatedOn = document.UpdatedOn;
-                articleDetails.Views = document.Views;
-                articleDetails.Author = await FindUserAsync(x => x.Id == document.AuthorId);
-
-                articleDetailsList.Add(articleDetails);
+                case SortByEnum.CreatedOn:
+                    if (sortOrder == SortOrderEnum.Ascending)
+                        query = query.OrderBy(x => x.CreatedOn);
+                    else
+                        query = query.OrderByDescending(x => x.CreatedOn);
+                    break;
+                case SortByEnum.Views:
+                    if (sortOrder == SortOrderEnum.Ascending)
+                        query = query.OrderBy(x => x.Views);
+                    else
+                        query = query.OrderByDescending(x => x.Views);
+                    break;
             }
 
-            var searchResponse = new SearchResponse(articleDetailsList, (int)totalDocuments, page, pageSize, searchKey, sortBy, sortOrder);
+            var documentsCount = await query.CountAsync();
 
-            return searchResponse;
+
+            var documents = await query.Join(users, a => a.AuthorId, u => u.Id, (a, u) => new ArticleDetails()
+            {
+                Abstract = a.Abstract,
+                CoverImage = a.CoverImage,
+                Id = a.Id,
+                Title = a.Title,
+                UpdatedOn = a.UpdatedOn,
+                CreatedOn = a.CreatedOn,
+                IsApproved = a.IsApproved,
+                IsPrivate = a.IsPrivate,
+                Views = a.Views,
+                Author = u
+            }).Skip(page - 1).Take(pageSize).ToListAsync();
+
+
+            return new ArticleSearchPagingResult(documents, documentsCount, page, pageSize, searchKey, sortBy, sortOrder);
         }
 
         public async Task<List<ArticleRanking>> FindArticleRankingsAsync(Expression<Func<ArticleRanking, bool>> filter)

@@ -26,7 +26,7 @@ namespace JunsBlog.Entities
         [BsonRequired]
         public bool IsPrivate { get; set; }
         [BsonRequired]
-        public bool IsAproved { get; set; }
+        public bool IsApproved { get; set; }
         [BsonRequired]
         public int Views { get; set; }
 

@@ -16,7 +16,7 @@ namespace JunsBlog.Interfaces.Services
         Task<UserToken> SaveUserTokenAsync(UserToken userToken);
         Task<Article> SaveArticleAsync(Article article);
         Task<Article> FindArticAsync(Expression<Func<Article, bool>> filter);
-        Task<SearchResponse> SearchArticlesAsyc(int page, int pageSize, string sortBy, string searchKey, SortOrderEnum sortOrder);
+        Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string searchKey, SortByEnum sortBy, SortOrderEnum sortOrder);
         Task<ArticleRanking> SaveArticleRankingAsync(ArticleRanking ranking);
         Task<List<ArticleRanking>> FindArticleRankingsAsync(Expression<Func<ArticleRanking, bool>> filter);
         Task<ArticleRanking> FindArticleRankingAsync(Expression<Func<ArticleRanking, bool>> filter);

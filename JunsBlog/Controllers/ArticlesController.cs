@@ -69,13 +69,13 @@ namespace JunsBlog.Controllers
         }
 
         [HttpGet("Search")]
-        public async Task<IActionResult> SearchArticles(int page = 1, int pageSize = 10, string searchKey = null, string sortBy = "UpdatedOn", SortOrderEnum sortOrder =SortOrderEnum.Descending)
+        public async Task<IActionResult> SearchArticles(int page = 1, int pageSize = 10, string searchKey = null, SortByEnum sortBy = SortByEnum.CreatedOn, SortOrderEnum sortOrder = SortOrderEnum.Descending)
         {
             try
             {
-                var searchResponse = await databaseService.SearchArticlesAsyc(page, pageSize, searchKey, sortBy, sortOrder);
+                var searchResult = await databaseService.SearchArticlesAsyc(page, pageSize, searchKey, sortBy, sortOrder);
 
-                return Ok(searchResponse);
+                return Ok(searchResult);
             }
             catch (Exception ex)
             {
@@ -84,7 +84,6 @@ namespace JunsBlog.Controllers
             }
         }
 
-  
         [Authorize(Roles = Role.User)]
         [HttpPost("rank")]
         public async Task<IActionResult> RankArticle(ArticleRankingRequest model)
@@ -125,15 +124,17 @@ namespace JunsBlog.Controllers
             }
         }
 
-
-        [HttpGet("test")]
-        public async Task<IActionResult> TestArticle(string articleId)
+        [HttpGet("rank")]
+        public async Task<IActionResult> GetArticleRanking(string articleId)
         {
             try
             {
-                logger.LogWarning("test message");
-                var result = await databaseService.GetArticleDetailsAsync(articleId);
-                return Ok(result);
+                if (String.IsNullOrWhiteSpace(articleId))
+                    return BadRequest(new { message = "Incomplete ranking information" });
+
+                var articleRankingDetails = await databaseService.GetArticleRankingDetailsAsync(articleId, currentUserId);
+
+                return Ok(articleRankingDetails);
             }
             catch (Exception ex)
             {
@@ -141,5 +142,6 @@ namespace JunsBlog.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
     }
 }

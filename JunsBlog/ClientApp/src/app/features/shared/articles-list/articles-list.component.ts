@@ -3,7 +3,7 @@ import { ArticleListConfig } from 'src/app/models/articleListConfig';
 import { Article } from 'src/app/models/article';
 import { ArticleService } from 'src/app/services/article.service';
 import { ToastrService } from 'ngx-toastr';
-import { ArticlePagingResult } from 'src/app/models/articlePagingResult';
+import { ArticleSearchPagingResult } from 'src/app/models/articleSearchPagingResult';
 
 @Component({
   selector: 'app-articles-list',
@@ -14,7 +14,7 @@ export class ArticlesListComponent implements OnInit {
   @Input() articleListConfig: ArticleListConfig;
 
   articles: Article[];
-  articlePagingResult: ArticlePagingResult;
+  articlePagingResult: ArticleSearchPagingResult;
   defaultAvatarUrl = './assets/avatar.png';
 
   
