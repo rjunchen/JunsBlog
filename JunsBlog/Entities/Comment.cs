@@ -12,5 +12,12 @@ namespace JunsBlog.Entities
         public DateTime UpdatedOn { get; set; }
         [BsonRequired]
         public DateTime CreatedOn { get; set; }
+        [BsonRequired]
+        public string Content { get; set; }
+        [BsonRequired]
+        public string TargetId { get; set; }
+        [BsonRequired]
+        public string CommenterId { get; set; }
+
     }
 }

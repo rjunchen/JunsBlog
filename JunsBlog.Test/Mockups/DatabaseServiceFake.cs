@@ -27,6 +27,11 @@ namespace JunsBlog.Test.Mockups
             return await Task.Run(() => articles.Find(predic));
         }
 
+        public Task<List<CommentRanking>> FindCommentRankingsAsync(Expression<Func<CommentRanking, bool>> filter)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<ArticleRanking> FindRankingAsync(Expression<Func<ArticleRanking, bool>> filter)
         {
             throw new NotImplementedException();
@@ -50,7 +55,17 @@ namespace JunsBlog.Test.Mockups
             return await Task.Run(() => userTokens.Find(predic));
         }
 
+        public Task<List<Comment>> GetCommentsAsync(string targetId)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<Article> SaveArticleAsync(Article article)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Comment> SaveCommentAsync(Comment comment)
         {
             throw new NotImplementedException();
         }

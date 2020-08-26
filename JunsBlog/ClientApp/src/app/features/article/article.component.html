@@ -17,8 +17,12 @@
             <button matTooltip="Dislike"  mat-mini-fab color="{{article.ranking.didIDislike ? 'success' : 'unrated'}}" mat-button (click)="dislike()"><mat-icon>thumb_down</mat-icon></button>
             <span >{{article.ranking.dislikes}}</span>
             <button matTooltip="Favorite"  mat-mini-fab color="{{article.ranking.didIFavor ? 'success' : 'unrated'}}" mat-button (click)="favor()"><mat-icon>favorite</mat-icon></button>
+            <button matTooltip="Comment" color="success"  mat-mini-fab mat-button (click)="showCommenter()"><mat-icon>comment</mat-icon></button>
         </div>
     </div>
-    <!-- <app-comments class="comments-section" [article]="article"></app-comments> -->
+
+    <app-comments [article]="article"></app-comments>
+
+    <app-comment-control></app-comment-control>
 </div>
 

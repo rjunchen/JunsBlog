@@ -10,17 +10,22 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
-import { QuillModule } from 'ngx-quill'
+import { QuillModule } from 'ngx-quill';
+import { CommentsComponent } from './comments/comments.component';
+import { CommentControlComponent } from './comment-control/comment-control.component';
+import { CommentDisplayerComponent } from './comment-displayer/comment-displayer.component';
 
 @NgModule({
-  declarations: [ArticleComponent],
+  declarations: [ArticleComponent, CommentsComponent, CommentControlComponent, CommentDisplayerComponent],
   imports: [
     CommonModule,
     ArticleRoutingModule,
     FormsModule, ReactiveFormsModule, 
     MatDividerModule, MatIconModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatProgressSpinnerModule,
+    MatTooltipModule,
     QuillModule.forRoot()
   ]
 })

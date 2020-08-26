@@ -1,0 +1,42 @@
+.comment-control{
+    padding: 10px;
+    background-color: white;
+    box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
+    display: flex;
+    position: fixed;
+    bottom:0px;
+    left: 0px;
+    width: 100%;
+    .comment-input-section{
+        display: flex;
+        width: 100%;
+        .profileImage{
+            margin-top: 15px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+        .comment-field{
+            width: 100%;   
+            margin-left: 10px; 
+            padding-right: 20px;
+        }
+    } 
+
+    .action-buttons-container{
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: flex-start;
+        padding-right: 5px;
+        button{
+            font-size: 12px;
+        }
+    }  
+}
+
+
+@media only screen and (max-width: 768px){
+    .comment-control{
+        margin-bottom: 64px;
+    }
+}

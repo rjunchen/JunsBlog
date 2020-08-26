@@ -57,7 +57,7 @@ $color-orange: #f44336;
 @media only screen and (max-width: 768px){
     .article-container{
         padding: 0px;  
-        margin-bottom: 50px;
+        margin-bottom: 64px;
         .article-display-box{
             padding: 5px 5px 10px 0px;
 
@@ -72,6 +72,10 @@ $color-orange: #f44336;
                     }
                 }
             }
+        }
+
+        .comment-control{
+            margin-bottom: 64px;
         }
     }
 }

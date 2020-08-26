@@ -30,7 +30,6 @@ export class ArticlesListComponent implements OnInit {
     const pageSize: number = 10;
     this.loading = true;
     this.articleService.searchArticle(intiPage, pageSize).subscribe(x=>{
-      console.log(x);
       this.articles = x.documents;
       this.articlePagingResult = x;
       this.loading = false;
@@ -47,7 +46,7 @@ export class ArticlesListComponent implements OnInit {
 
 
   onScrollDown () {
-    if(this.articlePagingResult.hasNextPage && !this.loading){
+    if(this.articlePagingResult && this.articlePagingResult.hasNextPage && !this.loading){
       this.loading = true;
       this.articleService.searchArticle(this.articlePagingResult.currentPage + 1 , this.articlePagingResult.pageSize).subscribe(
         data => {        

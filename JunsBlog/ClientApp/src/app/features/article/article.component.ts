@@ -7,6 +7,10 @@ import { mergeMap } from 'rxjs/operators';
 import { RankingResponse } from 'src/app/models/rankingResponse';
 import { RankingRequest } from 'src/app/models/RankingRequest';
 import { RankEnum } from 'src/app/models/rankEnum';
+import { User } from 'src/app/models/user';
+import { AuthenticationService } from 'src/app/core/authentication.service';
+import { CommentService } from 'src/app/services/comment.service';
+import { CommenterRequest } from 'src/app/models/commenterRequest';
 
 @Component({
   selector: 'app-article',
@@ -18,18 +22,19 @@ export class ArticleComponent implements OnInit {
   article: ArticleDetails;
   isProcessing: boolean;
   ranking: RankingResponse;
-
   defaultAvatarUrl = './assets/avatar.png';
 
-  constructor(private route: ActivatedRoute,  private articleService: ArticleService,
-     private router: Router, private toastr: ToastrService) {}
+  constructor(private auth: AuthenticationService, private route: ActivatedRoute,  private articleService: ArticleService,
+     private router: Router, private toastr: ToastrService, private commentService: CommentService) {}
 
 
   ngOnInit(): void {
+
+
+
     this.route.params.pipe(mergeMap(params => this.articleService.getArticle(params['id']))
     ).subscribe(
       data => { 
-        console.log(data);
         this.article = data;
       },
       err => {
@@ -49,7 +54,6 @@ export class ArticleComponent implements OnInit {
     request.rank = RankEnum.Like;
     this.articleService.rankArticle(request).subscribe(data=> {
       this.article.ranking = data;
-      console.log(this.article);
       this.isProcessing = false;
     }, err=>{
       this.isProcessing = false;
@@ -68,7 +72,6 @@ export class ArticleComponent implements OnInit {
     request.rank = RankEnum.Favor;
     this.articleService.rankArticle(request).subscribe(data=> {
       this.article.ranking = data;
-      console.log(this.article);
       this.isProcessing = false;
     }, err=>{
       this.isProcessing = false;
@@ -87,7 +90,7 @@ export class ArticleComponent implements OnInit {
     request.rank = RankEnum.Dislike;
     this.articleService.rankArticle(request).subscribe(data=> {
       this.article.ranking = data;
-      console.log(this.article);
+
       this.isProcessing = false;
     }, err=>{
       this.isProcessing = false;
@@ -97,5 +100,13 @@ export class ArticleComponent implements OnInit {
         this.toastr.error('Unknown error occurred, please try again later');
       }
     })
+  }
+
+  showCommenter(){
+    var request = new CommenterRequest();
+    request.callerId = this.article.id;
+    request.comments = this.article.comments;
+    request.isCallerArticle = true;
+    this.commentService.showCommentControl(request);
   }
 }
