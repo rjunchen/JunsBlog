@@ -10,6 +10,7 @@ import { RankEnum } from 'src/app/models/rankEnum';
 import { CommentService } from 'src/app/services/comment.service';
 import { CommenterRequest } from 'src/app/models/commenterRequest';
 import { ArticleRankingDetails } from 'src/app/models/articleRankingDetails';
+import { CommentTypeEnum } from 'src/app/models/CommentTypeEnum';
 
 @Component({
   selector: 'app-article',
@@ -85,7 +86,7 @@ export class ArticleComponent implements OnInit {
   }
 
   showCommenter(){
-    var request = new CommenterRequest(this.article.id, this.article.comments, true);
+    var request = new CommenterRequest(this.article.id, this.article.comments, CommentTypeEnum.Article);
     this.commentService.showCommentControl(request);
   }
 }

@@ -26,23 +26,19 @@ export class CommentsComponent implements OnInit {
   scrollUpDistance = 2;
   loading = false;
 
-
-
   constructor(private commentService: CommentService, private toastr: ToastrService,
     private router: Router, private auth: AuthenticationService) { }
 
   ngOnInit(): void {
     this.commentService.getComments(this.article.id).subscribe(x=>{
-      console.log(x);
       this.article.comments = x;
-
-      this.article.comments.forEach(comment => {
-        if(!comment.comments) comment.comments = []; 
-      });
-
+      console.log(x);
     }, err=>{
-
+      if (err.status === 400) {     
+        this.toastr.warning(err.error.message, err.statusText);
+      } else {
+        this.toastr.error('Unknown error occurred, please try again later');
+      }
     })
   }
-
 }

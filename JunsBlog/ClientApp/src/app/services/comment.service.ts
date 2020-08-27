@@ -13,8 +13,8 @@ export class CommentService {
   @Output() onShowCommentControl: EventEmitter<any> = new EventEmitter();
   constructor(private http: HttpClient) { }
 
-  public replyArticle(commentRequest: CommentRequest): Observable<any> {
-    return this.http.post('/api/comment/reply', commentRequest);
+  public replyArticle(commentRequest: CommentRequest): Observable<CommentDetails> {
+    return this.http.post('/api/comment/reply', commentRequest).pipe(map(data => { return <CommentDetails>data}));
   }
 
   public getComments(targetId: string): Observable<CommentDetails[]> {

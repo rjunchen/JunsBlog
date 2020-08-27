@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { Article } from 'src/app/models/article';
 import { ArticleService } from 'src/app/services/article.service';
 import { MatChipInputEvent } from '@angular/material/chips';
@@ -68,6 +68,11 @@ export class EditorComponent implements OnInit {
     if (index >= 0) {
       this.article.categories.splice(index, 1);
     }
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  unloadHandler(event: Event) {
+    // Your logic on beforeunload
   }
 
 }

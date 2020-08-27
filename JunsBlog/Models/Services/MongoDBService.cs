@@ -75,6 +75,10 @@ namespace JunsBlog.Models.Services
 
         public async Task<ArticleDetails> GetArticleDetailsAsync(string articleId)
         {
+            // Increase the view count by 1
+            var updateDef = Builders<Article>.Update.Inc(x => x.Views, 1);
+            await articles.UpdateOneAsync<Article>(x => x.Id == articleId, updateDef);
+
             var query = from a in articles.AsQueryable()
                        where a.Id == articleId
                        join u in users.AsQueryable() on a.AuthorId equals u.Id into userJoined
@@ -98,10 +102,38 @@ namespace JunsBlog.Models.Services
 
         public async Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string searchKey, SortByEnum sortBy, SortOrderEnum sortOrder)
         {
-            var query = articles.AsQueryable();
+            var query = articles.AsQueryable().GroupJoin(comments.AsQueryable(), x => x.Id, y => y.TargetId, (x, y) => new { article = x, comments = y })
+                               .Select(a => new
+                               {
+                                   Abstract = a.article.Abstract,
+                                   CoverImage = a.article.CoverImage,
+                                   Id = a.article.Id,
+                                   Title = a.article.Title,
+                                   UpdatedOn = a.article.UpdatedOn,
+                                   CreatedOn = a.article.CreatedOn,
+                                   IsApproved = a.article.IsApproved,
+                                   IsPrivate = a.article.IsPrivate,
+                                   Views = a.article.Views,
+                                   AuthorId = a.article.AuthorId,
+                                   commentsCount = a.comments.Count()
+                               }).Join(users.AsQueryable(), x => x.AuthorId, y => y.Id, (x, y) => new ArticleDetails
+                               {
+                                   Abstract = x.Abstract,
+                                   CoverImage = x.CoverImage,
+                                   Id = x.Id,
+                                   Title = x.Title,
+                                   UpdatedOn = x.UpdatedOn,
+                                   CreatedOn = x.CreatedOn,
+                                   IsApproved = x.IsApproved,
+                                   IsPrivate = x.IsPrivate,
+                                   Views = x.Views,
+                                   Author = y,
+                                   CommentsCount = x.commentsCount
+                               });
+
 
             if (!string.IsNullOrEmpty(searchKey)) query = query.Where(x => x.Content.Contains(searchKey));
-          
+
             switch (sortBy)
             {
                 case SortByEnum.CreatedOn:
@@ -118,25 +150,9 @@ namespace JunsBlog.Models.Services
                     break;
             }
 
-            var documentsCount = await query.CountAsync();
+            var documents = await query.Skip(page - 1).Take(pageSize).ToListAsync();
 
-
-            var documents = await query.Join(users, a => a.AuthorId, u => u.Id, (a, u) => new ArticleDetails()
-            {
-                Abstract = a.Abstract,
-                CoverImage = a.CoverImage,
-                Id = a.Id,
-                Title = a.Title,
-                UpdatedOn = a.UpdatedOn,
-                CreatedOn = a.CreatedOn,
-                IsApproved = a.IsApproved,
-                IsPrivate = a.IsPrivate,
-                Views = a.Views,
-                Author = u
-            }).Skip(page - 1).Take(pageSize).ToListAsync();
-
-
-            return new ArticleSearchPagingResult(documents, documentsCount, page, pageSize, searchKey, sortBy, sortOrder);
+            return new ArticleSearchPagingResult(documents, documents.Count, page, pageSize, searchKey, sortBy, sortOrder);
         }
 
         public async Task<List<ArticleRanking>> FindArticleRankingsAsync(Expression<Func<ArticleRanking, bool>> filter)

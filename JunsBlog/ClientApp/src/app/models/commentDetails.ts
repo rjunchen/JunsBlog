@@ -8,6 +8,7 @@ export class CommentDetails{
     content: string;
     id: string;
     commentsCount: number;
+    commentDraft: string;
     comments: Array<CommentDetails>;
 
 }

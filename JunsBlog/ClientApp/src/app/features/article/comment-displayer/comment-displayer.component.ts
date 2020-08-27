@@ -4,6 +4,7 @@ import { CommentService } from 'src/app/services/comment.service';
 import { ArticleDetails } from 'src/app/models/articleDetails';
 import { ToastrService } from 'ngx-toastr';
 import { CommenterRequest } from 'src/app/models/commenterRequest';
+import { CommentTypeEnum } from 'src/app/models/CommentTypeEnum';
 
 @Component({
   selector: 'app-comment-displayer',
@@ -31,7 +32,7 @@ export class CommentDisplayerComponent implements OnInit {
   }
 
   showCommentControl(comment: CommentDetails){
-    var commenterRequest = new CommenterRequest(comment.id, comment.comments, false);
+    var commenterRequest = new CommenterRequest(comment.id, comment.comments, CommentTypeEnum.Comment);
     this.commentService.showCommentControl(commenterRequest);
   }
 

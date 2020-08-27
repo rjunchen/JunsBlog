@@ -19,5 +19,6 @@ namespace JunsBlog.Models.Articles
         public string Id { get; set; }
         public bool IsPrivate { get; set; }
         public bool IsApproved { get; set; }
+        public int CommentsCount { get; set; }
     }
 }
