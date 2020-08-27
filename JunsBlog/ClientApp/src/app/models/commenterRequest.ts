@@ -1,13 +1,19 @@
 import { CommentDetails } from './commentDetails';
+import { CommentTypeEnum } from './Enums/commentTypeEnum';
+
 
 export class CommenterRequest{
     callerId: string;
     comments: Array<CommentDetails>;
-    isCallerArticle: boolean;
+    commentType: CommentTypeEnum;
+    commentDraft: string;
 
-    constructor(callerId: string, comments: Array<CommentDetails>, isCallerArticle: boolean){
+    constructor(callerId: string, comments: Array<CommentDetails>,  commentType: CommentTypeEnum, commentDraft: string = ""){
+        if(!comments) comments = [];
+
         this.callerId = callerId;
-        this.comments = comments;
-        this.isCallerArticle = isCallerArticle;
+        this.comments =  comments;  // Assign empty array if the comments is null
+        this.commentType = commentType;
+        this.commentDraft = commentDraft; 
     }
 }

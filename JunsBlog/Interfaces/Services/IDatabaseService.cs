@@ -1,5 +1,6 @@
 ﻿using JunsBlog.Entities;
 using JunsBlog.Models.Articles;
+using JunsBlog.Models.Comments;
 using JunsBlog.Models.Enums;
 using System;
 using System.Collections.Generic;
@@ -22,8 +23,12 @@ namespace JunsBlog.Interfaces.Services
         Task<ArticleRanking> FindArticleRankingAsync(Expression<Func<ArticleRanking, bool>> filter);
         Task<Comment> SaveCommentAsync(Comment comment);
         Task<List<Comment>> GetCommentsAsync(string targetId);
-        Task<List<CommentRanking>> FindCommentRankingsAsync(Expression<Func<CommentRanking, bool>> filter);
+        Task<CommentRanking> FindCommentRankingAsync(Expression<Func<CommentRanking, bool>> filter);
         Task<ArticleDetails> GetArticleDetailsAsync(string articleId);
         Task<ArticleRankingDetails> GetArticleRankingDetailsAsync(string articleId, string userId);
+        Task<CommentSearchPagingResult> SearchCommentsAsync(int page, int pageSize, string searchKey, CommentSearchOnEnum searchOn, SortByEnum sortBy, SortOrderEnum sortOrder, string currentUserId);
+        Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId);
+        Task<CommentRanking> SaveCommentRankingAsync(CommentRanking ranking);
+        Task<CommentRankingDetails> GetCommentRankingDetails(string commentId, string userId);
     }
 }

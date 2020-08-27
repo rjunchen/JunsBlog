@@ -2,7 +2,9 @@
 using JunsBlog.Interfaces.Services;
 using JunsBlog.Interfaces.Settings;
 using JunsBlog.Models.Articles;
+using JunsBlog.Models.Comments;
 using JunsBlog.Models.Enums;
+using MimeKit.Encodings;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using System;
@@ -19,7 +21,7 @@ namespace JunsBlog.Models.Services
         private readonly IMongoCollection<Article> articles;
         private readonly IMongoCollection<UserToken> userTokens;
         private readonly IMongoCollection<ArticleRanking> articleRankings;
-        private readonly IMongoCollection<CommentRanking> commentRanking;
+        private readonly IMongoCollection<CommentRanking> commentRankings;
         private readonly IMongoCollection<Comment> comments;
 
         public MongoDBService(IJunsBlogDatabaseSettings settings)
@@ -31,7 +33,7 @@ namespace JunsBlog.Models.Services
             articles = database.GetCollection<Article>(settings.ArticleCollectionName);
             articleRankings = database.GetCollection<ArticleRanking>(settings.RankingCollectionName);
             comments = database.GetCollection<Comment>(settings.CommentCollectionName);
-            commentRanking = database.GetCollection<CommentRanking>(settings.CommentRankingCollectionName);
+            commentRankings = database.GetCollection<CommentRanking>(settings.CommentRankingCollectionName);
         }
 
         public async Task<User> FindUserAsync(Expression<Func<User, bool>> filter)
@@ -75,6 +77,10 @@ namespace JunsBlog.Models.Services
 
         public async Task<ArticleDetails> GetArticleDetailsAsync(string articleId)
         {
+            // Increase the view count by 1
+            var updateDef = Builders<Article>.Update.Inc(x => x.Views, 1);
+            await articles.UpdateOneAsync<Article>(x => x.Id == articleId, updateDef);
+
             var query = from a in articles.AsQueryable()
                        where a.Id == articleId
                        join u in users.AsQueryable() on a.AuthorId equals u.Id into userJoined
@@ -98,17 +104,45 @@ namespace JunsBlog.Models.Services
 
         public async Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string searchKey, SortByEnum sortBy, SortOrderEnum sortOrder)
         {
-            var query = articles.AsQueryable();
+            var query = articles.AsQueryable().GroupJoin(comments.AsQueryable(), x => x.Id, y => y.TargetId, (x, y) => new { article = x, comments = y })
+                               .Select(a => new
+                               {
+                                   Abstract = a.article.Abstract,
+                                   CoverImage = a.article.CoverImage,
+                                   Id = a.article.Id,
+                                   Title = a.article.Title,
+                                   UpdatedOn = a.article.UpdatedOn,
+                                   CreatedOn = a.article.CreatedOn,
+                                   IsApproved = a.article.IsApproved,
+                                   IsPrivate = a.article.IsPrivate,
+                                   Views = a.article.Views,
+                                   AuthorId = a.article.AuthorId,
+                                   commentsCount = a.comments.Count()
+                               }).Join(users.AsQueryable(), x => x.AuthorId, y => y.Id, (x, y) => new ArticleDetails
+                               {
+                                   Abstract = x.Abstract,
+                                   CoverImage = x.CoverImage,
+                                   Id = x.Id,
+                                   Title = x.Title,
+                                   UpdatedOn = x.UpdatedOn,
+                                   CreatedOn = x.CreatedOn,
+                                   IsApproved = x.IsApproved,
+                                   IsPrivate = x.IsPrivate,
+                                   Views = x.Views,
+                                   Author = y,
+                                   CommentsCount = x.commentsCount
+                               });
+
 
             if (!string.IsNullOrEmpty(searchKey)) query = query.Where(x => x.Content.Contains(searchKey));
-          
+
             switch (sortBy)
             {
-                case SortByEnum.CreatedOn:
+                case SortByEnum.UpdatedOn:
                     if (sortOrder == SortOrderEnum.Ascending)
-                        query = query.OrderBy(x => x.CreatedOn);
+                        query = query.OrderBy(x => x.UpdatedOn);
                     else
-                        query = query.OrderByDescending(x => x.CreatedOn);
+                        query = query.OrderByDescending(x => x.UpdatedOn);
                     break;
                 case SortByEnum.Views:
                     if (sortOrder == SortOrderEnum.Ascending)
@@ -118,25 +152,11 @@ namespace JunsBlog.Models.Services
                     break;
             }
 
-            var documentsCount = await query.CountAsync();
+            var docsCount = await query.CountAsync();
 
+            var documents = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
-            var documents = await query.Join(users, a => a.AuthorId, u => u.Id, (a, u) => new ArticleDetails()
-            {
-                Abstract = a.Abstract,
-                CoverImage = a.CoverImage,
-                Id = a.Id,
-                Title = a.Title,
-                UpdatedOn = a.UpdatedOn,
-                CreatedOn = a.CreatedOn,
-                IsApproved = a.IsApproved,
-                IsPrivate = a.IsPrivate,
-                Views = a.Views,
-                Author = u
-            }).Skip(page - 1).Take(pageSize).ToListAsync();
-
-
-            return new ArticleSearchPagingResult(documents, documentsCount, page, pageSize, searchKey, sortBy, sortOrder);
+            return new ArticleSearchPagingResult(documents, docsCount, page, pageSize, searchKey, sortBy, sortOrder);
         }
 
         public async Task<List<ArticleRanking>> FindArticleRankingsAsync(Expression<Func<ArticleRanking, bool>> filter)
@@ -192,9 +212,137 @@ namespace JunsBlog.Models.Services
             return await comments.Find<Comment>(x=> x.TargetId == targetId).ToListAsync();
         }
 
-        public async Task<List<CommentRanking>> FindCommentRankingsAsync(Expression<Func<CommentRanking, bool>> filter)
+        public async Task<CommentRanking> FindCommentRankingAsync(Expression<Func<CommentRanking, bool>> filter)
         {
-            return await commentRanking.Find<CommentRanking>(filter).ToListAsync();
+            return await commentRankings.Find<CommentRanking>(filter).FirstOrDefaultAsync();
+        }
+
+        public async Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId)
+        {
+            var rankingDetails = await GetCommentRankingDetails(commentId, currentUserId);
+
+            var query = comments.AsQueryable().Where(x=>x.Id == commentId).GroupJoin(comments.AsQueryable(), x => x.Id, y => y.TargetId, (x, y) => new { comment = x, subComments = y })
+                              .Select(a => new
+                              {
+                                  Id = a.comment.Id,
+                                  CommentText = a.comment.CommentText,
+                                  UpdatedOn = a.comment.UpdatedOn,
+                                  CommentType = a.comment.CommentType,
+                                  TargetId = a.comment.TargetId,
+                                  CommentsCount = a.subComments.Count(),
+                                  CommmenterId = a.comment.CommenterId
+
+                              }).Join(users.AsQueryable(), x => x.CommmenterId, y => y.Id, (x, y) => new CommentDetails
+                              {
+                                  Id = x.Id,
+                                  CommentText = x.CommentText,
+                                  UpdatedOn = x.UpdatedOn,
+                                  CommentType = x.CommentType,
+                                  TargetId = x.TargetId,
+                                  CommentsCount = x.CommentsCount,
+                                  Commenter = y
+                              });
+
+            var commentDetail = await query.FirstOrDefaultAsync();
+            commentDetail.Ranking = rankingDetails;
+            return commentDetail;
+        }
+
+        public async Task<CommentRankingDetails> GetCommentRankingDetails(string commentId, string userId)
+        {
+            var rankings = await commentRankings.Find(x => x.CommentId == commentId).ToListAsync();
+
+            var rankingResponse = new CommentRankingDetails() { CommentId = commentId };
+
+            foreach (var item in rankings)
+            {
+                if (item.DidIDislike) rankingResponse.DislikesCount++;
+                if (item.DidILike) rankingResponse.LikesCount++;
+                rankingResponse.DidIFavor = item.DidIFavor;
+
+                if (item.UserId == userId)
+                {
+                    rankingResponse.DidIDislike = item.DidIDislike;
+                    rankingResponse.DidILike = item.DidILike;
+                    rankingResponse.DidIFavor = item.DidIFavor;
+                }
+            }
+            return rankingResponse;
+        }
+
+
+        public async Task<CommentSearchPagingResult> SearchCommentsAsync(int page, int pageSize, string searchKey, CommentSearchOnEnum searchOn, SortByEnum sortBy, SortOrderEnum sortOrder, string currentUserId = null)
+        {
+            var query = comments.AsQueryable().GroupJoin(comments.AsQueryable(), x => x.Id, y => y.TargetId, (x, y) => new { comment = x, subComments = y })
+                              .Select(a => new
+                              {
+                                  Id = a.comment.Id,
+                                  CommentText = a.comment.CommentText,
+                                  UpdatedOn = a.comment.UpdatedOn,
+                                  CommentType = a.comment.CommentType,
+                                  TargetId = a.comment.TargetId,
+                                  CommentsCount = a.subComments.Count(),
+                                  CommmenterId = a.comment.CommenterId
+
+                              }).Join(users.AsQueryable(), x => x.CommmenterId, y => y.Id, (x, y) => new CommentDetails
+                              {
+                                  Id = x.Id,
+                                  CommentText = x.CommentText,
+                                  UpdatedOn = x.UpdatedOn,
+                                  CommentType = x.CommentType,
+                                  TargetId = x.TargetId,
+                                  CommentsCount = x.CommentsCount,
+                                  Commenter = y
+                              });
+
+            if (!string.IsNullOrEmpty(searchKey))
+            {
+                switch (searchOn)
+                {
+                    case CommentSearchOnEnum.TargetId:
+                        query = query.Where(x => x.TargetId == searchKey.Trim());
+                        break;
+                    case CommentSearchOnEnum.CommentText:
+                        query = query.Where(x => x.CommentText.Contains(searchKey.Trim()));
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            switch (sortBy)
+            {
+                case SortByEnum.UpdatedOn:
+                    if (sortOrder == SortOrderEnum.Ascending)
+                        query = query.OrderBy(x => x.UpdatedOn);
+                    else
+                        query = query.OrderByDescending(x => x.UpdatedOn);
+                    break;
+                //case SortByEnum.Views:
+                //    if (sortOrder == SortOrderEnum.Ascending)
+                //        query = query.OrderBy(x => x.views);
+                //    else
+                //        query = query.OrderByDescending(x => x.Views);
+                //    break;
+            }
+
+            var docsCount = await query.CountAsync();
+
+            var documents = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            foreach (var item in documents)
+            {
+                item.Ranking = await GetCommentRankingDetails(item.Id, currentUserId);
+            }
+
+            return new CommentSearchPagingResult(documents, docsCount, page, pageSize, searchKey, searchOn, sortBy, sortOrder);
+        }
+
+        public async Task<CommentRanking> SaveCommentRankingAsync(CommentRanking ranking)
+        {
+            ranking.UpdatedOn = DateTime.UtcNow;
+            await commentRankings.ReplaceOneAsync(s => s.Id == ranking.Id, ranking, new ReplaceOptions { IsUpsert = true });
+            return ranking;
         }
     }
 }

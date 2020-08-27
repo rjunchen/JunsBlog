@@ -1,5 +1,6 @@
-import { SortOrderEnum } from './sortOrderEnum';
-import { SortByEnum } from './sortByEnum';
+import { SortOrderEnum } from './Enums/sortOrderEnum';
+import { SortByEnum } from './Enums/sortByEnum';
+
 
 export interface InterfaceSearchPagingResult {
     hasNextPage: boolean;

@@ -1,6 +1,6 @@
 import { User } from './user';
 import { Article } from './article';
-import { RankingRequest } from './RankingRequest';
+import { ArticleRankingRequest } from './articleRankingRequest';
 import { ArticleRankingDetails } from './articleRankingDetails';
 import { CommentDetails } from './commentDetails';
 
@@ -12,5 +12,6 @@ export class ArticleDetails extends Article{
     content: string;
     id: string;
     IsApproved: boolean;
+    commentDraft: string;
     comments: Array<CommentDetails>;
 }

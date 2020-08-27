@@ -14,7 +14,6 @@ import { ToastrService } from 'ngx-toastr';
 export class CommentControlComponent implements OnInit {
 
   isVisibleCommenter: boolean;
-  commentText = '';
   defaultAvatarUrl = './assets/avatar.png';
   currentUser: User;
   commenterRequest: CommenterRequest;
@@ -27,17 +26,21 @@ export class CommentControlComponent implements OnInit {
       console.log(data);
       this.isVisibleCommenter = true;
       this.commenterRequest = data;
+      this.commenterRequest.commentDraft += "1";
     });
   }
 
   submit(){
-    var commentRequest = new CommentRequest();
-    commentRequest.content = this.commentText;
-    commentRequest.targetId = this.commenterRequest.callerId;
+    var commentRequest = new CommentRequest(this.commenterRequest);
     this.commentService.replyArticle(commentRequest).subscribe(x=>{
+      console.log(x);
       this.commenterRequest.comments.unshift(x);
     }, err=>{
-      this.toastr.error('Unknown error occurred, please try again later');
+      if (err.status === 400) {     
+        this.toastr.warning(err.error.message, err.statusText);
+      } else {
+        this.toastr.error('Unknown error occurred, please try again later');
+      }
     })
     this.isVisibleCommenter = false;
   }

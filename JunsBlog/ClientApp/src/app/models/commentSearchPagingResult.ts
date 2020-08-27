@@ -1,9 +1,10 @@
 import { InterfaceSearchPagingResult } from './InterfaceSearchPagingResult';
-import { ArticleDetails } from './articleDetails';
 import { SortOrderEnum } from './Enums/sortOrderEnum';
+import { CommentDetails } from './commentDetails';
 import { SortByEnum } from './Enums/sortByEnum';
+import { commentSearchOnEnum } from './Enums/commentSearchOnEnum';
 
-export class ArticleSearchPagingResult implements InterfaceSearchPagingResult {
+export class CommentSearchPagingResult implements InterfaceSearchPagingResult {
     hasNextPage: boolean;
     hasPrevPage: boolean;
     totalDocuments: number;
@@ -13,5 +14,6 @@ export class ArticleSearchPagingResult implements InterfaceSearchPagingResult {
     searchKey: string;
     sortOrder: SortOrderEnum;
     sortBy: SortByEnum;
-    documents: ArticleDetails[];
+    searchOn: commentSearchOnEnum;
+    documents: CommentDetails[];
 }

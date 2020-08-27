@@ -1,4 +1,4 @@
-export class CommentRankingResponse {
+export class CommentRankingDetails {
     didILike: boolean;
     didIDislike: boolean;
     didIFavor: boolean;

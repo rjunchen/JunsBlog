@@ -7,6 +7,7 @@ using JunsBlog.Entities;
 using JunsBlog.Interfaces.Services;
 using JunsBlog.Models.Articles;
 using JunsBlog.Models.Comments;
+using JunsBlog.Models.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -41,14 +42,7 @@ namespace JunsBlog.Controllers
 
                 var insertedComment = await databaseService.SaveCommentAsync(new Comment(model, currentUserId));
 
-                var commentDetails = new CommentDetails()
-                {
-                    Commenter = await databaseService.FindUserAsync(x => x.Id == insertedComment.CommenterId),
-                    Content = insertedComment.CommentText,
-                    CreatedOn = insertedComment.CreatedOn,
-                    Ranking = await GetCommentRanking(insertedComment.Id),
-                    Id = insertedComment.Id
-                };
+                var commentDetails = await databaseService.GetCommentDetialsAsync(insertedComment.Id, currentUserId);
 
                 return Ok(commentDetails);
             }
@@ -59,69 +53,14 @@ namespace JunsBlog.Controllers
             }
         }
 
-
-
-        private async Task<CommentRankingResponse> GetCommentRanking(string commentId)
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchComments(int page = 1, int pageSize = 10, string searchKey = null, CommentSearchOnEnum searchOn = CommentSearchOnEnum.CommentText, SortByEnum sortBy = SortByEnum.UpdatedOn, SortOrderEnum sortOrder = SortOrderEnum.Descending)
         {
             try
             {
-                if (String.IsNullOrWhiteSpace(commentId))
-                    return null;
+                var searchResult = await databaseService.SearchCommentsAsync(page, pageSize, searchKey, searchOn, sortBy, sortOrder, currentUserId);
 
-                var rankings = await databaseService.FindCommentRankingsAsync(x => x.CommentId == commentId);
-
-                var rankingResponse = new CommentRankingResponse() { CommentId = commentId };
-
-                foreach (var item in rankings)
-                {
-                    if (item.DidIDislike) rankingResponse.Dislikes++;
-                    if (item.DidILike) rankingResponse.Likes++;
-                    rankingResponse.DidIFavor = item.DidIFavor;
-
-                    if (item.UserId == currentUserId)
-                    {
-                        rankingResponse.DidIDislike = item.DidIDislike;
-                        rankingResponse.DidILike = item.DidILike;
-                        rankingResponse.DidIFavor = item.DidIFavor;
-                    }
-                }
-
-                return rankingResponse;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, ex.Message);
-                return null;
-            }
-        }
-
-        [HttpGet("read")]
-        public async Task<IActionResult> GetComments(string targetId)
-        {
-            try
-            {
-                if (String.IsNullOrWhiteSpace(targetId))
-                    return BadRequest(new { message = "Missing targetId" });
-
-                var comments = await databaseService.GetCommentsAsync(targetId);
-
-                var commentsReponse = new List<CommentDetails>();
-
-                foreach (var item in comments)
-                {
-                    var commentDetails = new CommentDetails()
-                    {
-                        Commenter = await databaseService.FindUserAsync(x => x.Id == item.CommenterId),
-                        Content = item.CommentText,
-                        CreatedOn = item.CreatedOn,
-                        Ranking = await GetCommentRanking(item.Id),
-                        Id = item.Id,
-                        CommentsCount = databaseService.GetCommentsAsync(item.Id).Result.Count
-                     };
-                    commentsReponse.Add(commentDetails);
-                }
-
-                return Ok(commentsReponse);
+                return Ok(searchResult);
             }
             catch (Exception ex)
             {
@@ -130,5 +69,45 @@ namespace JunsBlog.Controllers
             }
         }
 
+
+        [Authorize(Roles = Role.User)]
+        [HttpPost("rank")]
+        public async Task<IActionResult> RankComments(CommentRankingRequest model)
+        {
+            try
+            {
+                if (model == null || String.IsNullOrWhiteSpace(model.CommentId))
+                    return BadRequest(new { message = "Incomplete ranking information" });
+
+                var ranking = await databaseService.FindCommentRankingAsync(x => x.CommentId == model.CommentId && x.UserId == currentUserId);
+
+                if (ranking == null) ranking = new CommentRanking(model.CommentId, currentUserId);
+
+                switch (model.Rank)
+                {
+                    case RankEnum.Like:
+                        ranking.DidILike = !ranking.DidILike;
+                        if (ranking.DidILike) ranking.DidIDislike = false;
+                        break;
+                    case RankEnum.Dislike:
+                        ranking.DidIDislike = !ranking.DidIDislike;
+                        if (ranking.DidIDislike) ranking.DidILike = false;
+                        break;
+                    case RankEnum.Favor:
+                        ranking.DidIFavor = !ranking.DidIFavor;
+                        break;
+                }
+                await databaseService.SaveCommentRankingAsync(ranking);
+
+                var rankingDetails = await databaseService.GetCommentRankingDetails(model.CommentId, currentUserId);
+
+                return Ok(rankingDetails);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
     }
 }

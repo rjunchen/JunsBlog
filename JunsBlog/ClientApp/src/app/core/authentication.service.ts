@@ -39,23 +39,25 @@ export class AuthenticationService {
     return this.token;
   }
 
-  public getCurrentUser(){
+  public getCurrentUser(): User{
     return this.currentUser;
   }
 
-  public register(formData): Observable<any> {
+  public register(formData): Observable<TokenResponse> {
     return this.http.post('/api/register', formData).pipe(map((data: TokenResponse)=>{
         if(data){
           this.saveToken(data);
         }
+        return data;
     }))
   }
 
-  public login(formData): Observable<any> {
+  public login(formData): Observable<TokenResponse> {
     return this.http.post('/api/authenticate', formData).pipe(map((data: TokenResponse)=>{
       if(data){
         this.saveToken(data);
       }
+      return data;
     }))
   }
 
@@ -75,7 +77,7 @@ export class AuthenticationService {
     this.router.navigateByUrl('/login');
   }
 
-  public getGoogleAuthUrl(): Observable<any> {
+  public getGoogleAuthUrl(): Observable<string> {
     if(this.googleAuthUrl)
       return of(this.googleAuthUrl);
     return this.http.get('/api/auth/google/url',{responseType: 'text'}).pipe(map((data: string) => {
@@ -84,11 +86,12 @@ export class AuthenticationService {
      }));
   }
 
-  public getAuthenticationInfo(accessToken: string): Observable<any> {
+  public getAuthenticationInfo(accessToken: string): Observable<TokenResponse> {
     return this.http.post('/api/auth/info',{accessToken}).pipe(map((data: TokenResponse) => {
       if(data){
         this.saveToken(data);
       }
+      return data;
      }));
   }
 }

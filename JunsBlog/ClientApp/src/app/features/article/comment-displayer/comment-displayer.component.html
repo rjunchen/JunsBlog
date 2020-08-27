@@ -3,19 +3,19 @@
         <img class="images profileImage" [src]="comment.commenter.image ? comment.commenter.image : defaultAvatarUrl" />
         <div class="name-div">
             <span class="reader-name" [ngClass]="{'chip-style': comment.commenter.id == article.author.id}">{{comment.commenter.name}}</span>
-            <span class="commented-time">{{comment.updatedOn}}</span>
+            <span class="commented-time">{{comment.updatedOn | timeAgo }}</span>
         </div>
     </div>
     <span class="comment-details">
         <div class="comment-content">
-            {{comment.content}}
+            {{comment.commentText}}
         </div>
         <div class="comment-status">
-            <button mat-icon-button [disabled]="isProcessing" color="{{comment.ranking.didILike ? 'success' : 'unrated'}}" mat-button (click)="likeComment(comment)">
+            <button mat-icon-button [disabled]="isProcessing" color="{{comment.ranking.didILike ? 'success' : 'unrated'}}" mat-button (click)="likeComment()">
                 <mat-icon matTooltip="Like">thumb_up</mat-icon>
             </button>
             <span>{{comment.ranking.likes}}</span>
-            <button mat-icon-button [disabled]="isProcessing" color="{{comment.ranking.didIDislike ? 'success' : 'unrated'}}" mat-button (click)="dislikeComment(comment)">
+            <button mat-icon-button [disabled]="isProcessing" color="{{comment.ranking.didIDislike ? 'success' : 'unrated'}}" mat-button (click)="dislikeComment()">
                 <mat-icon matTooltip="Dislike">thumb_down</mat-icon>
             </button>
             <button mat-button (click)="showCommentControl(comment)">REPLY</button>
