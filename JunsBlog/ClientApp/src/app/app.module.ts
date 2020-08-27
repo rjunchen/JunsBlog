@@ -21,7 +21,7 @@ import { QuillModule } from 'ngx-quill';
 @NgModule({
   declarations: [
     AppComponent,
-    NavBarComponent,
+    NavBarComponent
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule,

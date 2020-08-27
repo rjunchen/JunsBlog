@@ -69,7 +69,7 @@ namespace JunsBlog.Controllers
         }
 
         [HttpGet("Search")]
-        public async Task<IActionResult> SearchArticles(int page = 1, int pageSize = 10, string searchKey = null, SortByEnum sortBy = SortByEnum.CreatedOn, SortOrderEnum sortOrder = SortOrderEnum.Descending)
+        public async Task<IActionResult> SearchArticles(int page = 1, int pageSize = 10, string searchKey = null, SortByEnum sortBy = SortByEnum.UpdatedOn, SortOrderEnum sortOrder = SortOrderEnum.Descending)
         {
             try
             {

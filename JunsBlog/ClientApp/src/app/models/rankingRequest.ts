@@ -1,4 +1,5 @@
-import { RankEnum } from './rankEnum';
+import { RankEnum } from './Enums/rankEnum';
+
 
 export class RankingRequest {
     articleId: string;

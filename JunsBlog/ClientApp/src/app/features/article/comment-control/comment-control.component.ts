@@ -33,6 +33,7 @@ export class CommentControlComponent implements OnInit {
   submit(){
     var commentRequest = new CommentRequest(this.commenterRequest);
     this.commentService.replyArticle(commentRequest).subscribe(x=>{
+      console.log(x);
       this.commenterRequest.comments.unshift(x);
     }, err=>{
       if (err.status === 400) {     

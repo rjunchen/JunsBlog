@@ -2,7 +2,9 @@
 using JunsBlog.Interfaces.Services;
 using JunsBlog.Interfaces.Settings;
 using JunsBlog.Models.Articles;
+using JunsBlog.Models.Comments;
 using JunsBlog.Models.Enums;
+using MimeKit.Encodings;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using System;
@@ -136,11 +138,11 @@ namespace JunsBlog.Models.Services
 
             switch (sortBy)
             {
-                case SortByEnum.CreatedOn:
+                case SortByEnum.UpdatedOn:
                     if (sortOrder == SortOrderEnum.Ascending)
-                        query = query.OrderBy(x => x.CreatedOn);
+                        query = query.OrderBy(x => x.UpdatedOn);
                     else
-                        query = query.OrderByDescending(x => x.CreatedOn);
+                        query = query.OrderByDescending(x => x.UpdatedOn);
                     break;
                 case SortByEnum.Views:
                     if (sortOrder == SortOrderEnum.Ascending)
@@ -150,9 +152,11 @@ namespace JunsBlog.Models.Services
                     break;
             }
 
-            var documents = await query.Skip(page - 1).Take(pageSize).ToListAsync();
+            var docsCount = await query.CountAsync();
 
-            return new ArticleSearchPagingResult(documents, documents.Count, page, pageSize, searchKey, sortBy, sortOrder);
+            var documents = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return new ArticleSearchPagingResult(documents, docsCount, page, pageSize, searchKey, sortBy, sortOrder);
         }
 
         public async Task<List<ArticleRanking>> FindArticleRankingsAsync(Expression<Func<ArticleRanking, bool>> filter)
@@ -211,6 +215,127 @@ namespace JunsBlog.Models.Services
         public async Task<List<CommentRanking>> FindCommentRankingsAsync(Expression<Func<CommentRanking, bool>> filter)
         {
             return await commentRanking.Find<CommentRanking>(filter).ToListAsync();
+        }
+
+        public async Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId)
+        {
+            var rankingDetails = await GetCommentRankingDetails(commentId, currentUserId);
+
+            var query = comments.AsQueryable().Where(x=>x.Id == commentId).GroupJoin(comments.AsQueryable(), x => x.Id, y => y.TargetId, (x, y) => new { comment = x, subComments = y })
+                              .Select(a => new
+                              {
+                                  Id = a.comment.Id,
+                                  CommentText = a.comment.CommentText,
+                                  UpdatedOn = a.comment.UpdatedOn,
+                                  CommentType = a.comment.CommentType,
+                                  TargetId = a.comment.TargetId,
+                                  CommentsCount = a.subComments.Count(),
+                                  CommmenterId = a.comment.CommenterId
+
+                              }).Join(users.AsQueryable(), x => x.CommmenterId, y => y.Id, (x, y) => new CommentDetails
+                              {
+                                  Id = x.Id,
+                                  CommentText = x.CommentText,
+                                  UpdatedOn = x.UpdatedOn,
+                                  CommentType = x.CommentType,
+                                  TargetId = x.TargetId,
+                                  CommentsCount = x.CommentsCount,
+                                  Commenter = y
+                              });
+
+            var commentDetail = await query.FirstOrDefaultAsync();
+            commentDetail.Ranking = rankingDetails;
+            return commentDetail;
+        }
+
+        private async Task<CommentRankingDetails> GetCommentRankingDetails(string commentId, string userId)
+        {
+            var rankings = await commentRanking.Find(x => x.CommentId == commentId).ToListAsync();
+
+            var rankingResponse = new CommentRankingDetails() { CommentId = commentId };
+
+            foreach (var item in rankings)
+            {
+                if (item.DidIDislike) rankingResponse.DislikesCount++;
+                if (item.DidILike) rankingResponse.LikesCount++;
+                rankingResponse.DidIFavor = item.DidIFavor;
+
+                if (item.UserId == userId)
+                {
+                    rankingResponse.DidIDislike = item.DidIDislike;
+                    rankingResponse.DidILike = item.DidILike;
+                    rankingResponse.DidIFavor = item.DidIFavor;
+                }
+            }
+            return rankingResponse;
+        }
+
+
+        public async Task<CommentSearchPagingResult> SearchCommentsAsync(int page, int pageSize, string searchKey, CommentSearchOnEnum searchOn, SortByEnum sortBy, SortOrderEnum sortOrder, string currentUserId = null)
+        {
+            var query = comments.AsQueryable().GroupJoin(comments.AsQueryable(), x => x.Id, y => y.TargetId, (x, y) => new { comment = x, subComments = y })
+                              .Select(a => new
+                              {
+                                  Id = a.comment.Id,
+                                  CommentText = a.comment.CommentText,
+                                  UpdatedOn = a.comment.UpdatedOn,
+                                  CommentType = a.comment.CommentType,
+                                  TargetId = a.comment.TargetId,
+                                  CommentsCount = a.subComments.Count(),
+                                  CommmenterId = a.comment.CommenterId
+
+                              }).Join(users.AsQueryable(), x => x.CommmenterId, y => y.Id, (x, y) => new CommentDetails
+                              {
+                                  Id = x.Id,
+                                  CommentText = x.CommentText,
+                                  UpdatedOn = x.UpdatedOn,
+                                  CommentType = x.CommentType,
+                                  TargetId = x.TargetId,
+                                  CommentsCount = x.CommentsCount,
+                                  Commenter = y
+                              });
+
+            if (!string.IsNullOrEmpty(searchKey))
+            {
+                switch (searchOn)
+                {
+                    case CommentSearchOnEnum.TargetId:
+                        query = query.Where(x => x.TargetId == searchKey.Trim());
+                        break;
+                    case CommentSearchOnEnum.CommentText:
+                        query = query.Where(x => x.CommentText.Contains(searchKey.Trim()));
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            switch (sortBy)
+            {
+                case SortByEnum.UpdatedOn:
+                    if (sortOrder == SortOrderEnum.Ascending)
+                        query = query.OrderBy(x => x.UpdatedOn);
+                    else
+                        query = query.OrderByDescending(x => x.UpdatedOn);
+                    break;
+                //case SortByEnum.Views:
+                //    if (sortOrder == SortOrderEnum.Ascending)
+                //        query = query.OrderBy(x => x.views);
+                //    else
+                //        query = query.OrderByDescending(x => x.Views);
+                //    break;
+            }
+
+            var docsCount = await query.CountAsync();
+
+            var documents = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            foreach (var item in documents)
+            {
+                item.Ranking = await GetCommentRankingDetails(item.TargetId, currentUserId);
+            }
+
+            return new CommentSearchPagingResult(documents, docsCount, page, pageSize, searchKey, searchOn, sortBy, sortOrder);
         }
     }
 }

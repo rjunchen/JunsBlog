@@ -4,7 +4,8 @@ import { CommentService } from 'src/app/services/comment.service';
 import { ArticleDetails } from 'src/app/models/articleDetails';
 import { ToastrService } from 'ngx-toastr';
 import { CommenterRequest } from 'src/app/models/commenterRequest';
-import { CommentTypeEnum } from 'src/app/models/CommentTypeEnum';
+import { CommentTypeEnum } from 'src/app/models/Enums/commentTypeEnum';
+
 
 @Component({
   selector: 'app-comment-displayer',

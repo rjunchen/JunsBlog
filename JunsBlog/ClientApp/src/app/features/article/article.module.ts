@@ -17,6 +17,8 @@ import { QuillModule } from 'ngx-quill';
 import { CommentsComponent } from './comments/comments.component';
 import { CommentControlComponent } from './comment-control/comment-control.component';
 import { CommentDisplayerComponent } from './comment-displayer/comment-displayer.component';
+import { TimeAgoModule } from 'src/app/services/time-ago/time-ago.module';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 @NgModule({
   declarations: [ArticleComponent, CommentsComponent, CommentControlComponent, CommentDisplayerComponent],
@@ -25,7 +27,7 @@ import { CommentDisplayerComponent } from './comment-displayer/comment-displayer
     ArticleRoutingModule,
     FormsModule, ReactiveFormsModule, 
     MatDividerModule, MatIconModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatProgressSpinnerModule,
-    MatTooltipModule,
+    MatTooltipModule, TimeAgoModule, InfiniteScrollModule,
     QuillModule.forRoot()
   ]
 })

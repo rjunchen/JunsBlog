@@ -1,5 +1,6 @@
 import { CommentDetails } from './commentDetails';
-import { CommentTypeEnum } from './CommentTypeEnum';
+import { CommentTypeEnum } from './Enums/commentTypeEnum';
+
 
 export class CommenterRequest{
     callerId: string;

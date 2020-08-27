@@ -1,5 +1,6 @@
-import { CommentTypeEnum } from './CommentTypeEnum';
+
 import { CommenterRequest } from './commenterRequest';
+import { CommentTypeEnum } from './Enums/commentTypeEnum';
 
 export class CommentRequest {
     targetId: string;

@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace JunsBlog.Models.Enums
 {
-    public enum SortByEnum
+    public enum CommentSearchOnEnum
     {
-        UpdatedOn,
-        Views,
+        TargetId,
+        CommentText
     }
 }

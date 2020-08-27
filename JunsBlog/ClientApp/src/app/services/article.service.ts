@@ -6,9 +6,9 @@ import { ArticleDetails } from '../models/articleDetails';
 import { ArticleSearchPagingResult } from '../models/articleSearchPagingResult';
 import { RankingRequest } from '../models/RankingRequest';
 import { ArticleRankingDetails } from '../models/articleRankingDetails';
-import { SortByEnum } from '../models/sortByEnum';
-import { SortOrderEnum } from '../models/sortOrderEnum';
+import { SortOrderEnum } from '../models/Enums/sortOrderEnum';
 import { Observable } from 'rxjs';
+import { SortByEnum } from '../models/Enums/sortByEnum';
 
 @Injectable({
   providedIn: 'root'

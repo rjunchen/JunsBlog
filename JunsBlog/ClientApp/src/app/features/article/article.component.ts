@@ -6,11 +6,11 @@ import { ArticleDetails } from 'src/app/models/articleDetails';
 import { mergeMap } from 'rxjs/operators';
 
 import { RankingRequest } from 'src/app/models/RankingRequest';
-import { RankEnum } from 'src/app/models/rankEnum';
 import { CommentService } from 'src/app/services/comment.service';
 import { CommenterRequest } from 'src/app/models/commenterRequest';
 import { ArticleRankingDetails } from 'src/app/models/articleRankingDetails';
-import { CommentTypeEnum } from 'src/app/models/CommentTypeEnum';
+import { RankEnum } from 'src/app/models/Enums/rankEnum';
+import { CommentTypeEnum } from 'src/app/models/Enums/commentTypeEnum';
 
 @Component({
   selector: 'app-article',

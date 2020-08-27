@@ -26,6 +26,8 @@ export class TimeAgoPipe implements PipeTransform {
       for (const i in intervals) {
         counter = Math.floor(seconds / intervals[i]);
         if (counter > 0) {
+          if(counter == 1 && i == 'day')
+            return 'yesterday';
           return `${counter} ${i}${counter === 1 ? '' : 's'} ago`;
         }
       }
