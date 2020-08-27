@@ -68,5 +68,46 @@ namespace JunsBlog.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
+
+        [Authorize(Roles = Role.User)]
+        [HttpPost("rank")]
+        public async Task<IActionResult> RankComments(CommentRankingRequest model)
+        {
+            try
+            {
+                if (model == null || String.IsNullOrWhiteSpace(model.CommentId))
+                    return BadRequest(new { message = "Incomplete ranking information" });
+
+                var ranking = await databaseService.FindCommentRankingAsync(x => x.CommentId == model.CommentId && x.UserId == currentUserId);
+
+                if (ranking == null) ranking = new CommentRanking(model.CommentId, currentUserId);
+
+                switch (model.Rank)
+                {
+                    case RankEnum.Like:
+                        ranking.DidILike = !ranking.DidILike;
+                        if (ranking.DidILike) ranking.DidIDislike = false;
+                        break;
+                    case RankEnum.Dislike:
+                        ranking.DidIDislike = !ranking.DidIDislike;
+                        if (ranking.DidIDislike) ranking.DidILike = false;
+                        break;
+                    case RankEnum.Favor:
+                        ranking.DidIFavor = !ranking.DidIFavor;
+                        break;
+                }
+                await databaseService.SaveCommentRankingAsync(ranking);
+
+                var rankingDetails = await databaseService.GetCommentRankingDetails(model.CommentId, currentUserId);
+
+                return Ok(rankingDetails);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
     }
 }

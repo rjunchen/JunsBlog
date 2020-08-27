@@ -5,6 +5,8 @@ import { ArticleDetails } from 'src/app/models/articleDetails';
 import { ToastrService } from 'ngx-toastr';
 import { CommenterRequest } from 'src/app/models/commenterRequest';
 import { CommentTypeEnum } from 'src/app/models/Enums/commentTypeEnum';
+import { CommentRankingRequest } from 'src/app/models/commentRankingRequest';
+import { RankEnum } from 'src/app/models/Enums/rankEnum';
 
 
 @Component({
@@ -24,13 +26,30 @@ export class CommentDisplayerComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  likeComment(comment: CommentDetails){
-
+  likeComment(){
+    this.rank(RankEnum.Like);
   }
 
-  dislikeComment(comment: CommentDetails){
-
+  dislikeComment(){
+    this.rank(RankEnum.Dislike);
   }
+
+  rank(rank: RankEnum){
+    this.isProcessing = true;
+    var request = new CommentRankingRequest(this.comment.id, rank);
+    this.commentService.rankComment(request).subscribe(data=> {
+      this.comment.ranking = data;
+      this.isProcessing = false;
+    }, err=>{
+      this.isProcessing = false;
+      if (err.status === 400) {     
+        this.toastr.warning(err.error.message, err.statusText);
+      } else {
+        this.toastr.error('Unknown error occurred, please try again later');
+      }
+    })
+  }
+
 
   showCommentControl(comment: CommentDetails){
     var commenterRequest = new CommenterRequest(comment.id, comment.comments, CommentTypeEnum.Comment);

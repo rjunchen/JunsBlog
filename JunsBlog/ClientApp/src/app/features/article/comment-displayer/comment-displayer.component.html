@@ -11,11 +11,11 @@
             {{comment.commentText}}
         </div>
         <div class="comment-status">
-            <button mat-icon-button [disabled]="isProcessing" color="{{comment.ranking.didILike ? 'success' : 'unrated'}}" mat-button (click)="likeComment(comment)">
+            <button mat-icon-button [disabled]="isProcessing" color="{{comment.ranking.didILike ? 'success' : 'unrated'}}" mat-button (click)="likeComment()">
                 <mat-icon matTooltip="Like">thumb_up</mat-icon>
             </button>
             <span>{{comment.ranking.likes}}</span>
-            <button mat-icon-button [disabled]="isProcessing" color="{{comment.ranking.didIDislike ? 'success' : 'unrated'}}" mat-button (click)="dislikeComment(comment)">
+            <button mat-icon-button [disabled]="isProcessing" color="{{comment.ranking.didIDislike ? 'success' : 'unrated'}}" mat-button (click)="dislikeComment()">
                 <mat-icon matTooltip="Dislike">thumb_down</mat-icon>
             </button>
             <button mat-button (click)="showCommentControl(comment)">REPLY</button>

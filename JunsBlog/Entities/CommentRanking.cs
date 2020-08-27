@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace JunsBlog.Entities
 {
-    public class CommentRanking
+    public class CommentRanking : EntityBase
     {
         
         [BsonRequired]
@@ -25,5 +25,11 @@ namespace JunsBlog.Entities
         [BsonRequired]
         [BsonDefaultValue(false)]
         public bool DidIFavor { get; set; }
+
+        public CommentRanking(string commentId, string currentUserId)
+        {
+            this.CommentId = commentId;
+            this.UserId = currentUserId;
+        }
     }
 }

@@ -21,7 +21,7 @@ namespace JunsBlog.Models.Services
         private readonly IMongoCollection<Article> articles;
         private readonly IMongoCollection<UserToken> userTokens;
         private readonly IMongoCollection<ArticleRanking> articleRankings;
-        private readonly IMongoCollection<CommentRanking> commentRanking;
+        private readonly IMongoCollection<CommentRanking> commentRankings;
         private readonly IMongoCollection<Comment> comments;
 
         public MongoDBService(IJunsBlogDatabaseSettings settings)
@@ -33,7 +33,7 @@ namespace JunsBlog.Models.Services
             articles = database.GetCollection<Article>(settings.ArticleCollectionName);
             articleRankings = database.GetCollection<ArticleRanking>(settings.RankingCollectionName);
             comments = database.GetCollection<Comment>(settings.CommentCollectionName);
-            commentRanking = database.GetCollection<CommentRanking>(settings.CommentRankingCollectionName);
+            commentRankings = database.GetCollection<CommentRanking>(settings.CommentRankingCollectionName);
         }
 
         public async Task<User> FindUserAsync(Expression<Func<User, bool>> filter)
@@ -212,9 +212,9 @@ namespace JunsBlog.Models.Services
             return await comments.Find<Comment>(x=> x.TargetId == targetId).ToListAsync();
         }
 
-        public async Task<List<CommentRanking>> FindCommentRankingsAsync(Expression<Func<CommentRanking, bool>> filter)
+        public async Task<CommentRanking> FindCommentRankingAsync(Expression<Func<CommentRanking, bool>> filter)
         {
-            return await commentRanking.Find<CommentRanking>(filter).ToListAsync();
+            return await commentRankings.Find<CommentRanking>(filter).FirstOrDefaultAsync();
         }
 
         public async Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId)
@@ -248,9 +248,9 @@ namespace JunsBlog.Models.Services
             return commentDetail;
         }
 
-        private async Task<CommentRankingDetails> GetCommentRankingDetails(string commentId, string userId)
+        public async Task<CommentRankingDetails> GetCommentRankingDetails(string commentId, string userId)
         {
-            var rankings = await commentRanking.Find(x => x.CommentId == commentId).ToListAsync();
+            var rankings = await commentRankings.Find(x => x.CommentId == commentId).ToListAsync();
 
             var rankingResponse = new CommentRankingDetails() { CommentId = commentId };
 
@@ -332,10 +332,17 @@ namespace JunsBlog.Models.Services
 
             foreach (var item in documents)
             {
-                item.Ranking = await GetCommentRankingDetails(item.TargetId, currentUserId);
+                item.Ranking = await GetCommentRankingDetails(item.Id, currentUserId);
             }
 
             return new CommentSearchPagingResult(documents, docsCount, page, pageSize, searchKey, searchOn, sortBy, sortOrder);
+        }
+
+        public async Task<CommentRanking> SaveCommentRankingAsync(CommentRanking ranking)
+        {
+            ranking.UpdatedOn = DateTime.UtcNow;
+            await commentRankings.ReplaceOneAsync(s => s.Id == ranking.Id, ranking, new ReplaceOptions { IsUpsert = true });
+            return ranking;
         }
     }
 }

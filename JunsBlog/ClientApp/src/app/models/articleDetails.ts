@@ -1,6 +1,6 @@
 import { User } from './user';
 import { Article } from './article';
-import { RankingRequest } from './RankingRequest';
+import { ArticleRankingRequest } from './articleRankingRequest';
 import { ArticleRankingDetails } from './articleRankingDetails';
 import { CommentDetails } from './commentDetails';
 

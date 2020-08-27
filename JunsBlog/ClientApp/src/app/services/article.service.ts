@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { ArticleDetails } from '../models/articleDetails';
 import { ArticleSearchPagingResult } from '../models/articleSearchPagingResult';
-import { RankingRequest } from '../models/RankingRequest';
+import { ArticleRankingRequest } from '../models/articleRankingRequest';
 import { ArticleRankingDetails } from '../models/articleRankingDetails';
 import { SortOrderEnum } from '../models/Enums/sortOrderEnum';
 import { Observable } from 'rxjs';
@@ -31,7 +31,7 @@ export class ArticleService {
       &sortOrder=${sortOrder}&sortBy=${sortBy}`).pipe(map(data => { return <ArticleSearchPagingResult>data}));
   }
 
-  public rankArticle(rankRequest: RankingRequest): Observable<ArticleRankingDetails>{
+  public rankArticle(rankRequest: ArticleRankingRequest): Observable<ArticleRankingDetails>{
     return this.http.post('/api/article/rank', rankRequest).pipe(map(data => { return <ArticleRankingDetails>data}));
   }
 

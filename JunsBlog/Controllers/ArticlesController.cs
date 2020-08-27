@@ -124,6 +124,7 @@ namespace JunsBlog.Controllers
             }
         }
 
+
         [HttpGet("rank")]
         public async Task<IActionResult> GetArticleRanking(string articleId)
         {

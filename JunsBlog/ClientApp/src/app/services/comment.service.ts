@@ -9,6 +9,8 @@ import { SortOrderEnum } from '../models/Enums/sortOrderEnum';
 import { CommentSearchPagingResult } from '../models/commentSearchPagingResult';
 import { SortByEnum } from '../models/Enums/sortByEnum';
 import { commentSearchOnEnum } from '../models/Enums/commentSearchOnEnum';
+import { CommentRankingRequest } from '../models/commentRankingRequest';
+import { CommentRankingDetails } from '../models/commentRankingDetails';
 
 @Injectable({
   providedIn: 'root'
@@ -33,5 +35,9 @@ export class CommentService {
 
   public showCommentControl(request: CommenterRequest){
     this.onShowCommentControl.emit(request);
+  }
+
+  public rankComment(rankRequest: CommentRankingRequest): Observable<CommentRankingDetails>{
+    return this.http.post('/api/comment/rank', rankRequest).pipe(map(data => { return <CommentRankingDetails>data}));
   }
 }

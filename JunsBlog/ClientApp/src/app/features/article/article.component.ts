@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ArticleDetails } from 'src/app/models/articleDetails';
 import { mergeMap } from 'rxjs/operators';
 
-import { RankingRequest } from 'src/app/models/RankingRequest';
+import { ArticleRankingRequest } from 'src/app/models/articleRankingRequest';
 import { CommentService } from 'src/app/services/comment.service';
 import { CommenterRequest } from 'src/app/models/commenterRequest';
 import { ArticleRankingDetails } from 'src/app/models/articleRankingDetails';
@@ -71,7 +71,7 @@ export class ArticleComponent implements OnInit {
 
   rank(rank: RankEnum){
     this.isProcessing = true;
-    var request = new RankingRequest(this.article.id, rank);
+    var request = new ArticleRankingRequest(this.article.id, rank);
     this.articleService.rankArticle(request).subscribe(data=> {
       this.ranking = data;
       this.isProcessing = false;
