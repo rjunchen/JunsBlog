@@ -1,4 +1,5 @@
 export enum commentSearchOnEnum {
-    TargetId,
+    ArticleId,
+    ParentId,
     CommentText
 }

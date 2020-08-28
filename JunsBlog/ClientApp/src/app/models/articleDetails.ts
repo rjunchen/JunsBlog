@@ -12,6 +12,5 @@ export class ArticleDetails extends Article{
     content: string;
     id: string;
     IsApproved: boolean;
-    commentDraft: string;
-    comments: Array<CommentDetails>;
+    commentsCount: number;
 }

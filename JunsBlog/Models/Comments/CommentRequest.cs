@@ -8,8 +8,8 @@ namespace JunsBlog.Models.Comments
 {
     public class CommentRequest
     {
-        public string TargetId { get; set; }
+        public string ArticleId { get; set; }
         public string  CommentText { get; set; }
-        public CommentType CommentType { get; set; }
+        public string ParentId { get; set; }
     }
 }

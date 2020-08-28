@@ -3,7 +3,6 @@ import { User } from 'src/app/models/user';
 import { AuthenticationService } from 'src/app/core/authentication.service';
 import { CommentService } from 'src/app/services/comment.service';
 import { CommentRequest } from 'src/app/models/commentRequest';
-import { CommenterRequest } from 'src/app/models/commenterRequest';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -16,7 +15,7 @@ export class CommentControlComponent implements OnInit {
   isVisibleCommenter: boolean;
   defaultAvatarUrl = './assets/avatar.png';
   currentUser: User;
-  commenterRequest: CommenterRequest;
+  commentRequest: CommentRequest;
 
   constructor(private auth: AuthenticationService, private commentService: CommentService, private toastr: ToastrService) { }
 
@@ -25,16 +24,20 @@ export class CommentControlComponent implements OnInit {
     this.commentService.onShowCommentControl.subscribe( data =>{
       console.log(data);
       this.isVisibleCommenter = true;
-      this.commenterRequest = data;
-      this.commenterRequest.commentDraft += "1";
+      this.commentRequest = data;
     });
   }
 
   submit(){
-    var commentRequest = new CommentRequest(this.commenterRequest);
-    this.commentService.replyArticle(commentRequest).subscribe(x=>{
+    // prefix the @User if comment is reply to a child comment.
+    if(this.commentRequest.replyToUser){
+      this.commentRequest.commentText = `@${this.commentRequest.replyToUser.name} ${this.commentRequest.commentText}`;
+    }
+
+    this.commentService.replyArticle(this.commentRequest).subscribe(x=>{
       console.log(x);
-      this.commenterRequest.comments.unshift(x);
+      this.commentService.commentPosted(x);
+      this.isVisibleCommenter = false;
     }, err=>{
       if (err.status === 400) {     
         this.toastr.warning(err.error.message, err.statusText);

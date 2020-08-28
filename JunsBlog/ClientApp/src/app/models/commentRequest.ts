@@ -1,15 +1,18 @@
-
-import { CommenterRequest } from './commenterRequest';
-import { CommentTypeEnum } from './Enums/commentTypeEnum';
+import { ArticleDetails } from './articleDetails';
+import { CommentDetails } from './commentDetails';
+import { User } from './user';
 
 export class CommentRequest {
-    targetId: string;
+    articleId: string;
     commentText: string;
-    commentType: CommentTypeEnum
+    parentId: string;
+    replyToUser: User;
     
-    constructor(commenterRequest: CommenterRequest){
-        this.targetId = commenterRequest.callerId;
-        this.commentText = commenterRequest.commentDraft;
-        this.commentType = commenterRequest.commentType;
+    constructor(articleDetails: ArticleDetails, commentDetails: CommentDetails = null){
+        this.articleId = articleDetails.id;
+        this.commentText = "";
+        this.replyToUser = commentDetails ? ( commentDetails.parentId == commentDetails.articleId ? null : commentDetails.user ) : null;
+        // we don't want nested comments, so comment on a child comment, it will reply to its parent comment instead
+        this.parentId = commentDetails ? ( commentDetails.parentId == commentDetails.articleId ? commentDetails.id : commentDetails.parentId ) : articleDetails.id;
     }
 }

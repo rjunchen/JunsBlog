@@ -3,10 +3,11 @@ import { CommentDetails } from 'src/app/models/commentDetails';
 import { CommentService } from 'src/app/services/comment.service';
 import { ArticleDetails } from 'src/app/models/articleDetails';
 import { ToastrService } from 'ngx-toastr';
-import { CommenterRequest } from 'src/app/models/commenterRequest';
-import { CommentTypeEnum } from 'src/app/models/Enums/commentTypeEnum';
 import { CommentRankingRequest } from 'src/app/models/commentRankingRequest';
 import { RankEnum } from 'src/app/models/Enums/rankEnum';
+import { commentSearchOnEnum } from 'src/app/models/Enums/commentSearchOnEnum';
+import { CommentSearchPagingResult } from 'src/app/models/commentSearchPagingResult';
+import { CommentRequest } from 'src/app/models/commentRequest';
 
 
 @Component({
@@ -21,9 +22,19 @@ export class CommentDisplayerComponent implements OnInit {
   defaultAvatarUrl = './assets/avatar.png';
   isProcessing: boolean;
   loading: boolean;
+  commentPagingResult: CommentSearchPagingResult;
+  comments: CommentDetails[];
+
   constructor(private commentService: CommentService, private toastr: ToastrService) { }
 
   ngOnInit(): void {
+    this.comments = [];
+    this.commentService.onCommentPosted.subscribe( (commentDetails: CommentDetails)=>{
+        if(this.comment.id == commentDetails.parentId){
+          this.comment.childrenCommentsCount += 1;
+          this.comments.unshift(commentDetails);
+        }
+    });
   }
 
   likeComment(){
@@ -52,25 +63,60 @@ export class CommentDisplayerComponent implements OnInit {
 
 
   showCommentControl(comment: CommentDetails){
-    var commenterRequest = new CommenterRequest(comment.id, comment.comments, CommentTypeEnum.Comment);
+    console.log(comment);
+    var commenterRequest = new CommentRequest(this.article, comment);
     this.commentService.showCommentControl(commenterRequest);
+  }
+
+
+  getMoreReplies(){
+      if (!this.loading && this.commentPagingResult.hasNextPage) {
+        this.loading = true;
+        this.commentService.searchComments(this.commentPagingResult.currentPage + 1, this.commentPagingResult.pageSize,
+          this.commentPagingResult.searchKey, this.commentPagingResult.searchOn, this.commentPagingResult.sortBy, this.commentPagingResult.sortOrder).subscribe(
+          data => {
+            data.documents.forEach(doc => {
+              this.comments.push(doc);
+            });
+            this.commentPagingResult = data;           
+            this.loading = false;
+        },
+        err => {
+          this.loading = false;
+          if (err.status === 400) {     
+            this.toastr.warning(err.error.message, err.statusText);
+          } else {
+            this.toastr.error('Unknown error occurred, please try again later');
+          }
+        }
+      )
+    }
   }
 
   viewReplies(){
     this.viewRepliesOpen = !this.viewRepliesOpen;
-        this.commentService.getComments(this.comment.id).subscribe(
+
+    if(this.comments.length > 0) return; // Only get the comment calls on the first time when view reply is clicked.
+        const intiPage: number = 1;
+        const pageSize: number = 10;
+        this.commentService.searchComments(intiPage, pageSize, this.comment.id, commentSearchOnEnum.ParentId).subscribe(
           data => {
-            data.forEach(doc => {
-              if(!this.comment.comments) this.comment.comments = [];
-              this.comment.comments.push(doc);
+            console.log(data);
+            this.commentPagingResult = data;
+            this.commentPagingResult.documents.forEach(doc => {
+              this.comments.push(doc);
             });       
             this.loading = false;
         },
         err => {
           this.loading = false;
-          this.toastr.error('Unknown error occurred, please try again later');
+          if(err.status === 400){
+            this.toastr.warning(err.error.message, err.statusText);
+          }
+          else{
+            this.toastr.error('Unknown error occurred, please try again later');
+          }
         }
       )
-    
   }
 }

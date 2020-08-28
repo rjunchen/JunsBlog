@@ -1,6 +1,7 @@
 ﻿using JunsBlog.Entities;
 using JunsBlog.Interfaces.Services;
 using JunsBlog.Models.Articles;
+using JunsBlog.Models.Comments;
 using JunsBlog.Models.Enums;
 using System;
 using System.Collections.Generic;
@@ -132,6 +133,31 @@ namespace JunsBlog.Test.Mockups
         }
 
         public Task<ArticleRankingDetails> GetArticleRankingDetailsAsync(string articleId, string userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<CommentRanking> FindCommentRankingAsync(Expression<Func<CommentRanking, bool>> filter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<CommentSearchPagingResult> SearchCommentsAsync(int page, int pageSize, string searchKey, CommentSearchOnEnum searchOn, SortByEnum sortBy, SortOrderEnum sortOrder, string currentUserId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<CommentRanking> SaveCommentRankingAsync(CommentRanking ranking)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<CommentRankingDetails> GetCommentRankingDetails(string commentId, string userId)
         {
             throw new NotImplementedException();
         }

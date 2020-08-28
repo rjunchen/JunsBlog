@@ -5,6 +5,7 @@ import { User } from 'src/app/models/user';
 import { ArticleDetails } from 'src/app/models/articleDetails';
 import { CommentSearchPagingResult } from 'src/app/models/commentSearchPagingResult';
 import { commentSearchOnEnum } from 'src/app/models/Enums/commentSearchOnEnum';
+import { CommentDetails } from 'src/app/models/commentDetails';
 
 @Component({
   selector: 'app-comments',
@@ -14,8 +15,6 @@ import { commentSearchOnEnum } from 'src/app/models/Enums/commentSearchOnEnum';
 export class CommentsComponent implements OnInit {
   @Input() article: ArticleDetails;
   currentUser: User;
- 
- // currentPageResult: CommentPagingResult;
 
  commentPagingResult: CommentSearchPagingResult;
  defaultAvatarUrl = './assets/avatar.png';
@@ -24,7 +23,7 @@ export class CommentsComponent implements OnInit {
  scrollDistance = 1;
  scrollUpDistance = 2;
  loading = false;
- commentsCount = 0;
+ displayComments: CommentDetails[] = [];
 
  constructor(private commentService: CommentService, private toastr: ToastrService) { }
 
@@ -32,10 +31,9 @@ export class CommentsComponent implements OnInit {
    const intiPage: number = 1;
    const pageSize: number = 10;
    this.loading = true;
-   this.commentService.searchComments(intiPage, pageSize, this.article.id, commentSearchOnEnum.TargetId).subscribe(x=>{
-     this.article.comments = x.documents;
+   this.commentService.searchComments(intiPage, pageSize, this.article.id, commentSearchOnEnum.ParentId).subscribe(x=>{
+     this.displayComments = x.documents;
      this.commentPagingResult = x;
-     this.commentsCount = x.totalDocuments;
      console.log(x);
      this.loading = false;
    }, err =>{
@@ -47,6 +45,12 @@ export class CommentsComponent implements OnInit {
        this.toastr.error('Unknown error occurred, please try again later');
      }
    });
+
+   this.commentService.onCommentPosted.subscribe( (commentDetails : CommentDetails) => {
+      this.article.commentsCount += 1; // counts the total comments including all the children comments
+      if(commentDetails.articleId == commentDetails.parentId)  // This is a comment on the article
+        this.displayComments.unshift(commentDetails); 
+   })
  }
 
 
@@ -58,14 +62,18 @@ export class CommentsComponent implements OnInit {
       this.commentPagingResult.searchKey, this.commentPagingResult.searchOn, this.commentPagingResult.sortBy, this.commentPagingResult.sortOrder).subscribe(
        data => {        
            data.documents.forEach(doc => {
-            this.article.comments .push(doc);
+            this.displayComments.push(doc);
            });
            this.commentPagingResult = data;
            this.loading = false;
          },
        err => {
          this.loading = false;  
-         this.toastr.error('Unknown error occurred, please try again later');
+         if (err.status === 400) {     
+          this.toastr.warning(err.error.message, err.statusText);
+        } else {
+          this.toastr.error('Unknown error occurred, please try again later');
+        }
        }
      )
    }
