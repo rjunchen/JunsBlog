@@ -34,7 +34,6 @@ export class CommentsComponent implements OnInit {
    this.commentService.searchComments(intiPage, pageSize, this.article.id, commentSearchOnEnum.ParentId).subscribe(x=>{
      this.displayComments = x.documents;
      this.commentPagingResult = x;
-     console.log(x);
      this.loading = false;
    }, err =>{
      this.loading = false;
@@ -55,7 +54,6 @@ export class CommentsComponent implements OnInit {
 
 
  onScrollDown () {
-   console.log('hehhe');
    if(this.commentPagingResult && this.commentPagingResult.hasNextPage && !this.loading){
      this.loading = true;
      this.commentService.searchComments(this.commentPagingResult.currentPage + 1 , this.commentPagingResult.pageSize, 

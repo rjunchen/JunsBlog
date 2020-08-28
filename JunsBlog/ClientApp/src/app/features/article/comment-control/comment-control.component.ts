@@ -22,7 +22,6 @@ export class CommentControlComponent implements OnInit {
   ngOnInit(): void {
     this.currentUser = this.auth.getCurrentUser();
     this.commentService.onShowCommentControl.subscribe( data =>{
-      console.log(data);
       this.isVisibleCommenter = true;
       this.commentRequest = data;
     });
@@ -35,11 +34,10 @@ export class CommentControlComponent implements OnInit {
     }
 
     this.commentService.replyArticle(this.commentRequest).subscribe(x=>{
-      console.log(x);
       this.commentService.commentPosted(x);
       this.isVisibleCommenter = false;
     }, err=>{
-      if (err.status === 400) {     
+      if (err.status != 400) {     
         this.toastr.warning(err.error.message, err.statusText);
       } else {
         this.toastr.error('Unknown error occurred, please try again later');

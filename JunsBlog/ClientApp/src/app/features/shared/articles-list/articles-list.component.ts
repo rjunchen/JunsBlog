@@ -46,7 +46,6 @@ export class ArticlesListComponent implements OnInit {
 
 
   onScrollDown () {
-    console.log('down');
     if(this.articlePagingResult && this.articlePagingResult.hasNextPage && !this.loading){
       this.loading = true;
       this.articleService.searchArticle(this.articlePagingResult.currentPage + 1 , this.articlePagingResult.pageSize).subscribe(
