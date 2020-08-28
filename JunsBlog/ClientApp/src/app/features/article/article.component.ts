@@ -7,10 +7,9 @@ import { mergeMap } from 'rxjs/operators';
 
 import { ArticleRankingRequest } from 'src/app/models/articleRankingRequest';
 import { CommentService } from 'src/app/services/comment.service';
-import { CommenterRequest } from 'src/app/models/commenterRequest';
 import { ArticleRankingDetails } from 'src/app/models/articleRankingDetails';
 import { RankEnum } from 'src/app/models/Enums/rankEnum';
-import { CommentTypeEnum } from 'src/app/models/Enums/commentTypeEnum';
+import { CommentRequest } from 'src/app/models/commentRequest';
 
 @Component({
   selector: 'app-article',
@@ -86,7 +85,7 @@ export class ArticleComponent implements OnInit {
   }
 
   showCommenter(){
-    var request = new CommenterRequest(this.article.id, this.article.comments, CommentTypeEnum.Article);
+    var request = new CommentRequest(this.article);
     this.commentService.showCommentControl(request);
   }
 }

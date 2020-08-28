@@ -37,7 +37,7 @@ namespace JunsBlog.Controllers
         {
             try
             {
-                if (String.IsNullOrWhiteSpace(model.TargetId) || String.IsNullOrWhiteSpace(model.CommentText))
+                if (String.IsNullOrWhiteSpace(model.ArticleId) || String.IsNullOrWhiteSpace(model.CommentText) || String.IsNullOrWhiteSpace(model.ParentId))
                     return BadRequest(new { message = "Incomplete comment information" });
 
                 var insertedComment = await databaseService.SaveCommentAsync(new Comment(model, currentUserId));

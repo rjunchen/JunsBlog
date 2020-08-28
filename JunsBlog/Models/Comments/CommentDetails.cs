@@ -11,10 +11,10 @@ namespace JunsBlog.Models.Comments
         public string Id { get; set; }
         public DateTime UpdatedOn { get; set; }
         public string CommentText { get; set; }
-        public User Commenter { get; set; }
-        public int CommentsCount { get; set; }
-        public CommentType CommentType { get; set; }
-        public string TargetId { get; set; }
+        public User User { get; set; }
+        public int ChildrenCommentsCount { get; set; }
+        public string ArticleId { get; set; }
+        public string ParentId { get; set; }
         public CommentRankingDetails Ranking { get; set; }
 
     }

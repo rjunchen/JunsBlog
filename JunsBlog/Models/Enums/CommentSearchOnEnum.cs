@@ -7,7 +7,8 @@ namespace JunsBlog.Models.Enums
 {
     public enum CommentSearchOnEnum
     {
-        TargetId,
+        ArticleId,
+        ParentId,
         CommentText
     }
 }

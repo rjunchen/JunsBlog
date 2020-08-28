@@ -81,58 +81,47 @@ namespace JunsBlog.Models.Services
             var updateDef = Builders<Article>.Update.Inc(x => x.Views, 1);
             await articles.UpdateOneAsync<Article>(x => x.Id == articleId, updateDef);
 
-            var query = from a in articles.AsQueryable()
-                       where a.Id == articleId
-                       join u in users.AsQueryable() on a.AuthorId equals u.Id into userJoined
-                       select new ArticleDetails()
-                       {
-                           Abstract = a.Abstract,
-                           Content = a.Content,
-                           CoverImage = a.CoverImage,
-                           Id = a.Id,
-                           Title = a.Title,
-                           UpdatedOn = a.UpdatedOn,
-                           CreatedOn = a.CreatedOn,
-                           Views = a.Views,
-                           IsApproved = a.IsApproved,
-                           IsPrivate = a.IsPrivate,
-                           Author = userJoined.First()
-                       };
+            var query = GenerateArticleDetailsQuery();
 
-            return await query.FirstOrDefaultAsync();
+            return await query.Where(x => x.Id == articleId).FirstOrDefaultAsync();
+        }
+
+        private IMongoQueryable<ArticleDetails> GenerateArticleDetailsQuery()
+        {
+            var query = articles.AsQueryable().GroupJoin(comments.AsQueryable(), x => x.Id, y => y.ArticleId, (x, y) => new { article = x, comments = y })
+                            .Select(a => new
+                            {
+                                Abstract = a.article.Abstract,
+                                CoverImage = a.article.CoverImage,
+                                Id = a.article.Id,
+                                Title = a.article.Title,
+                                UpdatedOn = a.article.UpdatedOn,
+                                CreatedOn = a.article.CreatedOn,
+                                IsApproved = a.article.IsApproved,
+                                IsPrivate = a.article.IsPrivate,
+                                Views = a.article.Views,
+                                AuthorId = a.article.AuthorId,
+                                commentsCount = a.comments.Count()
+                            }).Join(users.AsQueryable(), x => x.AuthorId, y => y.Id, (x, y) => new ArticleDetails
+                            {
+                                Abstract = x.Abstract,
+                                CoverImage = x.CoverImage,
+                                Id = x.Id,
+                                Title = x.Title,
+                                UpdatedOn = x.UpdatedOn,
+                                CreatedOn = x.CreatedOn,
+                                IsApproved = x.IsApproved,
+                                IsPrivate = x.IsPrivate,
+                                Views = x.Views,
+                                Author = y,
+                                CommentsCount = x.commentsCount
+                            });
+            return query;
         }
 
         public async Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string searchKey, SortByEnum sortBy, SortOrderEnum sortOrder)
         {
-            var query = articles.AsQueryable().GroupJoin(comments.AsQueryable(), x => x.Id, y => y.TargetId, (x, y) => new { article = x, comments = y })
-                               .Select(a => new
-                               {
-                                   Abstract = a.article.Abstract,
-                                   CoverImage = a.article.CoverImage,
-                                   Id = a.article.Id,
-                                   Title = a.article.Title,
-                                   UpdatedOn = a.article.UpdatedOn,
-                                   CreatedOn = a.article.CreatedOn,
-                                   IsApproved = a.article.IsApproved,
-                                   IsPrivate = a.article.IsPrivate,
-                                   Views = a.article.Views,
-                                   AuthorId = a.article.AuthorId,
-                                   commentsCount = a.comments.Count()
-                               }).Join(users.AsQueryable(), x => x.AuthorId, y => y.Id, (x, y) => new ArticleDetails
-                               {
-                                   Abstract = x.Abstract,
-                                   CoverImage = x.CoverImage,
-                                   Id = x.Id,
-                                   Title = x.Title,
-                                   UpdatedOn = x.UpdatedOn,
-                                   CreatedOn = x.CreatedOn,
-                                   IsApproved = x.IsApproved,
-                                   IsPrivate = x.IsPrivate,
-                                   Views = x.Views,
-                                   Author = y,
-                                   CommentsCount = x.commentsCount
-                               });
-
+            var query = GenerateArticleDetailsQuery();
 
             if (!string.IsNullOrEmpty(searchKey)) query = query.Where(x => x.Content.Contains(searchKey));
 
@@ -209,7 +198,7 @@ namespace JunsBlog.Models.Services
 
         public async Task<List<Comment>> GetCommentsAsync(string targetId)
         {
-            return await comments.Find<Comment>(x=> x.TargetId == targetId).ToListAsync();
+            return await comments.Find<Comment>(x=> x.ArticleId == targetId).ToListAsync();
         }
 
         public async Task<CommentRanking> FindCommentRankingAsync(Expression<Func<CommentRanking, bool>> filter)
@@ -221,29 +210,9 @@ namespace JunsBlog.Models.Services
         {
             var rankingDetails = await GetCommentRankingDetails(commentId, currentUserId);
 
-            var query = comments.AsQueryable().Where(x=>x.Id == commentId).GroupJoin(comments.AsQueryable(), x => x.Id, y => y.TargetId, (x, y) => new { comment = x, subComments = y })
-                              .Select(a => new
-                              {
-                                  Id = a.comment.Id,
-                                  CommentText = a.comment.CommentText,
-                                  UpdatedOn = a.comment.UpdatedOn,
-                                  CommentType = a.comment.CommentType,
-                                  TargetId = a.comment.TargetId,
-                                  CommentsCount = a.subComments.Count(),
-                                  CommmenterId = a.comment.CommenterId
+            var query = GenerateCommentsDetailsQuery();
 
-                              }).Join(users.AsQueryable(), x => x.CommmenterId, y => y.Id, (x, y) => new CommentDetails
-                              {
-                                  Id = x.Id,
-                                  CommentText = x.CommentText,
-                                  UpdatedOn = x.UpdatedOn,
-                                  CommentType = x.CommentType,
-                                  TargetId = x.TargetId,
-                                  CommentsCount = x.CommentsCount,
-                                  Commenter = y
-                              });
-
-            var commentDetail = await query.FirstOrDefaultAsync();
+            var commentDetail = await query.Where(x => x.Id == commentId).FirstOrDefaultAsync();
             commentDetail.Ranking = rankingDetails;
             return commentDetail;
         }
@@ -270,37 +239,45 @@ namespace JunsBlog.Models.Services
             return rankingResponse;
         }
 
+        private IMongoQueryable<CommentDetails> GenerateCommentsDetailsQuery()
+        {
+            var query = comments.AsQueryable().GroupJoin(comments.AsQueryable(), x => x.Id, y => y.ParentId, (x, y) => new { comment = x, childrenComments = y })
+                            .Select(a => new
+                            {
+                                Id = a.comment.Id,
+                                CommentText = a.comment.CommentText,
+                                UpdatedOn = a.comment.UpdatedOn,
+                                ArticleId = a.comment.ArticleId,
+                                ChildrenCommentsCount = a.childrenComments.Count(),
+                                ParentId = a.comment.ParentId,
+                                UserId = a.comment.UserId,
+
+                            }).Join(users.AsQueryable(), x => x.UserId, y => y.Id, (x, y) => new CommentDetails
+                            {
+                                Id = x.Id,
+                                CommentText = x.CommentText,
+                                UpdatedOn = x.UpdatedOn,
+                                ArticleId = x.ArticleId,
+                                ChildrenCommentsCount = x.ChildrenCommentsCount,
+                                ParentId = x.ParentId,
+                                User = y
+                            });
+            return query;
+        } 
 
         public async Task<CommentSearchPagingResult> SearchCommentsAsync(int page, int pageSize, string searchKey, CommentSearchOnEnum searchOn, SortByEnum sortBy, SortOrderEnum sortOrder, string currentUserId = null)
         {
-            var query = comments.AsQueryable().GroupJoin(comments.AsQueryable(), x => x.Id, y => y.TargetId, (x, y) => new { comment = x, subComments = y })
-                              .Select(a => new
-                              {
-                                  Id = a.comment.Id,
-                                  CommentText = a.comment.CommentText,
-                                  UpdatedOn = a.comment.UpdatedOn,
-                                  CommentType = a.comment.CommentType,
-                                  TargetId = a.comment.TargetId,
-                                  CommentsCount = a.subComments.Count(),
-                                  CommmenterId = a.comment.CommenterId
-
-                              }).Join(users.AsQueryable(), x => x.CommmenterId, y => y.Id, (x, y) => new CommentDetails
-                              {
-                                  Id = x.Id,
-                                  CommentText = x.CommentText,
-                                  UpdatedOn = x.UpdatedOn,
-                                  CommentType = x.CommentType,
-                                  TargetId = x.TargetId,
-                                  CommentsCount = x.CommentsCount,
-                                  Commenter = y
-                              });
+            var query = GenerateCommentsDetailsQuery();
 
             if (!string.IsNullOrEmpty(searchKey))
             {
                 switch (searchOn)
                 {
-                    case CommentSearchOnEnum.TargetId:
-                        query = query.Where(x => x.TargetId == searchKey.Trim());
+                    case CommentSearchOnEnum.ArticleId:
+                        query = query.Where(x => x.ArticleId == searchKey.Trim());
+                        break;
+                    case CommentSearchOnEnum.ParentId:
+                        query = query.Where(x => x.ParentId == searchKey.Trim());
                         break;
                     case CommentSearchOnEnum.CommentText:
                         query = query.Where(x => x.CommentText.Contains(searchKey.Trim()));

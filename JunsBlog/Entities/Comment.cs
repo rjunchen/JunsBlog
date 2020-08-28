@@ -14,19 +14,20 @@ namespace JunsBlog.Entities
         public string CommentText { get; set; }
         [BsonRequired]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string TargetId { get; set; }
+        public string ArticleId { get; set; }
         [BsonRequired]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string CommenterId { get; set; }
+        public string UserId { get; set; }
         [BsonRequired]
-        public CommentType CommentType { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string ParentId { get; set; }
 
         public Comment(CommentRequest model, string userId)
         {
             CommentText = model.CommentText;
-            TargetId = model.TargetId;
-            CommenterId = userId;
-            CommentType = model.CommentType;
+            ArticleId = model.ArticleId;
+            UserId = userId;
+            ParentId = model.ParentId;
         }
     }
 }

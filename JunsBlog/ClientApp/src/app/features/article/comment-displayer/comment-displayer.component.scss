@@ -4,6 +4,7 @@ $color-orange: #f44336;
     display: flex;
     flex-direction: column;
     .user-details{
+        margin-top: 5px;
         display: flex;
         flex-direction: row;
         .profileImage{
@@ -48,6 +49,8 @@ $color-orange: #f44336;
         .view-reply-link{
             color: #065FD4;
             margin-bottom: 10px;
+            display: flex;
+            width: fit-content;
             .mat-icon{
                 vertical-align: bottom;
                 margin-right: 5px;
@@ -64,11 +67,11 @@ $color-orange: #f44336;
     }
 
     .comment-status{
-        span{
+        .rankingCounts{
             margin-right: 10px;
             color: $color-orange;
-            font-weight: bold;
-            vertical-align: sub;
+            font-weight: 500;
+            vertical-align: baseline;
         }
         .mat-icon {
             font-size: 20px;
@@ -79,5 +82,11 @@ $color-orange: #f44336;
         .mat-unrated {
             color: #999;
         }
+    }
+}
+
+@media only screen and (max-width: 768px){
+    .comment-item-container {
+
     }
 }

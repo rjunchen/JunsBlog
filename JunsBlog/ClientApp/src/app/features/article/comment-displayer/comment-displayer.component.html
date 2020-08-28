@@ -1,8 +1,9 @@
 <div class="comment-item-container">
+    <mat-divider></mat-divider>
     <div class="user-details">
-        <img class="images profileImage" [src]="comment.commenter.image ? comment.commenter.image : defaultAvatarUrl" />
+        <img class="images profileImage" [src]="comment.user.image ? comment.user.image : defaultAvatarUrl" />
         <div class="name-div">
-            <span class="reader-name" [ngClass]="{'chip-style': comment.commenter.id == article.author.id}">{{comment.commenter.name}}</span>
+            <span class="reader-name" [ngClass]="{'chip-style': comment.user.id == article.author.id}">{{comment.user.name}}</span>
             <span class="commented-time">{{comment.updatedOn | timeAgo }}</span>
         </div>
     </div>
@@ -14,23 +15,24 @@
             <button mat-icon-button [disabled]="isProcessing" color="{{comment.ranking.didILike ? 'success' : 'unrated'}}" mat-button (click)="likeComment()">
                 <mat-icon matTooltip="Like">thumb_up</mat-icon>
             </button>
-            <span>{{comment.ranking.likes}}</span>
+            <span class="rankingCounts" *ngIf="comment.ranking.likesCount > 0">{{comment.ranking.likesCount}}</span>
             <button mat-icon-button [disabled]="isProcessing" color="{{comment.ranking.didIDislike ? 'success' : 'unrated'}}" mat-button (click)="dislikeComment()">
                 <mat-icon matTooltip="Dislike">thumb_down</mat-icon>
             </button>
+            <span class="rankingCounts" *ngIf="comment.ranking.dislikesCount > 0">{{comment.ranking.dislikesCount}}</span>
             <button mat-button (click)="showCommentControl(comment)">REPLY</button>
-            <div class="view-reply-link" *ngIf="comment.commentsCount > 0" (click)="viewReplies()">
-                <mat-icon *ngIf="!viewRepliesOpen">arrow_drop_down</mat-icon>
-                <mat-icon *ngIf="viewRepliesOpen">arrow_drop_up</mat-icon>
-                <span *ngIf="comment.commentsCount == 1">{{viewRepliesOpen? 'Hide' : 'View'}} reply</span>
-                <span *ngIf="comment.commentsCount > 1">{{viewRepliesOpen? 'Hide' : 'View'}} {{comment.commentsCount}} replies</span>
+            <div class="view-reply-link" (click)="viewReplies()" *ngIf="comment.childrenCommentsCount > 0" >
+                <mat-icon  *ngIf="!viewRepliesOpen">arrow_drop_down</mat-icon>
+                <mat-icon  *ngIf="viewRepliesOpen">arrow_drop_up</mat-icon>
+                <div *ngIf="comment.childrenCommentsCount == 1">{{viewRepliesOpen? 'Hide' : 'View'}} reply</div>
+                <div *ngIf="comment.childrenCommentsCount > 1">{{viewRepliesOpen? 'Hide' : 'View'}} {{comment.childrenCommentsCount}} replies</div>
             </div>
             <div class="sub-comment-container">
                 <div *ngIf="viewRepliesOpen">
-                    <div class="reply-item" *ngFor="let reply of comment.comments">
+                    <div class="reply-item" *ngFor="let reply of comments">
                         <app-comment-displayer [comment]="reply" [article]="article"></app-comment-displayer>
                     </div>
-                    <!-- <div *ngIf="pageResult && pageResult.hasNextPage" class="view-reply-link margin-left-20px" (click)="getMoreReplies()"><mat-icon>vertical_align_bottom</mat-icon><span>View more replies</span></div> -->
+                    <div *ngIf="commentPagingResult && commentPagingResult.hasNextPage" class="view-reply-link" (click)="getMoreReplies()"><mat-icon>vertical_align_bottom</mat-icon><span>View more replies</span></div>
                 </div> 
             </div>   
         </div>
