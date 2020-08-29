@@ -15,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System.Net.Http;
 using System.Text;
 
 namespace JunsBlog
@@ -55,6 +56,7 @@ namespace JunsBlog
             services.AddScoped<IJwtTokenHelper, JwtTokenHelper>();
             services.AddScoped<INotificationService, EmailNotificationService>();
             services.AddScoped<IDatabaseService, MongoDBService>();
+
 
             services.AddLogging(configure => configure.AddConsole());
 

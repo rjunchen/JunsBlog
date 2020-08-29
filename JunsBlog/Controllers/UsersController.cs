@@ -24,7 +24,8 @@ namespace JunsBlog.Controllers
         private readonly string userId;
         private readonly Microsoft.Extensions.Logging.ILogger logger;
 
-        public UsersController(IHttpContextAccessor httpContextAccessor, IDatabaseService databaseService, IJwtTokenHelper jwtTokenHelper, INotificationService notificationService, ILogger<UsersController> logger)
+        public UsersController(IHttpContextAccessor httpContextAccessor, IDatabaseService databaseService,
+            IJwtTokenHelper jwtTokenHelper, INotificationService notificationService, ILogger<UsersController> logger)
         {
             this.databaseService = databaseService;
             this.notificationService = notificationService;
@@ -41,7 +42,7 @@ namespace JunsBlog.Controllers
                 if (String.IsNullOrWhiteSpace(model.Email) || String.IsNullOrWhiteSpace(model.Password))
                     return BadRequest(new { message = "Incomplete user authentication information" });
 
-                var user = await databaseService.FindUserAsync(x=> x.Email.ToLower() == model.Email.ToLower());
+                var user = await databaseService.GetUserByEmailAsync(model.Email);
 
                 if (user == null) return BadRequest(new { message = "User doesn't exist" });
 
@@ -49,7 +50,7 @@ namespace JunsBlog.Controllers
 
                 if (!Utilities.ValidatePassword(model.Password, user.Password)) return BadRequest(new { message = "Incorrect password" });
 
-                var userToken = await databaseService.FindUserTokenAsync(x => x.UserId == user.Id);
+                var userToken = await databaseService.GetUserTokenAsync(user.Id);
 
                 var response = new AuthenticateResponse(user, jwtTokenHelper.GenerateJwtToken(user), userToken.RefreshToken);
 
@@ -70,7 +71,7 @@ namespace JunsBlog.Controllers
                 if(String.IsNullOrWhiteSpace(model.Name) || String.IsNullOrWhiteSpace(model.Email) || String.IsNullOrWhiteSpace(model.Password))
                     return BadRequest(new { message = "Incomplete user registration information" });
 
-                var existingUser = await databaseService.FindUserAsync(x=> x.Email.ToLower() == model.Email.ToLower());
+                var existingUser = await databaseService.GetUserByEmailAsync(model.Email);
 
                 if(existingUser != null) return BadRequest(new { message = "Email has been already registered" });
 
@@ -102,11 +103,11 @@ namespace JunsBlog.Controllers
                     String.IsNullOrWhiteSpace(model.Password))
                     return BadRequest(new { message = "Incomplete password reset information" });
 
-                var user = await databaseService.FindUserAsync(x=> x.Email.ToLower() ==  model.Email.ToLower());
+                var user = await databaseService.GetUserByEmailAsync(model.Email);
 
                 if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "User not found");
 
-                var userToken = await databaseService.FindUserTokenAsync(x=> x.UserId == user.Id);
+                var userToken = await databaseService.GetUserTokenAsync(user.Id);
 
                 if(model.ResetToken != userToken.ResetToken || userToken.ResetExpiry < DateTime.UtcNow) 
                     return StatusCode(StatusCodes.Status400BadRequest, "Invalid or expired reset token");
@@ -131,11 +132,11 @@ namespace JunsBlog.Controllers
             {
                 if (String.IsNullOrWhiteSpace(email)) return StatusCode(StatusCodes.Status400BadRequest);
 
-                var user = await databaseService.FindUserAsync(x=> x.Email.ToLower() ==  email.ToLower());
+                var user = await databaseService.GetUserByEmailAsync(email);
 
                 if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "User not found");
 
-                var userToken = await databaseService.FindUserTokenAsync(x=> x.UserId == user.Id);
+                var userToken = await databaseService.GetUserTokenAsync(user.Id);
 
                 userToken.CreateResetToken();
 

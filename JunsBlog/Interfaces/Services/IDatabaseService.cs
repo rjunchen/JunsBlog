@@ -11,24 +11,44 @@ namespace JunsBlog.Interfaces.Services
 {
     public interface IDatabaseService
     {
-        Task<User> FindUserAsync(Expression<Func<User, bool>> filter);
+        // Users
         Task<User> SaveUserAsync(User user);
-        Task<UserToken> FindUserTokenAsync(Expression<Func<UserToken, bool>> filter);
+        Task<User> GetUserAsync(string userId);
+        Task<User> GetUserByEmailAsync(string email);
+
+
+        // UserTokens
+        Task<UserToken> GetUserTokenAsync(string userId);
         Task<UserToken> SaveUserTokenAsync(UserToken userToken);
+
+
+        // Articles
         Task<Article> SaveArticleAsync(Article article);
-        Task<Article> FindArticAsync(Expression<Func<Article, bool>> filter);
-        Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string searchKey, SortByEnum sortBy, SortOrderEnum sortOrder);
+
+
+        // ArticleRanking
         Task<ArticleRanking> SaveArticleRankingAsync(ArticleRanking ranking);
-        Task<List<ArticleRanking>> FindArticleRankingsAsync(Expression<Func<ArticleRanking, bool>> filter);
-        Task<ArticleRanking> FindArticleRankingAsync(Expression<Func<ArticleRanking, bool>> filter);
+        Task<List<ArticleRanking>> GetArticleRankingsAsync(string articleId);
+        Task<ArticleRanking> GetArticleRankingAsync(string articleId, string userId);
+
+
+        // Comments
         Task<Comment> SaveCommentAsync(Comment comment);
-        Task<List<Comment>> GetCommentsAsync(string targetId);
-        Task<CommentRanking> FindCommentRankingAsync(Expression<Func<CommentRanking, bool>> filter);
+        Task<List<Comment>> GetCommentsAsync(string articleId);
+
+
+        // CommentRankings
+        Task<CommentRanking> GetCommentRankingAsync(string commentId, string userId);
+        Task<List<CommentRanking>> GetCommentRankingsAsync(string commentId);
+        Task<CommentRanking> SaveCommentRankingAsync(CommentRanking ranking);
+
+
+        // Details
+        Task<CommentRankingDetails> GetCommentRankingDetails(string commentId, string userId);
+        Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string searchKey, SortByEnum sortBy, SortOrderEnum sortOrder);
         Task<ArticleDetails> GetArticleDetailsAsync(string articleId);
-        Task<ArticleRankingDetails> GetArticleRankingDetailsAsync(string articleId, string userId);
         Task<CommentSearchPagingResult> SearchCommentsAsync(int page, int pageSize, string searchKey, CommentSearchOnEnum searchOn, SortByEnum sortBy, SortOrderEnum sortOrder, string currentUserId);
         Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId);
-        Task<CommentRanking> SaveCommentRankingAsync(CommentRanking ranking);
-        Task<CommentRankingDetails> GetCommentRankingDetails(string commentId, string userId);
+        
     }
 }

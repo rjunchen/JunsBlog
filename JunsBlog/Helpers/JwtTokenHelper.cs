@@ -15,12 +15,10 @@ namespace JunsBlog.Helpers
     public class JwtTokenHelper : IJwtTokenHelper
     {
         private readonly IJwtSettings jwtSettings;
-        private readonly IDatabaseService databaseService;
 
-        public JwtTokenHelper(IJwtSettings jwtSettings, IDatabaseService databaseService)
+        public JwtTokenHelper(IJwtSettings jwtSettings)
         {
             this.jwtSettings = jwtSettings;
-            this.databaseService = databaseService;
         }
 
         public string GenerateJwtToken(User user)

@@ -19,6 +19,7 @@ namespace JunsBlog.Test.Mockups
         private readonly List<Article> articles;
         private readonly List<ArticleRanking> articleRankings;
         private readonly List<CommentRanking> commentRankings;
+        private readonly List<Comment> comments;
         public DatabaseServiceFake()
         {
             users = new List<User>();
@@ -26,111 +27,175 @@ namespace JunsBlog.Test.Mockups
             articles = new List<Article>();
             articleRankings = new List<ArticleRanking>();
             commentRankings = new List<CommentRanking>();
+            comments = new List<Comment>();
         }
 
-        public async Task<Article> FindArticAsync(Expression<Func<Article, bool>> filter)
+        #region Users
+        public async Task<User> GetUserAsync(string userId)
         {
-            var predic = new Predicate<Article>(filter.Compile());
-            return await Task.Run(() => articles.Find(predic));
+            return await Task.Run(() => users.Find(x => x.Id == userId));
         }
 
-        public async Task<ArticleRanking> FindArticleRankingAsync(Expression<Func<ArticleRanking, bool>> filter)
+        public async Task<User> GetUserByEmailAsync(string email)
         {
-            var predic = new Predicate<ArticleRanking>(filter.Compile());
-            return await Task.Run(() => articleRankings.Find(predic));
-        }
-
-        public async Task<List<ArticleRanking>> FindArticleRankingsAsync(Expression<Func<ArticleRanking, bool>> filter)
-        {
-            return await Task.Run(() => articleRankings.Where(filter.Compile()).ToList());
-        }
-
-        public async Task<CommentRanking> FindCommentRankingAsync(Expression<Func<CommentRanking, bool>> filter)
-        {
-            var predic = new Predicate<CommentRanking>(filter.Compile());
-            return await Task.Run(() => commentRankings.Find(predic));
-        }
-
-        public async Task<User> FindUserAsync(Expression<Func<User, bool>> filter)
-        {
-            var predic = new Predicate<User>(filter.Compile());
-            return await Task.Run(() => users.Find(predic));
-        }
-
- 
-        public async Task<UserToken> FindUserTokenAsync(Expression<Func<UserToken, bool>> filter)
-        {
-            var predic = new Predicate<UserToken>(filter.Compile());
-            return await Task.Run(() => userTokens.Find(predic));
-        }
-
-        public async Task<ArticleDetails> GetArticleDetailsAsync(string articleId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<ArticleRankingDetails> GetArticleRankingDetailsAsync(string articleId, string userId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<CommentRankingDetails> GetCommentRankingDetails(string commentId, string userId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<List<Comment>> GetCommentsAsync(string targetId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<Article> SaveArticleAsync(Article article)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<ArticleRanking> SaveArticleRankingAsync(ArticleRanking ranking)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<Comment> SaveCommentAsync(Comment comment)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<CommentRanking> SaveCommentRankingAsync(CommentRanking ranking)
-        {
-            throw new NotImplementedException();
+            return await Task.Run(() => users.Find(x => x.Email.ToLower() == email.ToLower()));
         }
 
         public async Task<User> SaveUserAsync(User user)
         {
+            user.UpdatedOn = DateTime.UtcNow;
             return await Task.Run(() => {
                 return users.ReplaceOne(user);
             });
         }
+        #endregion
+
+
+        #region UserTokens
+        public async Task<UserToken> GetUserTokenAsync(string userId)
+        {
+            return await Task.Run(() => userTokens.Find(x => x.UserId == userId));
+        }
 
         public async Task<UserToken> SaveUserTokenAsync(UserToken userToken)
         {
+            userToken.UpdatedOn = DateTime.UtcNow;
             return await Task.Run(() => {
                 return userTokens.ReplaceOne(userToken);
             });
         }
+        #endregion
 
-        public async Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string searchKey, SortByEnum sortBy, SortOrderEnum sortOrder)
+
+        #region Article
+        public async Task<Article> SaveArticleAsync(Article article)
+        {
+            article.UpdatedOn = DateTime.UtcNow;
+            return await Task.Run(() => {
+                return articles.ReplaceOne(article);
+            });
+        }
+        #endregion
+
+
+        #region ArticleRankings
+        public async Task<ArticleRanking> GetArticleRankingAsync(string articleId, string userId)
+        {
+            return await Task.Run(() => {
+                return articleRankings.Find(x => x.ArticleId == articleId && x.UserId == userId);
+            });
+        }
+
+        public async Task<List<ArticleRanking>> GetArticleRankingsAsync(string articleId)
+        {
+            return await Task.Run(() => {
+                return articleRankings.Where(x => x.ArticleId == articleId).ToList();
+            });
+        }
+
+        public async Task<ArticleRanking> SaveArticleRankingAsync(ArticleRanking ranking)
+        {
+            ranking.UpdatedOn = DateTime.UtcNow;
+            return await Task.Run(() => {
+                return articleRankings.ReplaceOne(ranking);
+            });
+        }
+        #endregion
+
+
+        #region Comment
+        public async Task<Comment> SaveCommentAsync(Comment comment)
+        {
+            comment.UpdatedOn = DateTime.UtcNow;
+            return await Task.Run(() => {
+                return comments.ReplaceOne(comment);
+            });
+        }
+
+        public async Task<List<Comment>> GetCommentsAsync(string articleId)
+        {
+            return await Task.Run(() => {
+                return comments.Where(x => x.ArticleId == articleId).ToList();
+            });
+        }
+        #endregion
+
+
+        #region CommentRankings
+        public async Task<CommentRanking> GetCommentRankingAsync(string commentId, string userId)
+        {
+            return await Task.Run(() => {
+                return commentRankings.Find(x => x.CommentId == commentId && x.UserId == userId);
+            });
+        }
+
+        public async Task<List<CommentRanking>> GetCommentRankingsAsync(string commentId)
+        {
+            return await Task.Run(() => {
+                return commentRankings.Where(x => x.CommentId == commentId).ToList();
+            });
+        }
+
+        public async Task<CommentRanking> SaveCommentRankingAsync(CommentRanking ranking)
+        {
+            ranking.UpdatedOn = DateTime.UtcNow;
+            return await Task.Run(() => {
+                return commentRankings.ReplaceOne(ranking);
+            });
+        }
+        #endregion
+
+
+
+        public Task<CommentRankingDetails> GetCommentRankingDetails(string commentId, string userId)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<CommentSearchPagingResult> SearchCommentsAsync(int page, int pageSize, string searchKey, CommentSearchOnEnum searchOn, SortByEnum sortBy, SortOrderEnum sortOrder, string currentUserId)
+        public Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string searchKey, SortByEnum sortBy, SortOrderEnum sortOrder)
         {
             throw new NotImplementedException();
         }
+
+        public async Task<ArticleDetails> GetArticleDetailsAsync(string articleId)
+        {
+            return await Task.Run(async () => {
+                var article = articles.FirstOrDefault(x => x.Id == articleId);
+                if (article == null) return null;
+                article.Views++;
+
+                var articleDetails = new ArticleDetails()
+                {
+                    Title = article.Title,
+                    Abstract = article.Abstract,
+                    Content = article.Content,
+                    CoverImage = article.CoverImage,
+                    CreatedOn = article.CreatedOn,
+                    UpdatedOn = article.UpdatedOn,
+                    Id = article.Id,
+                    Views = article.Views,
+                    IsApproved = article.IsApproved,
+                    IsPrivate = article.IsPrivate,
+                    Author = await GetUserAsync(article.AuthorId),
+                    CommentsCount = GetCommentsAsync(articleId).Result.Count
+                };
+
+                return articleDetails;
+            });
+        }
+
+        public Task<CommentSearchPagingResult> SearchCommentsAsync(int page, int pageSize, string searchKey, CommentSearchOnEnum searchOn, SortByEnum sortBy, SortOrderEnum sortOrder, string currentUserId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId)
+        {
+            throw new NotImplementedException();
+        }
+   
+
+
+
     }
 }
