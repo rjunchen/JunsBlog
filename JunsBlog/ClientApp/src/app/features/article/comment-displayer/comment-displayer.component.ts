@@ -63,7 +63,6 @@ export class CommentDisplayerComponent implements OnInit {
 
 
   showCommentControl(comment: CommentDetails){
-    console.log(comment);
     var commenterRequest = new CommentRequest(this.article, comment);
     this.commentService.showCommentControl(commenterRequest);
   }
@@ -101,7 +100,6 @@ export class CommentDisplayerComponent implements OnInit {
         const pageSize: number = 10;
         this.commentService.searchComments(intiPage, pageSize, this.comment.id, commentSearchOnEnum.ParentId).subscribe(
           data => {
-            console.log(data);
             this.commentPagingResult = data;
             this.commentPagingResult.documents.forEach(doc => {
               this.comments.push(doc);

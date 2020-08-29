@@ -31,7 +31,11 @@ export class LoginComponent implements OnInit {
     this.auth.getGoogleAuthUrl().subscribe( x=>{
       this.googleAuthUrl = x;
     }, err =>{
-      console.log(err);
+      if (err.status === 400) {     
+        this.toastr.warning(err.error.message, err.statusText);
+      } else {
+        this.toastr.error('Unknown error occurred, please try again later');
+      }
     })
   }
 

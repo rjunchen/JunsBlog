@@ -23,7 +23,7 @@ namespace JunsBlog.Controllers
         private readonly Microsoft.Extensions.Logging.ILogger logger;
         private readonly string currentUserId;
 
-        public CommentsController(IHttpContextAccessor httpContextAccessor, IDatabaseService databaseService, ILogger<OAuthsController> logger)
+        public CommentsController(IHttpContextAccessor httpContextAccessor, IDatabaseService databaseService, ILogger<CommentsController> logger)
         {
             this.databaseService = databaseService;
             this.logger = logger;
@@ -79,7 +79,7 @@ namespace JunsBlog.Controllers
                 if (model == null || String.IsNullOrWhiteSpace(model.CommentId))
                     return BadRequest(new { message = "Incomplete ranking information" });
 
-                var ranking = await databaseService.FindCommentRankingAsync(x => x.CommentId == model.CommentId && x.UserId == currentUserId);
+                var ranking = await databaseService.GetCommentRankingAsync(model.CommentId, currentUserId);
 
                 if (ranking == null) ranking = new CommentRanking(model.CommentId, currentUserId);
 
@@ -99,7 +99,7 @@ namespace JunsBlog.Controllers
                 }
                 await databaseService.SaveCommentRankingAsync(ranking);
 
-                var rankingDetails = await databaseService.GetCommentRankingDetails(model.CommentId, currentUserId);
+                var rankingDetails = await GetCommentRankingDetails(model.CommentId, currentUserId);
 
                 return Ok(rankingDetails);
             }
@@ -108,6 +108,28 @@ namespace JunsBlog.Controllers
                 logger.LogError(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
+        }
+
+        private async Task<CommentRankingDetails> GetCommentRankingDetails(string commentId, string userId)
+        {
+            var rankings = await databaseService.GetCommentRankingsAsync(commentId);
+
+            var rankingResponse = new CommentRankingDetails() { CommentId = commentId };
+
+            foreach (var item in rankings)
+            {
+                if (item.DidIDislike) rankingResponse.DislikesCount++;
+                if (item.DidILike) rankingResponse.LikesCount++;
+                rankingResponse.DidIFavor = item.DidIFavor;
+
+                if (item.UserId == userId)
+                {
+                    rankingResponse.DidIDislike = item.DidIDislike;
+                    rankingResponse.DidILike = item.DidILike;
+                    rankingResponse.DidIFavor = item.DidIFavor;
+                }
+            }
+            return rankingResponse;
         }
     }
 }

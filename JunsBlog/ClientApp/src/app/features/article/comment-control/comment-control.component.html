@@ -2,7 +2,7 @@
     <div class="overlay"></div>
     <div class="comment-control">
         <div class="comment-input-section">
-            <img class="images profileImage" [src]="currentUser.image? currentUser.image : defaultAvatarUrl"/>
+            <img class="images profileImage" [src]="currentUser?.image ? currentUser.image : defaultAvatarUrl"/>
             <mat-form-field class="comment-field">
                 <mat-label>Leave a comment</mat-label>
                 <textarea [(ngModel)]="commentRequest.commentText" matInput matTextareaAutosize [matAutosizeMaxRows]="10" [matAutosizeMinRows]="2" placeholder="Leave a footstep here..."></textarea>

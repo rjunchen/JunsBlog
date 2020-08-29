@@ -22,7 +22,7 @@ namespace JunsBlog.Controllers
         private readonly Microsoft.Extensions.Logging.ILogger logger;
         private readonly string currentUserId;
 
-        public ArticlesController(IHttpContextAccessor httpContextAccessor, IDatabaseService databaseService, ILogger<OAuthsController> logger)
+        public ArticlesController(IHttpContextAccessor httpContextAccessor, IDatabaseService databaseService, ILogger<ArticlesController> logger)
         {
             this.databaseService = databaseService;
             this.logger = logger;
@@ -59,6 +59,8 @@ namespace JunsBlog.Controllers
 
                 var articleDetails = await databaseService.GetArticleDetailsAsync(articleId);
 
+                if(articleDetails == null) return BadRequest(new { message = "Article does not exist" });
+
                 return Ok(articleDetails);
             }
             catch (Exception ex)
@@ -93,7 +95,7 @@ namespace JunsBlog.Controllers
                 if (model == null || String.IsNullOrWhiteSpace(model.ArticleId))
                     return BadRequest(new { message = "Incomplete ranking information" });
 
-                var ranking = await databaseService.FindArticleRankingAsync(x => x.ArticleId == model.ArticleId && x.UserId == currentUserId);
+                var ranking = await databaseService.GetArticleRankingAsync(model.ArticleId, currentUserId);
 
                 if (ranking == null) ranking = new ArticleRanking(model.ArticleId, currentUserId);
 
@@ -113,7 +115,7 @@ namespace JunsBlog.Controllers
                 }
                 await databaseService.SaveArticleRankingAsync(ranking);
 
-                var rankingDetails = await databaseService.GetArticleRankingDetailsAsync(model.ArticleId, currentUserId);
+                var rankingDetails = await GetArticleRankingDetailsAsync(model.ArticleId, currentUserId);
 
                 return Ok(rankingDetails);
             }
@@ -133,7 +135,7 @@ namespace JunsBlog.Controllers
                 if (String.IsNullOrWhiteSpace(articleId))
                     return BadRequest(new { message = "Incomplete ranking information" });
 
-                var articleRankingDetails = await databaseService.GetArticleRankingDetailsAsync(articleId, currentUserId);
+                var articleRankingDetails = await GetArticleRankingDetailsAsync(articleId, currentUserId);
 
                 return Ok(articleRankingDetails);
             }
@@ -142,6 +144,28 @@ namespace JunsBlog.Controllers
                 logger.LogError(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
+        }
+
+        private async Task<ArticleRankingDetails> GetArticleRankingDetailsAsync(string articleId, string userId)
+        {
+            var rankings = await databaseService.GetArticleRankingsAsync(articleId);
+
+            var rankingResponse = new ArticleRankingDetails() { ArticleId = articleId };
+
+            foreach (var item in rankings)
+            {
+                if (item.DidIDislike) rankingResponse.DislikesCount++;
+                if (item.DidILike) rankingResponse.LikesCount++;
+                rankingResponse.DidIFavor = item.DidIFavor;
+
+                if (item.UserId == userId)
+                {
+                    rankingResponse.DidIDislike = item.DidIDislike;
+                    rankingResponse.DidILike = item.DidILike;
+                    rankingResponse.DidIFavor = item.DidIFavor;
+                }
+            }
+            return rankingResponse;
         }
 
     }

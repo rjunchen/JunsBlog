@@ -36,9 +36,17 @@ namespace JunsBlog.Models.Services
             commentRankings = database.GetCollection<CommentRanking>(settings.CommentRankingCollectionName);
         }
 
-        public async Task<User> FindUserAsync(Expression<Func<User, bool>> filter)
+        #region Users
+        public async Task<User> GetUserAsync(string userId)
         {
-            return await users.Find<User>(filter).SingleOrDefaultAsync();
+            var user = await users.Find<User>(x => x.Id == userId).SingleOrDefaultAsync();
+            return user;
+        }
+
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            var user = await users.Find<User>(x => x.Email.ToLower() == email.ToLower()).SingleOrDefaultAsync();
+            return user;
         }
 
         public async Task<User> SaveUserAsync(User user)
@@ -47,6 +55,15 @@ namespace JunsBlog.Models.Services
             await users.ReplaceOneAsync(s => s.Id == user.Id, user, new ReplaceOptions { IsUpsert = true });
             return user;
         }
+        #endregion
+
+
+        #region UserTokens
+        public async Task<UserToken> GetUserTokenAsync(string userId)
+        {
+            var userToken = await userTokens.Find<UserToken>(x => x.UserId == userId).SingleOrDefaultAsync();
+            return userToken;
+        }
 
         public async Task<UserToken> SaveUserTokenAsync(UserToken userToken)
         {
@@ -54,27 +71,77 @@ namespace JunsBlog.Models.Services
             await userTokens.ReplaceOneAsync(s => s.Id == userToken.Id, userToken, new ReplaceOptions { IsUpsert = true });
             return userToken;
         }
+        #endregion
 
-        public async Task<UserToken> FindUserTokenAsync(Expression<Func<UserToken, bool>> filter)
-        {
-            return await userTokens.Find<UserToken>(filter).FirstOrDefaultAsync();
-        }
 
+        #region Articles
         public async Task<Article> SaveArticleAsync(Article article)
         {
             article.UpdatedOn = DateTime.UtcNow;
             await articles.ReplaceOneAsync(s => s.Id == article.Id, article, new ReplaceOptions { IsUpsert = true });
             return article;
         }
+        #endregion
 
-        public async Task<Article> FindArticAsync(Expression<Func<Article, bool>> filter)
+
+        #region ArtileRankings
+        public async Task<ArticleRanking> GetArticleRankingAsync(string articleId, string userId)
         {
-            var updateDef = Builders<Article>.Update.Inc(x => x.Views, 1);
-            return await articles.FindOneAndUpdateAsync<Article>(filter, updateDef, 
-                new FindOneAndUpdateOptions<Article, Article> { ReturnDocument = ReturnDocument.After });
+            return await articleRankings.Find<ArticleRanking>(x => x.ArticleId == articleId && x.UserId == userId).FirstOrDefaultAsync();
         }
 
+        public async Task<List<ArticleRanking>> GetArticleRankingsAsync(string articleId)
+        {
+            return await articleRankings.Find<ArticleRanking>(x => x.ArticleId == articleId).ToListAsync();
+        }
 
+        public async Task<ArticleRanking> SaveArticleRankingAsync(ArticleRanking ranking)
+        {
+            ranking.UpdatedOn = DateTime.UtcNow;
+            await articleRankings.ReplaceOneAsync(s => s.Id == ranking.Id, ranking, new ReplaceOptions { IsUpsert = true });
+            return ranking;
+        }
+        #endregion
+
+
+        #region Comments
+        public async Task<List<Comment>> GetCommentsAsync(string articleId)
+        {
+            return await comments.Find<Comment>(x => x.ArticleId == articleId).ToListAsync();
+        }
+
+        public async Task<Comment> SaveCommentAsync(Comment comment)
+        {
+            comment.UpdatedOn = DateTime.UtcNow;
+
+            await comments.ReplaceOneAsync(s => s.Id == comment.Id, comment, new ReplaceOptions { IsUpsert = true });
+
+            return comment;
+        }
+        #endregion
+
+
+        #region CommentRanking
+        public async Task<CommentRanking> GetCommentRankingAsync(string commentId, string userId)
+        {
+            return await commentRankings.Find<CommentRanking>(x => x.CommentId == commentId && x.UserId == userId).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<CommentRanking>> GetCommentRankingsAsync(string commentId)
+        {
+            return await commentRankings.Find<CommentRanking>(x => x.CommentId == commentId).ToListAsync();
+        }
+
+        public async Task<CommentRanking> SaveCommentRankingAsync(CommentRanking ranking)
+        {
+            ranking.UpdatedOn = DateTime.UtcNow;
+            await commentRankings.ReplaceOneAsync(s => s.Id == ranking.Id, ranking, new ReplaceOptions { IsUpsert = true });
+            return ranking;
+        }
+        #endregion
+
+
+        #region Details
         public async Task<ArticleDetails> GetArticleDetailsAsync(string articleId)
         {
             // Increase the view count by 1
@@ -148,67 +215,10 @@ namespace JunsBlog.Models.Services
             return new ArticleSearchPagingResult(documents, docsCount, page, pageSize, searchKey, sortBy, sortOrder);
         }
 
-        public async Task<List<ArticleRanking>> FindArticleRankingsAsync(Expression<Func<ArticleRanking, bool>> filter)
-        {
-            return await articleRankings.Find<ArticleRanking>(filter).ToListAsync();
-        }
-
-        public async Task<ArticleRanking> FindArticleRankingAsync(Expression<Func<ArticleRanking, bool>> filter)
-        {
-            return await articleRankings.Find<ArticleRanking>(filter).FirstOrDefaultAsync();
-        }
-
-        public async Task<ArticleRanking> SaveArticleRankingAsync(ArticleRanking ranking)
-        {
-            ranking.UpdatedOn = DateTime.UtcNow;
-            await articleRankings.ReplaceOneAsync(s => s.Id == ranking.Id, ranking, new ReplaceOptions { IsUpsert = true });
-            return ranking;
-        }
-
-        public async Task<ArticleRankingDetails> GetArticleRankingDetailsAsync(string articleId, string userId)
-        {
-            var rankings = await articleRankings.Find(x => x.ArticleId == articleId).ToListAsync();
-
-            var rankingResponse = new ArticleRankingDetails() { ArticleId = articleId };
-
-            foreach (var item in rankings)
-            {
-                if (item.DidIDislike) rankingResponse.DislikesCount++;
-                if (item.DidILike) rankingResponse.LikesCount++;
-                rankingResponse.DidIFavor = item.DidIFavor;
-
-                if (item.UserId == userId)
-                {
-                    rankingResponse.DidIDislike = item.DidIDislike;
-                    rankingResponse.DidILike = item.DidILike;
-                    rankingResponse.DidIFavor = item.DidIFavor;
-                }
-            }
-            return rankingResponse;
-        }
-
-        public async Task<Comment> SaveCommentAsync(Comment comment)
-        {
-            comment.UpdatedOn = DateTime.UtcNow;
-
-            await comments.ReplaceOneAsync(s => s.Id == comment.Id, comment, new ReplaceOptions { IsUpsert = true });
-
-            return comment;
-        }
-
-        public async Task<List<Comment>> GetCommentsAsync(string targetId)
-        {
-            return await comments.Find<Comment>(x=> x.ArticleId == targetId).ToListAsync();
-        }
-
-        public async Task<CommentRanking> FindCommentRankingAsync(Expression<Func<CommentRanking, bool>> filter)
-        {
-            return await commentRankings.Find<CommentRanking>(filter).FirstOrDefaultAsync();
-        }
 
         public async Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId)
         {
-            var rankingDetails = await GetCommentRankingDetails(commentId, currentUserId);
+            var rankingDetails = await GetCommentRankingDetailsAsync(commentId, currentUserId);
 
             var query = GenerateCommentsDetailsQuery();
 
@@ -217,7 +227,7 @@ namespace JunsBlog.Models.Services
             return commentDetail;
         }
 
-        public async Task<CommentRankingDetails> GetCommentRankingDetails(string commentId, string userId)
+        private async Task<CommentRankingDetails> GetCommentRankingDetailsAsync(string commentId, string userId)
         {
             var rankings = await commentRankings.Find(x => x.CommentId == commentId).ToListAsync();
 
@@ -309,17 +319,12 @@ namespace JunsBlog.Models.Services
 
             foreach (var item in documents)
             {
-                item.Ranking = await GetCommentRankingDetails(item.Id, currentUserId);
+                item.Ranking = await GetCommentRankingDetailsAsync(item.Id, currentUserId);
             }
 
             return new CommentSearchPagingResult(documents, docsCount, page, pageSize, searchKey, searchOn, sortBy, sortOrder);
         }
 
-        public async Task<CommentRanking> SaveCommentRankingAsync(CommentRanking ranking)
-        {
-            ranking.UpdatedOn = DateTime.UtcNow;
-            await commentRankings.ReplaceOneAsync(s => s.Id == ranking.Id, ranking, new ReplaceOptions { IsUpsert = true });
-            return ranking;
-        }
+        #endregion
     }
 }

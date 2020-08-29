@@ -25,7 +25,8 @@ namespace JunsBlog.Controllers
         private readonly Microsoft.Extensions.Logging.ILogger logger;
         private readonly IJwtTokenHelper jwtTokenHelper;
         private readonly IHttpContextAccessor httpContextAccessor;
-        public OAuthsController(IHttpContextAccessor httpContextAccessor, IAuthenticationSettings authSettings, IDatabaseService databaseService, IJwtTokenHelper jwtTokenHelper, ILogger<OAuthsController> logger)
+        public OAuthsController(IHttpContextAccessor httpContextAccessor, IAuthenticationSettings authSettings, IDatabaseService databaseService,
+             IJwtTokenHelper jwtTokenHelper, ILogger<OAuthsController> logger)
         {
             this.authSettings = authSettings;
             this.databaseService = databaseService;
@@ -101,7 +102,7 @@ namespace JunsBlog.Controllers
 
                 var userInfo = await GetGoogleUserInfoAsync(tokenResponse.access_token);
 
-                var googleUser = await databaseService.FindUserAsync( x=> x.Email.ToLower() == userInfo.Email.ToLower());
+                var googleUser = await databaseService.GetUserByEmailAsync(userInfo.Email);
 
                 UserToken userToken;
 
@@ -115,7 +116,7 @@ namespace JunsBlog.Controllers
                 }
                 else
                 {
-                    userToken = await databaseService.FindUserTokenAsync(x => x.UserId == googleUser.Id);
+                    userToken = await databaseService.GetUserTokenAsync(googleUser.Id);
                 }
 
                 var response = new AuthenticateResponse(googleUser, jwtTokenHelper.GenerateJwtToken(googleUser), userToken.RefreshToken);
@@ -167,9 +168,9 @@ namespace JunsBlog.Controllers
             {
                 var claim = jwtTokenHelper.ValidateToken(request.AccessToken);
 
-                var user = await databaseService.FindUserAsync(x=>x.Id == claim.Value);
+                var user = await databaseService.GetUserAsync(claim.Value);
 
-                var userToken = await databaseService.FindUserTokenAsync(x => x.UserId == user.Id);
+                var userToken = await databaseService.GetUserTokenAsync(user.Id);
 
                 var response = new AuthenticateResponse(user, jwtTokenHelper.GenerateJwtToken(user), userToken.RefreshToken);
 
@@ -181,7 +182,5 @@ namespace JunsBlog.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
-
-
     }
 }
