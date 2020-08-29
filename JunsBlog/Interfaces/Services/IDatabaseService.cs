@@ -44,7 +44,6 @@ namespace JunsBlog.Interfaces.Services
 
 
         // Details
-        Task<CommentRankingDetails> GetCommentRankingDetails(string commentId, string userId);
         Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string searchKey, SortByEnum sortBy, SortOrderEnum sortOrder);
         Task<ArticleDetails> GetArticleDetailsAsync(string articleId);
         Task<CommentSearchPagingResult> SearchCommentsAsync(int page, int pageSize, string searchKey, CommentSearchOnEnum searchOn, SortByEnum sortBy, SortOrderEnum sortOrder, string currentUserId);

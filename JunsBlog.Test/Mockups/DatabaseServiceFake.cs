@@ -146,15 +146,59 @@ namespace JunsBlog.Test.Mockups
         #endregion
 
 
-
-        public Task<CommentRankingDetails> GetCommentRankingDetails(string commentId, string userId)
+        // Integration Test should test this instead of unit test 
+        public async Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string searchKey, SortByEnum sortBy, SortOrderEnum sortOrder)
         {
-            throw new NotImplementedException();
-        }
+            return await Task.Run( async () => {
+                List<Article> resultArticles = new List<Article>();
+                if (!string.IsNullOrWhiteSpace(searchKey))
+                    resultArticles = articles.Where(x => x.Content.Contains(searchKey)).ToList();
 
-        public Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string searchKey, SortByEnum sortBy, SortOrderEnum sortOrder)
-        {
-            throw new NotImplementedException();
+                switch (sortBy)
+                {
+                    case SortByEnum.UpdatedOn:
+                        if (sortOrder == SortOrderEnum.Ascending)
+                            resultArticles = resultArticles.OrderBy(x => x.UpdatedOn).ToList();
+                        else
+                            resultArticles = resultArticles.OrderByDescending(x => x.UpdatedOn).ToList();
+                        break;
+                    case SortByEnum.Views:
+                        if (sortOrder == SortOrderEnum.Ascending)
+                            resultArticles = resultArticles.OrderBy(x => x.Views).ToList();
+                        else
+                            resultArticles = resultArticles.OrderByDescending(x => x.Views).ToList();
+                        break;
+                    default:
+                        break;
+                }
+
+                List<ArticleDetails> articleDetailsList = new List<ArticleDetails>();
+
+                foreach (var x in resultArticles)
+                {
+                    var articeDetails = new ArticleDetails()
+                    {
+                        Abstract = x.Abstract,
+                        CoverImage = x.CoverImage,
+                        Id = x.Id,
+                        Title = x.Title,
+                        UpdatedOn = x.UpdatedOn,
+                        CreatedOn = x.CreatedOn,
+                        IsApproved = x.IsApproved,
+                        IsPrivate = x.IsPrivate,
+                        Views = x.Views,
+                        Author = await GetUserAsync(x.AuthorId),
+                        CommentsCount = GetCommentsAsync(x.Id).Result.Count
+                    };
+                    articleDetailsList.Add(articeDetails);
+                }
+
+                var articlesCount = articleDetailsList.Count;
+
+                var pageResult = new ArticleSearchPagingResult(articleDetailsList, articlesCount, page, pageSize, searchKey, sortBy, sortOrder);
+
+                return pageResult;
+            });
         }
 
         public async Task<ArticleDetails> GetArticleDetailsAsync(string articleId)
@@ -189,13 +233,49 @@ namespace JunsBlog.Test.Mockups
             throw new NotImplementedException();
         }
 
-        public Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId)
+        public async Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId)
         {
-            throw new NotImplementedException();
+            return await Task.Run(async () => {
+                var comment = comments.FirstOrDefault(x => x.Id == commentId);
+
+                var commentDetails = new CommentDetails()
+                {
+                   ArticleId = comment.ArticleId,
+                   CommentText = comment.CommentText,
+                   Id = comment.Id,
+                   UpdatedOn = comment.UpdatedOn,
+                   ParentId = comment.ParentId,
+                   ChildrenCommentsCount = 0,
+                   Ranking = await GetCommentRankingDetailsAsync(commentId, currentUserId),
+                   User = await GetUserAsync(comment.UserId)
+                };
+
+                return commentDetails;
+            });
         }
-   
 
+        private async Task<CommentRankingDetails> GetCommentRankingDetailsAsync(string commentId, string userId)
+        {
+            return await Task.Run( () => {
+                var rankings = commentRankings.Where(x => x.CommentId == commentId);
 
+                var rankingResponse = new CommentRankingDetails() { CommentId = commentId };
 
+                foreach (var item in rankings)
+                {
+                    if (item.DidIDislike) rankingResponse.DislikesCount++;
+                    if (item.DidILike) rankingResponse.LikesCount++;
+                    rankingResponse.DidIFavor = item.DidIFavor;
+
+                    if (item.UserId == userId)
+                    {
+                        rankingResponse.DidIDislike = item.DidIDislike;
+                        rankingResponse.DidILike = item.DidILike;
+                        rankingResponse.DidIFavor = item.DidIFavor;
+                    }
+                }
+                return rankingResponse;
+            });
+        }
     }
 }

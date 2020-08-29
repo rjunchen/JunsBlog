@@ -218,7 +218,7 @@ namespace JunsBlog.Models.Services
 
         public async Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId)
         {
-            var rankingDetails = await GetCommentRankingDetails(commentId, currentUserId);
+            var rankingDetails = await GetCommentRankingDetailsAsync(commentId, currentUserId);
 
             var query = GenerateCommentsDetailsQuery();
 
@@ -227,7 +227,7 @@ namespace JunsBlog.Models.Services
             return commentDetail;
         }
 
-        public async Task<CommentRankingDetails> GetCommentRankingDetails(string commentId, string userId)
+        private async Task<CommentRankingDetails> GetCommentRankingDetailsAsync(string commentId, string userId)
         {
             var rankings = await commentRankings.Find(x => x.CommentId == commentId).ToListAsync();
 
@@ -319,7 +319,7 @@ namespace JunsBlog.Models.Services
 
             foreach (var item in documents)
             {
-                item.Ranking = await GetCommentRankingDetails(item.Id, currentUserId);
+                item.Ranking = await GetCommentRankingDetailsAsync(item.Id, currentUserId);
             }
 
             return new CommentSearchPagingResult(documents, docsCount, page, pageSize, searchKey, searchOn, sortBy, sortOrder);
