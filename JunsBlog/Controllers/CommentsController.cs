@@ -53,12 +53,12 @@ namespace JunsBlog.Controllers
             }
         }
 
-        [HttpGet("search")]
-        public async Task<IActionResult> SearchComments(int page = 1, int pageSize = 10, string searchKey = null, CommentSearchOnEnum searchOn = CommentSearchOnEnum.CommentText, SortByEnum sortBy = SortByEnum.UpdatedOn, SortOrderEnum sortOrder = SortOrderEnum.Descending)
+        [HttpPost("search")]
+        public async Task<IActionResult> SearchComments(CommentSearchPagingOption options)
         {
             try
             {
-                var searchResult = await databaseService.SearchCommentsAsync(page, pageSize, searchKey, searchOn, sortBy, sortOrder, currentUserId);
+                var searchResult = await databaseService.SearchCommentsAsync(options, currentUserId);
 
                 return Ok(searchResult);
             }

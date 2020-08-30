@@ -1,6 +1,6 @@
-import { ArticleDetails } from './articleDetails';
 import { CommentDetails } from './commentDetails';
-import { User } from './user';
+import { User } from '../user';
+import { ArticleDetails } from '../article/articleDetails';
 
 export class CommentRequest {
     articleId: string;

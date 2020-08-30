@@ -10,7 +10,8 @@ const routes: Routes = [
     { path: 'register', loadChildren: () => import('./features/register/register.module').then(m => m.RegisterModule) },
     { path: 'profile', loadChildren: () => import('./features/profile/profile.module').then(m => m.ProfileModule) },
     { path: 'social', loadChildren: () => import('./features/social/social.module').then(m => m.SocialModule) },
-    { path: 'editor', loadChildren: () => import('./features/editor/editor.module').then(m => m.EditorModule), canActivate: [AuthGuard] } 
+    { path: 'editor', loadChildren: () => import('./features/editor/editor.module').then(m => m.EditorModule), canActivate: [AuthGuard] },
+    { path: 'search', loadChildren: () => import('./features/search/search.module').then(m => m.SearchModule) } 
   ];
 
 @NgModule({

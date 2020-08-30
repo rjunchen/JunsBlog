@@ -1,8 +1,7 @@
-import { User } from './user';
 import { Article } from './article';
 import { ArticleRankingRequest } from './articleRankingRequest';
 import { ArticleRankingDetails } from './articleRankingDetails';
-import { CommentDetails } from './commentDetails';
+import { User } from '../user';
 
 export class ArticleDetails extends Article{
     author: User;

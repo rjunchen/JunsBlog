@@ -63,26 +63,6 @@ $color-orange: #f44336;
             }
         }
     } 
-        
-    .searchBar{
-        background-color: white;
-        box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
-        position: fixed;
-        top:70px;
-        right: 0px;
-        padding-left: 15px;
-        width: 300px;
-        .mat-form-field{
-            width: 100%;
-            .search-icon{
-                margin-right: 30px;
-                &:hover{
-                    color: $color-orange;
-                    cursor: pointer;
-                }
-            } 
-        }
-    }
 }
 
 @media only screen and (max-width: 768px){
@@ -91,13 +71,6 @@ $color-orange: #f44336;
         bottom: 0;
         .app-title{
           display: none;
-        }
-        .searchBar{
-            top:auto;
-            right: auto;
-            left: 0px;
-            bottom: 65px;
-            width: 100%;
         }
     } 
 }

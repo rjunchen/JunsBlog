@@ -1,9 +1,9 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ArticleListConfig } from 'src/app/models/articleListConfig';
-import { Article } from 'src/app/models/article';
+import { Article } from 'src/app/models/article/article';
 import { ArticleService } from 'src/app/services/article.service';
 import { ToastrService } from 'ngx-toastr';
-import { ArticleSearchPagingResult } from 'src/app/models/articleSearchPagingResult';
+import { ArticleSearchPagingResult } from 'src/app/models/article/articleSearchPagingResult';
+import { ArticleSearchPagingOption } from 'src/app/models/article/articleSearchPagingOption';
 
 @Component({
   selector: 'app-articles-list',
@@ -11,28 +11,38 @@ import { ArticleSearchPagingResult } from 'src/app/models/articleSearchPagingRes
   styleUrls: ['./articles-list.component.scss']
 })
 export class ArticlesListComponent implements OnInit {
-  @Input() articleListConfig: ArticleListConfig;
+  @Input() loadOnInit: boolean;
 
   articles: Article[];
   articlePagingResult: ArticleSearchPagingResult;
   defaultAvatarUrl = './assets/avatar.png';
 
-  
   throttle = 300;
   scrollDistance = 1;
   scrollUpDistance = 2;
   loading = false;
+  noSearchResult: boolean;
 
   constructor(private articleService: ArticleService, private toastr: ToastrService) { }
 
   ngOnInit(): void {
-    const intiPage: number = 1;
-    const pageSize: number = 10;
+
+    this.articleService.onSearchClicked.subscribe(option=>{
+      this.search(option);
+    })
+
+    if(this.loadOnInit){
+      this.search(new ArticleSearchPagingOption());
+    }
+  }
+
+  search(option: ArticleSearchPagingOption){
     this.loading = true;
-    this.articleService.searchArticle(intiPage, pageSize).subscribe(x=>{
+    this.articleService.searchArticle(option).subscribe(x=>{
       this.articles = x.documents;
       this.articlePagingResult = x;
       this.loading = false;
+      this.noSearchResult = x.documents.length == 0;
     }, err =>{
       this.loading = false;
       if(err.status === 400){
@@ -44,11 +54,11 @@ export class ArticlesListComponent implements OnInit {
     });
   }
 
-
   onScrollDown () {
     if(this.articlePagingResult && this.articlePagingResult.hasNextPage && !this.loading){
       this.loading = true;
-      this.articleService.searchArticle(this.articlePagingResult.currentPage + 1 , this.articlePagingResult.pageSize).subscribe(
+      this.articlePagingResult.searchOption.currentPage += 1;
+      this.articleService.searchArticle(this.articlePagingResult.searchOption).subscribe(
         data => {        
             data.documents.forEach(doc => {
               this.articles.push(doc);

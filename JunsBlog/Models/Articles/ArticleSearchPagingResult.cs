@@ -16,22 +16,18 @@ namespace JunsBlog.Models.Articles
         public int PageSize { get; set; }
         public bool HasNextPage { get; set; }
         public bool HasPreviousPage { get; set; }
-        public string SearchKey { get; set; }
-        public SortOrderEnum SortOrder { get; set; }
-        public SortByEnum SortBy { get; set; }
+        public ArticleSearchPagingOption SearchOption { get; set; }
 
-        public ArticleSearchPagingResult(List<ArticleDetails> articleDetailsList, int totalDocument, int currentPage, int pageSize, string searchKey, SortByEnum sortBy, SortOrderEnum sortOrder)
+        public ArticleSearchPagingResult(List<ArticleDetails> articleDetailsList, int totalDocument, ArticleSearchPagingOption options)
         {
             Documents = articleDetailsList;
             TotalDocuments = totalDocument;
-            TotalPages = (int)Math.Ceiling((double)totalDocument / pageSize);
-            CurrentPage = currentPage;
-            PageSize = pageSize;
+            TotalPages = (int)Math.Ceiling((double)totalDocument / options.PageSize);
             HasNextPage = TotalPages > CurrentPage;
             HasPreviousPage = CurrentPage > 1;
-            SearchKey = searchKey;
-            SortOrder = sortOrder;
-            SortBy = sortBy;
+            SearchOption = options;
+            CurrentPage = options.CurrentPage;
+            PageSize = options.PageSize;
         }
     }
 }

@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { User } from 'src/app/models/user';
 import { AuthenticationService } from 'src/app/core/authentication.service';
 import { CommentService } from 'src/app/services/comment.service';
-import { CommentRequest } from 'src/app/models/commentRequest';
 import { ToastrService } from 'ngx-toastr';
+import { CommentRequest } from 'src/app/models/comment/commentRequest';
 
 @Component({
   selector: 'app-comment-control',

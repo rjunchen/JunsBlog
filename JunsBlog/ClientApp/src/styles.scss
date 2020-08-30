@@ -39,6 +39,12 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-
     font-size: 16px;
 }
 
+.search-control-container{
+    .mat-form-field-wrapper{
+        margin: 8px 20px 0px 8px;
+    }
+}
+
 
 @media only screen and (max-width: 768px){
     body{

@@ -70,12 +70,12 @@ namespace JunsBlog.Controllers
             }
         }
 
-        [HttpGet("Search")]
-        public async Task<IActionResult> SearchArticles(int page = 1, int pageSize = 10, string searchKey = null, SortByEnum sortBy = SortByEnum.UpdatedOn, SortOrderEnum sortOrder = SortOrderEnum.Descending)
+        [HttpPost("Search")]
+        public async Task<IActionResult> SearchArticles(ArticleSearchPagingOption options)
         {
             try
             {
-                var searchResult = await databaseService.SearchArticlesAsyc(page, pageSize, searchKey, sortBy, sortOrder);
+                var searchResult = await databaseService.SearchArticlesAsyc(options);
 
                 return Ok(searchResult);
             }

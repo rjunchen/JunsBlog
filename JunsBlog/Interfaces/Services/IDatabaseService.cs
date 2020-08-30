@@ -44,9 +44,9 @@ namespace JunsBlog.Interfaces.Services
 
 
         // Details
-        Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string searchKey, SortByEnum sortBy, SortOrderEnum sortOrder);
+        Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options);
         Task<ArticleDetails> GetArticleDetailsAsync(string articleId);
-        Task<CommentSearchPagingResult> SearchCommentsAsync(int page, int pageSize, string searchKey, CommentSearchOnEnum searchOn, SortByEnum sortBy, SortOrderEnum sortOrder, string currentUserId);
+        Task<CommentSearchPagingResult> SearchCommentsAsync(CommentSearchPagingOption options, string currentUserId);
         Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId);
         
     }

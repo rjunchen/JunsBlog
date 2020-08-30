@@ -2,14 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { ArticleService } from 'src/app/services/article.service';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute } from '@angular/router';
-import { ArticleDetails } from 'src/app/models/articleDetails';
 import { mergeMap } from 'rxjs/operators';
-
-import { ArticleRankingRequest } from 'src/app/models/articleRankingRequest';
 import { CommentService } from 'src/app/services/comment.service';
-import { ArticleRankingDetails } from 'src/app/models/articleRankingDetails';
 import { RankEnum } from 'src/app/models/Enums/rankEnum';
-import { CommentRequest } from 'src/app/models/commentRequest';
+import { ArticleDetails } from 'src/app/models/article/articleDetails';
+import { ArticleRankingDetails } from 'src/app/models/article/articleRankingDetails';
+import { ArticleRankingRequest } from 'src/app/models/article/articleRankingRequest';
+import { CommentRequest } from 'src/app/models/comment/commentRequest';
+
 
 @Component({
   selector: 'app-article',
