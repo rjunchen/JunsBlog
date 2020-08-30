@@ -29,4 +29,16 @@
             <div class="article-abstract">{{article.abstract}}</div>
         </div>
     </div>
+    <div *ngIf="noSearchResult" class="no-result">
+        <p>Your search - <b>{{articlePagingResult.searchOption.searchKey}}</b> - did not match any image results.</p>
+        <p>Suggestions:</p>
+        <ul>
+            <li>Make sure all words are spelled correctly.</li>
+            <li>Try different keywords.</li>
+            <li>Try more general keywords.</li>
+        </ul>
+    </div>
+    <div class="overlay" *ngIf="loading">
+        <mat-spinner color="warn"></mat-spinner>
+    </div>
 </div>

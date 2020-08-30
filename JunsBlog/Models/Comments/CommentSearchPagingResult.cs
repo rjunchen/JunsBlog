@@ -11,28 +11,18 @@ namespace JunsBlog.Models.Comments
         public List<CommentDetails> Documents { get; set; }
         public int TotalDocuments { get; set; }
         public int TotalPages { get; set; }
-        public int CurrentPage { get; set; }
-        public int PageSize { get; set; }
         public bool HasNextPage { get; set; }
         public bool HasPreviousPage { get; set; }
-        public string SearchKey { get; set; }
-        public SortOrderEnum SortOrder { get; set; }
-        public SortByEnum SortBy { get; set; }
-        public CommentSearchOnEnum SearchOn { get; set; }
+        public CommentSearchPagingOption SearchOption { get; set; }
 
-        public CommentSearchPagingResult(List<CommentDetails> commentDetailsList, int totalDocument, int currentPage, int pageSize, string searchKey, CommentSearchOnEnum searchOn, SortByEnum sortBy, SortOrderEnum sortOrder)
+        public CommentSearchPagingResult(List<CommentDetails> commentDetailsList, int totalDocument, CommentSearchPagingOption options)
         {
             Documents = commentDetailsList;
             TotalDocuments = totalDocument;
-            TotalPages = (int)Math.Ceiling((double)totalDocument / pageSize);
-            CurrentPage = currentPage;
-            PageSize = pageSize;
-            HasNextPage = TotalPages > CurrentPage;
-            HasPreviousPage = CurrentPage > 1;
-            SearchKey = searchKey;
-            SortOrder = sortOrder;
-            SortBy = sortBy;
-            SearchOn = searchOn;
+            TotalPages = (int)Math.Ceiling((double)totalDocument / options.PageSize);
+            HasNextPage = TotalPages > options.CurrentPage;
+            HasPreviousPage = options.CurrentPage > 1;
+            SearchOption = options;
         }
     }
 }

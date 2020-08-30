@@ -186,22 +186,22 @@ namespace JunsBlog.Models.Services
             return query;
         }
 
-        public async Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string searchKey, SortByEnum sortBy, SortOrderEnum sortOrder)
+        public async Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options)
         {
             var query = GenerateArticleDetailsQuery();
 
-            if (!string.IsNullOrEmpty(searchKey)) query = query.Where(x => x.Content.Contains(searchKey));
+            if (!string.IsNullOrEmpty(options.SearchKey)) query = query.Where(x => x.Content.ToLower().Contains(options.SearchKey.ToLower()));
 
-            switch (sortBy)
+            switch (options.SortBy)
             {
                 case SortByEnum.UpdatedOn:
-                    if (sortOrder == SortOrderEnum.Ascending)
+                    if (options.SortOrder == SortOrderEnum.Ascending)
                         query = query.OrderBy(x => x.UpdatedOn);
                     else
                         query = query.OrderByDescending(x => x.UpdatedOn);
                     break;
                 case SortByEnum.Views:
-                    if (sortOrder == SortOrderEnum.Ascending)
+                    if (options.SortOrder == SortOrderEnum.Ascending)
                         query = query.OrderBy(x => x.Views);
                     else
                         query = query.OrderByDescending(x => x.Views);
@@ -210,9 +210,9 @@ namespace JunsBlog.Models.Services
 
             var docsCount = await query.CountAsync();
 
-            var documents = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            var documents = await query.Skip((options.CurrentPage - 1) * options.PageSize).Take(options.PageSize).ToListAsync();
 
-            return new ArticleSearchPagingResult(documents, docsCount, page, pageSize, searchKey, sortBy, sortOrder);
+            return new ArticleSearchPagingResult(documents, docsCount, options);
         }
 
 
@@ -275,32 +275,32 @@ namespace JunsBlog.Models.Services
             return query;
         } 
 
-        public async Task<CommentSearchPagingResult> SearchCommentsAsync(int page, int pageSize, string searchKey, CommentSearchOnEnum searchOn, SortByEnum sortBy, SortOrderEnum sortOrder, string currentUserId = null)
+        public async Task<CommentSearchPagingResult> SearchCommentsAsync(CommentSearchPagingOption options, string currentUserId)
         {
             var query = GenerateCommentsDetailsQuery();
 
-            if (!string.IsNullOrEmpty(searchKey))
+            if (!string.IsNullOrEmpty(options.SearchKey))
             {
-                switch (searchOn)
+                switch (options.SearchOn)
                 {
                     case CommentSearchOnEnum.ArticleId:
-                        query = query.Where(x => x.ArticleId == searchKey.Trim());
+                        query = query.Where(x => x.ArticleId == options.SearchKey.Trim());
                         break;
                     case CommentSearchOnEnum.ParentId:
-                        query = query.Where(x => x.ParentId == searchKey.Trim());
+                        query = query.Where(x => x.ParentId == options.SearchKey.Trim());
                         break;
                     case CommentSearchOnEnum.CommentText:
-                        query = query.Where(x => x.CommentText.Contains(searchKey.Trim()));
+                        query = query.Where(x => x.CommentText.Contains(options.SearchKey.Trim()));
                         break;
                     default:
                         break;
                 }
             }
 
-            switch (sortBy)
+            switch (options.SortBy)
             {
                 case SortByEnum.UpdatedOn:
-                    if (sortOrder == SortOrderEnum.Ascending)
+                    if (options.SortOrder == SortOrderEnum.Ascending)
                         query = query.OrderBy(x => x.UpdatedOn);
                     else
                         query = query.OrderByDescending(x => x.UpdatedOn);
@@ -315,14 +315,14 @@ namespace JunsBlog.Models.Services
 
             var docsCount = await query.CountAsync();
 
-            var documents = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            var documents = await query.Skip((options.CurrentPage - 1) * options.PageSize).Take(options.PageSize).ToListAsync();
 
             foreach (var item in documents)
             {
                 item.Ranking = await GetCommentRankingDetailsAsync(item.Id, currentUserId);
             }
 
-            return new CommentSearchPagingResult(documents, docsCount, page, pageSize, searchKey, searchOn, sortBy, sortOrder);
+            return new CommentSearchPagingResult(documents, docsCount, options);
         }
 
         #endregion

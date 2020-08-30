@@ -1,13 +1,15 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { CommentDetails } from 'src/app/models/commentDetails';
+import { CommentDetails } from 'src/app/models/comment/commentDetails';
 import { CommentService } from 'src/app/services/comment.service';
-import { ArticleDetails } from 'src/app/models/articleDetails';
 import { ToastrService } from 'ngx-toastr';
-import { CommentRankingRequest } from 'src/app/models/commentRankingRequest';
 import { RankEnum } from 'src/app/models/Enums/rankEnum';
 import { commentSearchOnEnum } from 'src/app/models/Enums/commentSearchOnEnum';
-import { CommentSearchPagingResult } from 'src/app/models/commentSearchPagingResult';
-import { CommentRequest } from 'src/app/models/commentRequest';
+import { ArticleDetails } from 'src/app/models/article/articleDetails';
+import { CommentSearchPagingResult } from 'src/app/models/comment/commentSearchPagingResult';
+import { CommentRankingRequest } from 'src/app/models/comment/commentRankingRequest';
+import { CommentRequest } from 'src/app/models/comment/commentRequest';
+import { CommentSearchPagingOption } from 'src/app/models/comment/commentSearchPaingOption';
+
 
 
 @Component({
@@ -71,8 +73,8 @@ export class CommentDisplayerComponent implements OnInit {
   getMoreReplies(){
       if (!this.loading && this.commentPagingResult.hasNextPage) {
         this.loading = true;
-        this.commentService.searchComments(this.commentPagingResult.currentPage + 1, this.commentPagingResult.pageSize,
-          this.commentPagingResult.searchKey, this.commentPagingResult.searchOn, this.commentPagingResult.sortBy, this.commentPagingResult.sortOrder).subscribe(
+        this.commentPagingResult.searchOption.currentPage += 1;
+        this.commentService.searchComments(this.commentPagingResult.searchOption).subscribe(
           data => {
             data.documents.forEach(doc => {
               this.comments.push(doc);
@@ -98,7 +100,9 @@ export class CommentDisplayerComponent implements OnInit {
     if(this.comments.length > 0) return; // Only get the comment calls on the first time when view reply is clicked.
         const intiPage: number = 1;
         const pageSize: number = 10;
-        this.commentService.searchComments(intiPage, pageSize, this.comment.id, commentSearchOnEnum.ParentId).subscribe(
+        var option = new CommentSearchPagingOption(intiPage, pageSize, this.comment.id, commentSearchOnEnum.ParentId);
+        this.loading = true;
+        this.commentService.searchComments(option).subscribe(
           data => {
             this.commentPagingResult = data;
             this.commentPagingResult.documents.forEach(doc => {

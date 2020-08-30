@@ -1,18 +1,10 @@
 <div class="toolbar-container">
-    <div class="searchBar" *ngIf="showSearchBar">
-      <form class="user-info-form" [formGroup]="searchForm">
-        <mat-form-field>
-            <input matInput type="search" formControlName="searchKeyWord" placeholder="search here" class="search-input">
-            <mat-icon class="search-icon"  matSuffix (click)="search()">search</mat-icon>
-        </mat-form-field>   
-      </form>
-    </div>
     <mat-toolbar class="tool-bar">
       <img class="logo" [src]="logoUrl" (click)="goToPage('')"/>
       <span class="app-title" (click)="goToPage('')">Jun's Blog</span>
       <span class="spacer"></span>
     
-      <div class="action-button" (click)="showSearchBar = !showSearchBar">
+      <div class="action-button" (click)="showSearchBar = !showSearchBar" [routerLink]="['/search']" [routerLinkActive]="['is-active']">
         <mat-icon>search</mat-icon>
         <span class="icon-label">Search</span>
      </div>

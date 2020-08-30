@@ -2,10 +2,11 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { CommentService } from 'src/app/services/comment.service';
 import { User } from 'src/app/models/user';
-import { ArticleDetails } from 'src/app/models/articleDetails';
-import { CommentSearchPagingResult } from 'src/app/models/commentSearchPagingResult';
 import { commentSearchOnEnum } from 'src/app/models/Enums/commentSearchOnEnum';
-import { CommentDetails } from 'src/app/models/commentDetails';
+import { CommentDetails } from 'src/app/models/comment/commentDetails';
+import { ArticleDetails } from 'src/app/models/article/articleDetails';
+import { CommentSearchPagingResult } from 'src/app/models/comment/commentSearchPagingResult';
+import { CommentSearchPagingOption } from 'src/app/models/comment/commentSearchPaingOption';
 
 @Component({
   selector: 'app-comments',
@@ -31,7 +32,8 @@ export class CommentsComponent implements OnInit {
    const intiPage: number = 1;
    const pageSize: number = 10;
    this.loading = true;
-   this.commentService.searchComments(intiPage, pageSize, this.article.id, commentSearchOnEnum.ParentId).subscribe(x=>{
+   var option = new CommentSearchPagingOption(intiPage, pageSize, this.article.id, commentSearchOnEnum.ParentId);
+   this.commentService.searchComments(option).subscribe(x=>{
      this.displayComments = x.documents;
      this.commentPagingResult = x;
      this.loading = false;
@@ -56,8 +58,8 @@ export class CommentsComponent implements OnInit {
  onScrollDown () {
    if(this.commentPagingResult && this.commentPagingResult.hasNextPage && !this.loading){
      this.loading = true;
-     this.commentService.searchComments(this.commentPagingResult.currentPage + 1 , this.commentPagingResult.pageSize, 
-      this.commentPagingResult.searchKey, this.commentPagingResult.searchOn, this.commentPagingResult.sortBy, this.commentPagingResult.sortOrder).subscribe(
+     this.commentPagingResult.searchOption.currentPage += 1;
+     this.commentService.searchComments(this.commentPagingResult.searchOption).subscribe(
        data => {        
            data.documents.forEach(doc => {
             this.displayComments.push(doc);

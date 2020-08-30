@@ -1,5 +1,5 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { Article } from 'src/app/models/article';
+import { Article } from 'src/app/models/article/article';
 import { ArticleService } from 'src/app/services/article.service';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';

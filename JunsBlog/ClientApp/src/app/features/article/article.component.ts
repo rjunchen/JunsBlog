@@ -2,14 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { ArticleService } from 'src/app/services/article.service';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute } from '@angular/router';
-import { ArticleDetails } from 'src/app/models/articleDetails';
 import { mergeMap } from 'rxjs/operators';
-
-import { ArticleRankingRequest } from 'src/app/models/articleRankingRequest';
 import { CommentService } from 'src/app/services/comment.service';
-import { ArticleRankingDetails } from 'src/app/models/articleRankingDetails';
 import { RankEnum } from 'src/app/models/Enums/rankEnum';
-import { CommentRequest } from 'src/app/models/commentRequest';
+import { ArticleDetails } from 'src/app/models/article/articleDetails';
+import { ArticleRankingDetails } from 'src/app/models/article/articleRankingDetails';
+import { ArticleRankingRequest } from 'src/app/models/article/articleRankingRequest';
+import { CommentRequest } from 'src/app/models/comment/commentRequest';
+
 
 @Component({
   selector: 'app-article',
@@ -20,6 +20,7 @@ export class ArticleComponent implements OnInit {
 
   article: ArticleDetails;
   isProcessing: boolean;
+  loading: boolean;
   ranking: ArticleRankingDetails;
   defaultAvatarUrl = './assets/avatar.png';
 
@@ -28,12 +29,15 @@ export class ArticleComponent implements OnInit {
 
 
   ngOnInit(): void {
+    this.loading = true;
     this.route.params.pipe(mergeMap(params => this.articleService.getArticle(params['id']))
     ).subscribe(
       data => { 
         this.article = data;
+        this.loading = false;
       },
       err => {
+        this.loading = false;
         if (err.status === 400) {     
           this.toastr.warning(err.error.message, err.statusText);
         } else {

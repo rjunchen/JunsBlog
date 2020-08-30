@@ -146,61 +146,6 @@ namespace JunsBlog.Test.Mockups
         #endregion
 
 
-        // Integration Test should test this instead of unit test 
-        public async Task<ArticleSearchPagingResult> SearchArticlesAsyc(int page, int pageSize, string searchKey, SortByEnum sortBy, SortOrderEnum sortOrder)
-        {
-            return await Task.Run( async () => {
-                List<Article> resultArticles = new List<Article>();
-                if (!string.IsNullOrWhiteSpace(searchKey))
-                    resultArticles = articles.Where(x => x.Content.Contains(searchKey)).ToList();
-
-                switch (sortBy)
-                {
-                    case SortByEnum.UpdatedOn:
-                        if (sortOrder == SortOrderEnum.Ascending)
-                            resultArticles = resultArticles.OrderBy(x => x.UpdatedOn).ToList();
-                        else
-                            resultArticles = resultArticles.OrderByDescending(x => x.UpdatedOn).ToList();
-                        break;
-                    case SortByEnum.Views:
-                        if (sortOrder == SortOrderEnum.Ascending)
-                            resultArticles = resultArticles.OrderBy(x => x.Views).ToList();
-                        else
-                            resultArticles = resultArticles.OrderByDescending(x => x.Views).ToList();
-                        break;
-                    default:
-                        break;
-                }
-
-                List<ArticleDetails> articleDetailsList = new List<ArticleDetails>();
-
-                foreach (var x in resultArticles)
-                {
-                    var articeDetails = new ArticleDetails()
-                    {
-                        Abstract = x.Abstract,
-                        CoverImage = x.CoverImage,
-                        Id = x.Id,
-                        Title = x.Title,
-                        UpdatedOn = x.UpdatedOn,
-                        CreatedOn = x.CreatedOn,
-                        IsApproved = x.IsApproved,
-                        IsPrivate = x.IsPrivate,
-                        Views = x.Views,
-                        Author = await GetUserAsync(x.AuthorId),
-                        CommentsCount = GetCommentsAsync(x.Id).Result.Count
-                    };
-                    articleDetailsList.Add(articeDetails);
-                }
-
-                var articlesCount = articleDetailsList.Count;
-
-                var pageResult = new ArticleSearchPagingResult(articleDetailsList, articlesCount, page, pageSize, searchKey, sortBy, sortOrder);
-
-                return pageResult;
-            });
-        }
-
         public async Task<ArticleDetails> GetArticleDetailsAsync(string articleId)
         {
             return await Task.Run(async () => {
@@ -226,11 +171,6 @@ namespace JunsBlog.Test.Mockups
 
                 return articleDetails;
             });
-        }
-
-        public Task<CommentSearchPagingResult> SearchCommentsAsync(int page, int pageSize, string searchKey, CommentSearchOnEnum searchOn, SortByEnum sortBy, SortOrderEnum sortOrder, string currentUserId)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId)
@@ -276,6 +216,16 @@ namespace JunsBlog.Test.Mockups
                 }
                 return rankingResponse;
             });
+        }
+
+        public Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<CommentSearchPagingResult> SearchCommentsAsync(CommentSearchPagingOption options, string currentUserId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

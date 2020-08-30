@@ -14,7 +14,6 @@
     .comment-control{
         padding: 10px;
         background-color: white;
-        box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
         display: flex;
         
         .comment-input-section{
@@ -48,6 +47,6 @@
 
 @media only screen and (max-width: 768px){
     .comment-control-container{
-        margin-bottom: 64px;
+        margin-bottom: 58px;
     }
 }

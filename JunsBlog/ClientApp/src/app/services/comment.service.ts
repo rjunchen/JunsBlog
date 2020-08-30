@@ -1,15 +1,17 @@
 import { Injectable, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
-import { CommentRequest } from '../models/commentRequest';
-import { CommentDetails } from '../models/commentDetails';
+import { CommentDetails } from '../models/comment/commentDetails';
 import { Observable } from 'rxjs';
 import { SortOrderEnum } from '../models/Enums/sortOrderEnum';
-import { CommentSearchPagingResult } from '../models/commentSearchPagingResult';
 import { SortByEnum } from '../models/Enums/sortByEnum';
 import { commentSearchOnEnum } from '../models/Enums/commentSearchOnEnum';
-import { CommentRankingRequest } from '../models/commentRankingRequest';
-import { CommentRankingDetails } from '../models/commentRankingDetails';
+import { CommentRequest } from '../models/comment/commentRequest';
+import { CommentSearchPagingResult } from '../models/comment/commentSearchPagingResult';
+import { CommentRankingRequest } from '../models/comment/commentRankingRequest';
+import { CommentRankingDetails } from '../models/comment/commentRankingDetails';
+import { CommentSearchPagingOption } from '../models/comment/commentSearchPaingOption';
+
 
 @Injectable({
   providedIn: 'root'
@@ -23,10 +25,8 @@ export class CommentService {
     return this.http.post('/api/comment/reply', commentRequest).pipe(map(data => { return <CommentDetails>data}));
   }
 
-  public searchComments(page: number, pageSize: number, searchKey: string = "", searchOn: commentSearchOnEnum = commentSearchOnEnum.CommentText,
-    sortBy: SortByEnum = SortByEnum.CreatedOn, sortOrder: SortOrderEnum = SortOrderEnum.descending) : Observable<CommentSearchPagingResult> {
-    return this.http.get(`/api/comment/search?page=${page}&pageSize=${pageSize}&searchKey=${searchKey}&searchOn=${searchOn}
-      &sortOrder=${sortOrder}&sortBy=${sortBy}`).pipe(map(data => { return <CommentSearchPagingResult>data}));
+  public searchComments(option: CommentSearchPagingOption) : Observable<CommentSearchPagingResult> {
+    return this.http.post('/api/comment/search', option).pipe(map(data => { return <CommentSearchPagingResult>data}));
   }
 
   public showCommentControl(request: CommentRequest){
