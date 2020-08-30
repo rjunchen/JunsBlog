@@ -101,6 +101,7 @@ export class CommentDisplayerComponent implements OnInit {
         const intiPage: number = 1;
         const pageSize: number = 10;
         var option = new CommentSearchPagingOption(intiPage, pageSize, this.comment.id, commentSearchOnEnum.ParentId);
+        this.loading = true;
         this.commentService.searchComments(option).subscribe(
           data => {
             this.commentPagingResult = data;

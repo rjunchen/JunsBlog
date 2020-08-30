@@ -39,6 +39,9 @@ $color-orange: #f44336;
 
         .sub-comment-container{
             margin-left: 40px;
+            .mat-spinner{
+                margin-left: 10px;
+            }
         }
 
         .comment-content {
@@ -52,6 +55,9 @@ $color-orange: #f44336;
             margin-bottom: 10px;
             display: flex;
             width: fit-content;
+            .mat-spinner{
+                margin-left: 10px;
+            }
             .mat-icon{
                 vertical-align: bottom;
                 margin-right: 5px;

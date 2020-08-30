@@ -26,13 +26,18 @@
                 <mat-icon  *ngIf="viewRepliesOpen">arrow_drop_up</mat-icon>
                 <div *ngIf="comment.childrenCommentsCount == 1">{{viewRepliesOpen? 'Hide' : 'View'}} reply</div>
                 <div *ngIf="comment.childrenCommentsCount > 1">{{viewRepliesOpen? 'Hide' : 'View'}} {{comment.childrenCommentsCount}} replies</div>
+                <mat-spinner [diameter]="22" *ngIf="loading" color="warn"></mat-spinner>
             </div>
             <div class="sub-comment-container">
                 <div *ngIf="viewRepliesOpen">
                     <div class="reply-item" *ngFor="let reply of comments">
                         <app-comment-displayer [comment]="reply" [article]="article"></app-comment-displayer>
                     </div>
-                    <div *ngIf="commentPagingResult && commentPagingResult.hasNextPage" class="view-reply-link" (click)="getMoreReplies()"><mat-icon>vertical_align_bottom</mat-icon><span>View more replies</span></div>
+                    <div *ngIf="commentPagingResult && commentPagingResult.hasNextPage" class="view-reply-link" (click)="getMoreReplies()">
+                        <mat-icon>vertical_align_bottom</mat-icon>
+                        <span>View more replies</span>
+                        <mat-spinner [diameter]="22" *ngIf="loading" color="warn"></mat-spinner>
+                    </div>
                 </div> 
             </div>   
         </div>

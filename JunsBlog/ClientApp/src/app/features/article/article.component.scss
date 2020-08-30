@@ -6,6 +6,16 @@ $color-orange: #f44336;
 
 .article-container{
     padding: 10px 0px 0px 0px;
+    .overlay{
+        margin-top: 20px;
+        height: 100%;
+        width: 100%;
+        z-index: 900;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
     .article-display-box{
         padding: 20px;
         background-color: white;

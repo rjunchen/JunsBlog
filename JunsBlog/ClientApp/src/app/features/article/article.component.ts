@@ -20,6 +20,7 @@ export class ArticleComponent implements OnInit {
 
   article: ArticleDetails;
   isProcessing: boolean;
+  loading: boolean;
   ranking: ArticleRankingDetails;
   defaultAvatarUrl = './assets/avatar.png';
 
@@ -28,12 +29,15 @@ export class ArticleComponent implements OnInit {
 
 
   ngOnInit(): void {
+    this.loading = true;
     this.route.params.pipe(mergeMap(params => this.articleService.getArticle(params['id']))
     ).subscribe(
       data => { 
         this.article = data;
+        this.loading = false;
       },
       err => {
+        this.loading = false;
         if (err.status === 400) {     
           this.toastr.warning(err.error.message, err.statusText);
         } else {

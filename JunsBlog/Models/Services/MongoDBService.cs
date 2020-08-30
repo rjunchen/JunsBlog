@@ -167,7 +167,6 @@ namespace JunsBlog.Models.Services
                                 IsApproved = a.article.IsApproved,
                                 IsPrivate = a.article.IsPrivate,
                                 Views = a.article.Views,
-                                Content = a.article.Content,
                                 AuthorId = a.article.AuthorId,
                                 commentsCount = a.comments.Count()
                             }).Join(users.AsQueryable(), x => x.AuthorId, y => y.Id, (x, y) => new ArticleDetails
@@ -181,7 +180,6 @@ namespace JunsBlog.Models.Services
                                 IsApproved = x.IsApproved,
                                 IsPrivate = x.IsPrivate,
                                 Views = x.Views,
-                                Content = x.Content,
                                 Author = y,
                                 CommentsCount = x.commentsCount
                             });
