@@ -167,6 +167,7 @@ namespace JunsBlog.Models.Services
                                 IsApproved = a.article.IsApproved,
                                 IsPrivate = a.article.IsPrivate,
                                 Views = a.article.Views,
+                                Content = a.article.Content,
                                 AuthorId = a.article.AuthorId,
                                 commentsCount = a.comments.Count()
                             }).Join(users.AsQueryable(), x => x.AuthorId, y => y.Id, (x, y) => new ArticleDetails
@@ -180,6 +181,7 @@ namespace JunsBlog.Models.Services
                                 IsApproved = x.IsApproved,
                                 IsPrivate = x.IsPrivate,
                                 Views = x.Views,
+                                Content = x.Content,
                                 Author = y,
                                 CommentsCount = x.commentsCount
                             });
@@ -207,6 +209,22 @@ namespace JunsBlog.Models.Services
                         query = query.OrderByDescending(x => x.Views);
                     break;
             }
+
+            // remove the content from return to the endpoint
+            query = query.Select(x => new ArticleDetails()
+            {
+                Abstract = x.Abstract,
+                CoverImage = x.CoverImage,
+                Id = x.Id,
+                Title = x.Title,
+                UpdatedOn = x.UpdatedOn,
+                CreatedOn = x.CreatedOn,
+                IsApproved = x.IsApproved,
+                IsPrivate = x.IsPrivate,
+                Views = x.Views,
+                Author = x.Author,
+                CommentsCount = x.CommentsCount
+            });
 
             var docsCount = await query.CountAsync();
 
