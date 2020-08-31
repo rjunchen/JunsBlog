@@ -2,6 +2,7 @@
 using JunsBlog.Models.Articles;
 using JunsBlog.Models.Comments;
 using JunsBlog.Models.Enums;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -24,7 +25,7 @@ namespace JunsBlog.Interfaces.Services
 
         // Articles
         Task<Article> SaveArticleAsync(Article article);
-
+        Task<Article> GetArticleAsync(string articleId);
 
         // ArticleRanking
         Task<ArticleRanking> SaveArticleRankingAsync(ArticleRanking ranking);

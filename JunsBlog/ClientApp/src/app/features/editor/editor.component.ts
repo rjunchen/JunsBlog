@@ -4,7 +4,8 @@ import { ArticleService } from 'src/app/services/article.service';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { ToastrService } from 'ngx-toastr';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import { mergeMap } from 'rxjs/operators';
 
 export interface Category {
   name: string;
@@ -23,13 +24,32 @@ export class EditorComponent implements OnInit {
   selectable = true;
   removable = true;
   addOnBlur = true;
+  updateMode = false;
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
 
-  constructor(private articleService: ArticleService, private toastr: ToastrService, private router: Router) { }
+  constructor(private articleService: ArticleService, private toastr: ToastrService, private router: Router, private route: ActivatedRoute,) { }
 
   ngOnInit(): void {
-    this.article = new Article();
-    this.article.categories = [];
+    
+    this.route.paramMap.subscribe(x=>{
+      var articleId = x.get("id")
+      if(articleId){
+        // Update mode
+        this.updateMode = true;
+        this.articleService.getArticle(articleId).subscribe( ar=> {
+          this.article = ar;
+        }, err=>{
+          if (err.status === 400) {     
+            this.toastr.warning(err.error.message, err.statusText);
+          } else {
+            this.toastr.error('Unknown error occurred, please try again later');
+          }
+        })
+      }else{
+        // create mode
+        this.article = new Article();
+      }
+    });
   }
 
   cancel(){
@@ -37,15 +57,27 @@ export class EditorComponent implements OnInit {
   }
 
   summit(){
-    this.articleService.createArticle(this.article).subscribe( x=>{
-      this.router.navigateByUrl(`/article/${x.id}`);
-    }, err=>{
-      if (err.status === 400) {     
-        this.toastr.warning(err.error.message, err.statusText);
-      } else {
-        this.toastr.error('Unknown error occurred, please try again later');
-      }
-    })
+    if(this.updateMode){
+      this.articleService.UpdateArticle(this.article).subscribe( x=>{
+        this.router.navigateByUrl(`/article/${x.id}`);
+      }, err=>{
+        if (err.status === 400) {     
+          this.toastr.warning(err.error.message, err.statusText);
+        } else {
+          this.toastr.error('Unknown error occurred, please try again later');
+        }
+      })
+    }else{
+      this.articleService.createArticle(this.article).subscribe( x=>{
+        this.router.navigateByUrl(`/article/${x.id}`);
+      }, err=>{
+        if (err.status === 400) {     
+          this.toastr.warning(err.error.message, err.statusText);
+        } else {
+          this.toastr.error('Unknown error occurred, please try again later');
+        }
+      })
+    }
   }
 
   add(event: MatChipInputEvent): void {

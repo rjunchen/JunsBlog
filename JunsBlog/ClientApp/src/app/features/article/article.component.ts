@@ -30,7 +30,7 @@ export class ArticleComponent implements OnInit {
 
   ngOnInit(): void {
     this.loading = true;
-    this.route.params.pipe(mergeMap(params => this.articleService.getArticle(params['id']))
+    this.route.params.pipe(mergeMap(params => this.articleService.getArticleDetails(params['id']))
     ).subscribe(
       data => { 
         this.article = data;

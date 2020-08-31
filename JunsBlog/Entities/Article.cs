@@ -40,5 +40,15 @@ namespace JunsBlog.Entities
             Title = model.Title;
             Categories = model.Categories;
         }
+
+        public void UpdateContents(ArticleRequest model)
+        {
+            Abstract = model.Abstract;
+            Content = model.Content;
+            CoverImage = model.CoverImage;
+            IsPrivate = model.IsPrivate;
+            Title = model.Title;
+            Categories = model.Categories;
+        }
     }
 }
