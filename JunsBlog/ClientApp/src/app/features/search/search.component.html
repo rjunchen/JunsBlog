@@ -7,8 +7,7 @@
 <div class="search-control-container">
     <div class="search-control">
         <mat-form-field>
-            <input matInput  autocomplete="off" [(ngModel)]="searchOption.searchKey" type="search" (keyup.enter)="search()" placeholder="search..." class="search-input">
-            <!-- <mat-icon class="search-icon" *ngIf="searchText.length > 0" (click)="search()" matSuffix>search</mat-icon> -->
+            <input matInput  autocomplete="off" [(ngModel)]="searchOption.searchKey" type="search" (keyup.enter)="search()" placeholder="filter..." class="search-input">
             <mat-icon (click)="search()"  matSuffix>search</mat-icon>
         </mat-form-field>     
     </div>

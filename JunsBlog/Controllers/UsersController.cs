@@ -5,6 +5,7 @@ using JunsBlog.Interfaces;
 using JunsBlog.Interfaces.Services;
 using JunsBlog.Models.Authentication;
 using JunsBlog.Models.Notifications;
+using JunsBlog.Models.Profile;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -145,6 +146,29 @@ namespace JunsBlog.Controllers
                 // Send the password reset email
                 notificationService.SendNotification(Notification.GeneratePasswordResetNotification(user, updatedUserToken));
                 return Ok();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetProfile(string userId)
+        {
+            try
+            {
+                if (String.IsNullOrWhiteSpace(userId)) return StatusCode(StatusCodes.Status400BadRequest);
+
+                var user = await databaseService.GetUserAsync(userId);
+
+                if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "User not found");
+
+                var profile = new Profile();
+                profile.User = user;
+
+                return Ok(profile);
             }
             catch (Exception ex)
             {

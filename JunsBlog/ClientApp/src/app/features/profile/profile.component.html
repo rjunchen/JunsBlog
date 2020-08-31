@@ -1,2 +1,30 @@
-<p>profile works!</p>
-<button (click)="logout()">sign out</button>
+<div class="profile-container" *ngIf="profile">
+    <div class="profile-stats-box">
+        <div class="avatar-box">
+            <img class="images profileImage image-link" [src]="profile.user.image ? profile.user.image : defaultAvatarUrl"/>
+            <div class="grey-text">{{profile.user.role}}</div>    
+        </div>   
+        <div class="user-info">
+            <div>{{profile.user.name}}</div>
+            <div class="grey-text">{{profile.user.email}}</div>
+            <div class="grey-text">Joined: {{profile.user.createdOn | date:'shortDate'}}</div>
+        </div>      
+    </div>
+    <div class="summary-info">
+        <div class="my-list">
+            <div class="list-item">My articles</div>
+            <div class="list-item">My likes</div>
+            <div class="list-item">My favorites</div>
+            <div class="list-item log-out-item" (click)="logout()">Sign out</div>
+        </div>
+        <div class="list-content">
+            <div class="search-control-container">
+                <mat-form-field>
+                    <input matInput  autocomplete="off" [(ngModel)]="searchOption.searchKey" type="search" (keyup.enter)="search()" placeholder="search..." class="search-input">
+                    <mat-icon (click)="search()"  matSuffix>search</mat-icon>
+                </mat-form-field>     
+            </div>
+            <app-articles-list [loadOnInit]="true"></app-articles-list>
+        </div>
+    </div>
+</div>

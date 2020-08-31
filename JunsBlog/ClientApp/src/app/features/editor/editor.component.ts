@@ -27,7 +27,7 @@ export class EditorComponent implements OnInit {
   updateMode = false;
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
 
-  constructor(private articleService: ArticleService, private toastr: ToastrService, private router: Router, private route: ActivatedRoute,) { }
+  constructor(private articleService: ArticleService, private toastr: ToastrService, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     

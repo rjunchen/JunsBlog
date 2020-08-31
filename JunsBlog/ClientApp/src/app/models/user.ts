@@ -4,5 +4,7 @@ export class User {
     id: string;
     email: string;
     role: string;
-    joinedBy: string;
+    type: string;
+    createdOn: string;
+    updatedOn: string;
 }

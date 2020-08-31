@@ -9,8 +9,7 @@ import { ArticleSearchPagingOption } from 'src/app/models/article/articleSearchP
 })
 export class SearchComponent implements OnInit {
 
-  initialCurrentPage: number = 1;
-  pageSize: number = 3;
+
   isProcessing: boolean;
   searchOption: ArticleSearchPagingOption;
   constructor(private articleService: ArticleService) { }

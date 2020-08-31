@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators';
 import { TokenResponse } from '../models/TokenResponse';
 import { User } from '../models/user';
 import { of } from 'rxjs';
+import { Profile } from '../models/profile/profile';
 
 @Injectable({
   providedIn: 'root'
@@ -94,4 +95,9 @@ export class AuthenticationService {
       return data;
      }));
   }
+
+  public getProfile(userId: string){
+    return this.http.get(`/api/profile?userId=${userId}`).pipe(map(data => { return <Profile>data}));
+  }
+
 }

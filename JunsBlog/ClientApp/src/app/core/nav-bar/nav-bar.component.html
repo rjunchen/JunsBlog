@@ -20,7 +20,7 @@
         <mat-icon >post_add</mat-icon>
         <span class="icon-label">Post</span>
       </div>
-      <div class="action-button" *ngIf="currentUser" [routerLink]="['/profile']" [routerLinkActive]="['is-active']">
+      <div class="action-button" *ngIf="currentUser" [routerLink]="['/profile/',currentUser.id]" [routerLinkActive]="['is-active']">
         <mat-icon >person</mat-icon>
         <span class="icon-label">Me</span>
       </div>
