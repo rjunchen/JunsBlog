@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { ArticleSearchPagingOption } from 'src/app/models/article/articleSearchPagingOption';
 import { ArticleService } from 'src/app/services/article.service';
+import { ArticleFilterEnum } from 'src/app/models/enums/articleFilterEnum';
 
 @Component({
   selector: 'app-profile',
@@ -17,6 +18,7 @@ export class ProfileComponent implements OnInit {
   profile: Profile;
   isProcessing: boolean;
   searchOption: ArticleSearchPagingOption;
+  pageSize: number = 10;
 
   constructor(private auth: AuthenticationService, private route: ActivatedRoute,
     private articleService: ArticleService, private toastr: ToastrService) { }
@@ -42,9 +44,22 @@ export class ProfileComponent implements OnInit {
     this.auth.logout()
   }
 
-  clear(){
-    this.searchOption.searchKey = null;
+  showMyLikes(){
+    this.searchOption.filter = ArticleFilterEnum.MyLikes;
+    this.search();
   }
+
+  showMyArticles(){
+    this.searchOption.filter = ArticleFilterEnum.MyArticles;
+    this.search();
+  }
+
+  showMyFavorites(){
+    console.log("clicked favorite");
+    this.searchOption.filter = ArticleFilterEnum.MyFavorites;
+    this.search();
+  }
+
   search(){
     this.articleService.SearchClicked(this.searchOption);
   }

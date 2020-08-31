@@ -1,27 +1,32 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { User } from 'src/app/models/user';
 import { AuthenticationService } from 'src/app/core/authentication.service';
 import { CommentService } from 'src/app/services/comment.service';
 import { ToastrService } from 'ngx-toastr';
 import { CommentRequest } from 'src/app/models/comment/commentRequest';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-comment-control',
   templateUrl: './comment-control.component.html',
   styleUrls: ['./comment-control.component.scss']
 })
-export class CommentControlComponent implements OnInit {
+export class CommentControlComponent implements OnInit, OnDestroy {
 
   isVisibleCommenter: boolean;
   defaultAvatarUrl = './assets/avatar.png';
   currentUser: User;
   commentRequest: CommentRequest;
+  commentSubscription: Subscription;
 
   constructor(private auth: AuthenticationService, private commentService: CommentService, private toastr: ToastrService) { }
+  ngOnDestroy(): void {
+    this.commentSubscription.unsubscribe();
+  }
 
   ngOnInit(): void {
     this.currentUser = this.auth.getCurrentUser();
-    this.commentService.onShowCommentControl.subscribe( data =>{
+   this.commentSubscription = this.commentService.onShowCommentControl.subscribe( data =>{
       this.isVisibleCommenter = true;
       this.commentRequest = data;
     });

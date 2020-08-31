@@ -157,7 +157,13 @@ namespace JunsBlog.Models.Services
             return await query.Where(x => x.Id == articleId).FirstOrDefaultAsync();
         }
 
-        private IMongoQueryable<ArticleDetails> GenerateArticleDetailsQuery()
+
+        private class ArticleWithRankings : ArticleDetails
+        {
+           public IEnumerable<ArticleRanking> Rankings { get; set; }
+        }
+
+        private IMongoQueryable<ArticleWithRankings> GenerateArticleDetailsQuery()
         {
             var query = articles.AsQueryable().GroupJoin(comments.AsQueryable(), x => x.Id, y => y.ArticleId, (x, y) => new { article = x, comments = y })
                             .Select(a => new
@@ -190,11 +196,26 @@ namespace JunsBlog.Models.Services
                                 Categories = x.Categories,
                                 Author = y,
                                 CommentsCount = x.commentsCount
+                            }).GroupJoin(articleRankings.AsQueryable(), x=> x.Id, y=> y.ArticleId, (x, y)=> new ArticleWithRankings {
+                                Abstract = x.Abstract,
+                                CoverImage = x.CoverImage,
+                                Id = x.Id,
+                                Title = x.Title,
+                                UpdatedOn = x.UpdatedOn,
+                                CreatedOn = x.CreatedOn,
+                                IsApproved = x.IsApproved,
+                                IsPrivate = x.IsPrivate,
+                                Views = x.Views,
+                                Content = x.Content,
+                                Categories = x.Categories,
+                                Author = x.Author,
+                                CommentsCount = x.CommentsCount,
+                                Rankings = y
                             });
             return query;
         }
 
-        public async Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options)
+        public async Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options, string currentUserId)
         {
             var query = GenerateArticleDetailsQuery();
 
@@ -216,28 +237,49 @@ namespace JunsBlog.Models.Services
                     break;
             }
 
-            // remove the content from return to the endpoint
-            query = query.Select(x => new ArticleDetails()
+            switch (options.Filter)
             {
-                Abstract = x.Abstract,
-                CoverImage = x.CoverImage,
-                Id = x.Id,
-                Title = x.Title,
-                UpdatedOn = x.UpdatedOn,
-                CreatedOn = x.CreatedOn,
-                IsApproved = x.IsApproved,
-                IsPrivate = x.IsPrivate,
-                Views = x.Views,
-                Categories = x.Categories,
-                Author = x.Author,
-                CommentsCount = x.CommentsCount
-            });
+                case ArticleFilterEnum.MyArticles:
+                    query = query.Where(x => x.Author.Id == currentUserId);
+                    break;
+                case ArticleFilterEnum.MyLikes:
+                    query = query.Where(x => x.Rankings.Any(x=> x.DidILike == true && x.UserId == currentUserId));
+                    break;
+                case ArticleFilterEnum.MyFavorites:
+                    query = query.Where(x => x.Rankings.Any(x => x.DidIFavor == true && x.UserId == currentUserId));
+                    break;
+            }
 
             var docsCount = await query.CountAsync();
 
             var documents = await query.Skip((options.CurrentPage - 1) * options.PageSize).Take(options.PageSize).ToListAsync();
 
-            return new ArticleSearchPagingResult(documents, docsCount, options);
+            var articleDetailsList = new List<ArticleDetails>();
+
+            foreach (var item in documents)
+            {
+                item.Content = null; // Don't return the content
+                var articleDetails = new ArticleDetails()
+                {
+                    Abstract = item.Abstract,
+                    CoverImage = item.CoverImage,
+                    Id = item.Id,
+                    Title = item.Title,
+                    UpdatedOn = item.UpdatedOn,
+                    CreatedOn = item.CreatedOn,
+                    IsApproved = item.IsApproved,
+                    IsPrivate = item.IsPrivate,
+                    Views = item.Views,
+                    Content = item.Content,
+                    Categories = item.Categories,
+                    Author = item.Author,
+                    CommentsCount = item.CommentsCount,
+                    Ranking = new ArticleRankingDetails(item.Id, currentUserId, item.Rankings)
+                };
+                articleDetailsList.Add(articleDetails);
+            }
+
+            return new ArticleSearchPagingResult(articleDetailsList, docsCount, options);
         }
 
 

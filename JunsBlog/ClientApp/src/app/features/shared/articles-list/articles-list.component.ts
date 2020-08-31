@@ -1,16 +1,17 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { Article } from 'src/app/models/article/article';
 import { ArticleService } from 'src/app/services/article.service';
 import { ToastrService } from 'ngx-toastr';
 import { ArticleSearchPagingResult } from 'src/app/models/article/articleSearchPagingResult';
 import { ArticleSearchPagingOption } from 'src/app/models/article/articleSearchPagingOption';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-articles-list',
   templateUrl: './articles-list.component.html',
   styleUrls: ['./articles-list.component.scss']
 })
-export class ArticlesListComponent implements OnInit {
+export class ArticlesListComponent implements OnInit, OnDestroy {
   @Input() loadOnInit: boolean;
 
   articles: Article[];
@@ -22,12 +23,15 @@ export class ArticlesListComponent implements OnInit {
   scrollUpDistance = 2;
   loading = false;
   noSearchResult: boolean;
+  searchSubscription: Subscription;
 
   constructor(private articleService: ArticleService, private toastr: ToastrService) { }
+  ngOnDestroy(): void {
+    this.searchSubscription.unsubscribe();  //Leave the page doesn't unsubscribe by default, need manually unsubscribe it
+  }
 
   ngOnInit(): void {
-
-    this.articleService.onSearchClicked.subscribe(option=>{
+    this.searchSubscription = this.articleService.onSearchClicked.subscribe(option=>{
       this.search(option);
     })
 
@@ -39,6 +43,7 @@ export class ArticlesListComponent implements OnInit {
   search(option: ArticleSearchPagingOption){
     this.loading = true;
     this.articleService.searchArticle(option).subscribe(x=>{
+      console.log(x);
       this.articles = x.documents;
       this.articlePagingResult = x;
       this.loading = false;
@@ -55,6 +60,7 @@ export class ArticlesListComponent implements OnInit {
   }
 
   onScrollDown () {
+    console.log("scroll down");
     if(this.articlePagingResult && this.articlePagingResult.hasNextPage && !this.loading){
       this.loading = true;
       this.articlePagingResult.searchOption.currentPage += 1;

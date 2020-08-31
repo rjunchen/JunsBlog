@@ -45,7 +45,7 @@ namespace JunsBlog.Interfaces.Services
 
 
         // Details
-        Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options);
+        Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options, string currentUserId);
         Task<ArticleDetails> GetArticleDetailsAsync(string articleId);
         Task<CommentSearchPagingResult> SearchCommentsAsync(CommentSearchPagingOption options, string currentUserId);
         Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId);

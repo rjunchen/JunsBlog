@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { CommentDetails } from 'src/app/models/comment/commentDetails';
 import { CommentService } from 'src/app/services/comment.service';
 import { ToastrService } from 'ngx-toastr';
@@ -9,6 +9,8 @@ import { CommentSearchPagingResult } from 'src/app/models/comment/commentSearchP
 import { CommentRankingRequest } from 'src/app/models/comment/commentRankingRequest';
 import { CommentRequest } from 'src/app/models/comment/commentRequest';
 import { CommentSearchPagingOption } from 'src/app/models/comment/commentSearchPaingOption';
+import { Subscription } from 'rxjs';
+import { subscribeOn } from 'rxjs/operators';
 
 
 
@@ -17,7 +19,7 @@ import { CommentSearchPagingOption } from 'src/app/models/comment/commentSearchP
   templateUrl: './comment-displayer.component.html',
   styleUrls: ['./comment-displayer.component.scss']
 })
-export class CommentDisplayerComponent implements OnInit {
+export class CommentDisplayerComponent implements OnInit, OnDestroy {
   @Input() comment: CommentDetails;
   @Input() article: ArticleDetails;
   viewRepliesOpen: boolean = false;
@@ -26,15 +28,24 @@ export class CommentDisplayerComponent implements OnInit {
   loading: boolean;
   commentPagingResult: CommentSearchPagingResult;
   comments: CommentDetails[];
-
+  commentSubscription: Subscription;
   constructor(private commentService: CommentService, private toastr: ToastrService) { }
+
+
+  ngOnDestroy(): void {
+    this.commentSubscription.unsubscribe();
+  }
 
   ngOnInit(): void {
     this.comments = [];
-    this.commentService.onCommentPosted.subscribe( (commentDetails: CommentDetails)=>{
+
+    if(this.commentSubscription) return;
+
+    this.commentSubscription = this.commentService.onCommentPosted.subscribe( (commentDetails: CommentDetails)=>{
         if(this.comment.id == commentDetails.parentId){
           this.comment.childrenCommentsCount += 1;
           this.comments.unshift(commentDetails);
+          console.log(this.comments);
         }
     });
   }

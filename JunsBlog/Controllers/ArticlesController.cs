@@ -122,7 +122,7 @@ namespace JunsBlog.Controllers
         {
             try
             {
-                var searchResult = await databaseService.SearchArticlesAsyc(options);
+                var searchResult = await databaseService.SearchArticlesAsyc(options, currentUserId);
 
                 return Ok(searchResult);
             }
@@ -162,7 +162,9 @@ namespace JunsBlog.Controllers
                 }
                 await databaseService.SaveArticleRankingAsync(ranking);
 
-                var rankingDetails = await GetArticleRankingDetailsAsync(model.ArticleId, currentUserId);
+                var rankings = await databaseService.GetArticleRankingsAsync(model.ArticleId);
+
+                var rankingDetails = new ArticleRankingDetails(model.ArticleId, currentUserId, rankings);
 
                 return Ok(rankingDetails);
             }
@@ -182,7 +184,9 @@ namespace JunsBlog.Controllers
                 if (String.IsNullOrWhiteSpace(articleId))
                     return BadRequest(new { message = "Incomplete ranking information" });
 
-                var articleRankingDetails = await GetArticleRankingDetailsAsync(articleId, currentUserId);
+                var rankings = await databaseService.GetArticleRankingsAsync(articleId);
+
+                var articleRankingDetails = new ArticleRankingDetails(articleId, currentUserId, rankings);
 
                 return Ok(articleRankingDetails);
             }
@@ -192,28 +196,5 @@ namespace JunsBlog.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
-
-        private async Task<ArticleRankingDetails> GetArticleRankingDetailsAsync(string articleId, string userId)
-        {
-            var rankings = await databaseService.GetArticleRankingsAsync(articleId);
-
-            var rankingResponse = new ArticleRankingDetails() { ArticleId = articleId };
-
-            foreach (var item in rankings)
-            {
-                if (item.DidIDislike) rankingResponse.DislikesCount++;
-                if (item.DidILike) rankingResponse.LikesCount++;
-                rankingResponse.DidIFavor = item.DidIFavor;
-
-                if (item.UserId == userId)
-                {
-                    rankingResponse.DidIDislike = item.DidIDislike;
-                    rankingResponse.DidILike = item.DidILike;
-                    rankingResponse.DidIFavor = item.DidIFavor;
-                }
-            }
-            return rankingResponse;
-        }
-
     }
 }

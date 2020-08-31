@@ -16,13 +16,14 @@
                 </div>
                 <div class="article-status-block">
                     <span >{{article.author.name}}</span>
+                    <mat-icon>schedule</mat-icon>
+                    <span>{{article.updatedOn | timeAgo}}</span>
                     <div>
                         <mat-icon>visibility</mat-icon>
                         <span>{{article.views}}</span>
                         <mat-icon>comment</mat-icon>
                         <span>{{article.commentsCount}}</span>
-                        <mat-icon>schedule</mat-icon>
-                        <span>{{article.updatedOn | timeAgo}}</span>
+                        <mat-icon color="{{article.ranking.didIFavor ? 'success' : 'unrated'}}">favorite</mat-icon>
                     </div>
                 </div>
             </div> 

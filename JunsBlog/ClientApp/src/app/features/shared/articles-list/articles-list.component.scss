@@ -35,6 +35,13 @@ $color-orange: #f44336;
             }
             .article-status-block{
                 padding-top: 6px;
+                .mat-success {
+                    color: $color-orange;
+                }
+                
+                .mat-unrated {        
+                    color: #999;
+                }
             }
             span{
                 margin: 0px 20px 0px 5px;

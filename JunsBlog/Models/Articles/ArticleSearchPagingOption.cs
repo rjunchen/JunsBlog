@@ -13,6 +13,7 @@ namespace JunsBlog.Models.Articles
         public SortByEnum SortBy { get; set; }
         public int CurrentPage { get; set; }
         public int PageSize { get; set; }
+        public ArticleFilterEnum Filter { get; set; }
 
         public ArticleSearchPagingOption()
         {
@@ -21,6 +22,7 @@ namespace JunsBlog.Models.Articles
             SortBy = SortByEnum.UpdatedOn;
             CurrentPage = 1;
             PageSize = 10;
+            Filter = ArticleFilterEnum.All;
         }
     }
 }

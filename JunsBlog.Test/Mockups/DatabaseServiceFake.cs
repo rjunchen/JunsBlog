@@ -225,7 +225,7 @@ namespace JunsBlog.Test.Mockups
             });
         }
 
-        public Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options)
+        public Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options, string userId)
         {
             throw new NotImplementedException();
         }

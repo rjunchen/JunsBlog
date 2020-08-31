@@ -36,6 +36,8 @@ $color-orange: #f44336;
         width: 100%;
         .my-list{
             .list-item{
+                display: flex;
+                align-items: center;
                 width: 200px;
                 background-color: white;
                 box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
@@ -44,8 +46,11 @@ $color-orange: #f44336;
                     color: $color-orange;
                     cursor: pointer;
                 }
+                .mat-icon{
+                    margin-right: 5px;
+                }
             }
-            .log-out-item{
+            .margin-top{
                 margin-top: 8px;
             }
         }
