@@ -35,6 +35,13 @@ $color-orange: #f44336;
         height: 100%;
         width: 100%;
         .my-list{
+            .active{
+                background-color: $color-orange !important;
+                color: white;
+                &:hover{
+                    color: white !important;
+                }
+            }
             .list-item{
                 display: flex;
                 align-items: center;
@@ -48,7 +55,7 @@ $color-orange: #f44336;
                 }
                 .mat-icon{
                     margin-right: 5px;
-                }
+                }          
             }
             .margin-top{
                 margin-top: 8px;

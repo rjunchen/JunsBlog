@@ -45,7 +45,6 @@ export class CommentDisplayerComponent implements OnInit, OnDestroy {
         if(this.comment.id == commentDetails.parentId){
           this.comment.childrenCommentsCount += 1;
           this.comments.unshift(commentDetails);
-          console.log(this.comments);
         }
     });
   }

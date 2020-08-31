@@ -23,6 +23,10 @@
                         <span>{{article.views}}</span>
                         <mat-icon>comment</mat-icon>
                         <span>{{article.commentsCount}}</span>
+                        <mat-icon color="{{article.ranking.didILike ? 'success' : 'unrated'}}">thumb_up</mat-icon>
+                        <span>{{article.ranking.likesCount}}</span>
+                        <mat-icon color="{{article.ranking.didIDislike ? 'success' : 'unrated'}}">thumb_down</mat-icon>
+                        <span>{{article.ranking.dislikesCount}}</span>
                         <mat-icon color="{{article.ranking.didIFavor ? 'success' : 'unrated'}}">favorite</mat-icon>
                     </div>
                 </div>

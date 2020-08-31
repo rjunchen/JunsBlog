@@ -12,10 +12,10 @@
     </div>
     <div class="summary-info">
         <div class="my-list">
-            <div class="list-item" (click)="showMyArticles()"><mat-icon>article</mat-icon><span>My articles</span></div>
-            <div class="list-item" (click)="showMyLikes()"><mat-icon>thumb_up</mat-icon><span>My likes</span></div>
-            <div class="list-item" (click)="showMyFavorites()"><mat-icon>favorite</mat-icon><span>My favorite</span></div>
-            <div class="list-item margin-top"><mat-icon>settings</mat-icon><span>Settings</span></div>
+            <div class="list-item" [ngClass]="{'active': selectedTab == 'myArticles'}" (click)="showMyArticles()"><mat-icon>article</mat-icon><span>My articles</span></div>
+            <div class="list-item" [ngClass]="{'active': selectedTab == 'myLikes'}" (click)="showMyLikes()"><mat-icon>thumb_up</mat-icon><span>My likes</span></div>
+            <div class="list-item" [ngClass]="{'active': selectedTab == 'myFavorites'}" (click)="showMyFavorites()"><mat-icon>favorite</mat-icon><span>My favorite</span></div>
+            <div class="list-item margin-top" [ngClass]="{'active': selectedTab == 'settings'}" (click)="showSettings()"><mat-icon>settings</mat-icon><span>Settings</span></div>
             <div class="list-item" (click)="logout()"><mat-icon>exit_to_app</mat-icon><span>Sign out</span></div>
         </div>
         <div class="list-content">
@@ -25,7 +25,7 @@
                     <mat-icon (click)="search()"  matSuffix>search</mat-icon>
                 </mat-form-field>     
             </div>
-            <app-articles-list [loadOnInit]="true"></app-articles-list>
+            <app-articles-list [loadOnInit]="false"></app-articles-list>
         </div>
     </div>
 </div>

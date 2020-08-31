@@ -19,6 +19,7 @@ export class ProfileComponent implements OnInit {
   isProcessing: boolean;
   searchOption: ArticleSearchPagingOption;
   pageSize: number = 10;
+  selectedTab: string;
 
   constructor(private auth: AuthenticationService, private route: ActivatedRoute,
     private articleService: ArticleService, private toastr: ToastrService) { }
@@ -28,7 +29,6 @@ export class ProfileComponent implements OnInit {
     this.route.paramMap.subscribe(x=>{
       var userId = x.get("id")
       this.auth.getProfile(userId).subscribe(data=>{
-        console.log(data);
         this.profile = data;
       }, err=>{
         if (err.status === 400) {     
@@ -45,19 +45,25 @@ export class ProfileComponent implements OnInit {
   }
 
   showMyLikes(){
+    this.selectedTab = 'myLikes';
     this.searchOption.filter = ArticleFilterEnum.MyLikes;
     this.search();
   }
 
   showMyArticles(){
+    this.selectedTab = 'myArticles';
     this.searchOption.filter = ArticleFilterEnum.MyArticles;
     this.search();
   }
 
   showMyFavorites(){
-    console.log("clicked favorite");
+    this.selectedTab = 'myFavorites';
     this.searchOption.filter = ArticleFilterEnum.MyFavorites;
     this.search();
+  }
+
+  showSettings(){
+    this.selectedTab = 'settings';
   }
 
   search(){
