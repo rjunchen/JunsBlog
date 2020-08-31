@@ -26,6 +26,9 @@
                     </div>
                 </div>
             </div> 
+            <div class="article-categories">
+                <span class="chip-style" *ngFor="let category of article.categories">#{{category}}</span>
+            </div>
             <div class="article-abstract">{{article.abstract}}</div>
         </div>
     </div>

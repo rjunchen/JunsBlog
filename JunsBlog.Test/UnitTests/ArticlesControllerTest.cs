@@ -107,13 +107,73 @@ namespace JunsBlog.Test.UnitTests
         }
 
         [Fact]
-        public async void Get_ValidArticleId_Success()
+        public async void UpdateArticle_ValidArticle_Success()
+        {
+            var result = await ariclesController.CreateArticle(validArticleRequest);
+            var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+            var article = okResult.Value.Should().BeAssignableTo<Article>().Subject;
+
+            var updatedArticleRequest = new ArticleRequest() {
+                Id = article.Id,
+                Abstract = "Updated Abstract",
+                Categories = new string[] {"1", "2"},
+                Content = "Updated Content",
+                CoverImage = "Updated CoverImage",
+                IsPrivate = true,
+                Title = "Updated Title"
+            };
+
+            result = await ariclesController.UpdateArticle(updatedArticleRequest);
+            result.Should().BeOfType<OkObjectResult>();
+            okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+            var articleResponse = okResult.Value.Should().BeAssignableTo<Article>().Subject;
+            articleResponse.Should().NotBeNull();
+            articleResponse.Title.Should().Be(updatedArticleRequest.Title);
+            articleResponse.Id.Should().Be(article.Id);  // Make sure the ID is the same old ID
+            articleResponse.Abstract.Should().Be(updatedArticleRequest.Abstract);
+            articleResponse.Content.Should().Be(updatedArticleRequest.Content);
+            articleResponse.AuthorId.Should().Be(currentUserId);
+            articleResponse.IsPrivate.Should().Be(updatedArticleRequest.IsPrivate);
+            articleResponse.IsApproved.Should().Be(false);
+            //articleDetailsResponse.Categories.Should().Be(validArticleRequest.Categories.Count);
+            articleResponse.Content.Should().Be(updatedArticleRequest.Content);
+            articleResponse.UpdatedOn.Should().BeCloseTo(DateTime.UtcNow, TWO_SECONDS_IN_MILLIONSECONDS);
+            articleResponse.CreatedOn.Should().BeCloseTo(DateTime.UtcNow, TWO_SECONDS_IN_MILLIONSECONDS);
+        }
+
+        [Fact]
+        public async void GetArticle_ValidArticleId_Success()
+        {
+            var result = await ariclesController.CreateArticle(validArticleRequest);
+            var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+            var article = okResult.Value.Should().BeAssignableTo<Article>().Subject;
+
+            result = await ariclesController.GetArticle(article.Id);
+            result.Should().BeOfType<OkObjectResult>();
+            okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+            var articleResponse = okResult.Value.Should().BeAssignableTo<Article>().Subject;
+            articleResponse.Should().NotBeNull();
+            articleResponse.Title.Should().Be(validArticleRequest.Title);
+            articleResponse.Abstract.Should().Be(validArticleRequest.Abstract);
+            articleResponse.Content.Should().Be(validArticleRequest.Content);
+            articleResponse.AuthorId.Should().Be(currentUserId);
+            articleResponse.IsPrivate.Should().Be(false);
+            articleResponse.IsApproved.Should().Be(false);
+            //articleDetailsResponse.Categories.Should().Be(validArticleRequest.Categories.Count);
+            articleResponse.Content.Should().Be(validArticleRequest.Content);
+            articleResponse.UpdatedOn.Should().BeCloseTo(DateTime.UtcNow, TWO_SECONDS_IN_MILLIONSECONDS);
+            articleResponse.CreatedOn.Should().BeCloseTo(DateTime.UtcNow, TWO_SECONDS_IN_MILLIONSECONDS);
+        }
+
+
+        [Fact]
+        public async void GetArticleDetails_ValidArticleId_Success()
         {
             var result = await ariclesController.CreateArticle(validArticleRequest);
             var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
             var articleResponse = okResult.Value.Should().BeAssignableTo<Article>().Subject;
 
-            result = await ariclesController.GetArticle(articleResponse.Id);
+            result = await ariclesController.GetArticleDetails(articleResponse.Id);
             result.Should().BeOfType<OkObjectResult>();
             okResult = result.Should().BeOfType<OkObjectResult>().Subject;
             var articleDetailsResponse = okResult.Value.Should().BeAssignableTo<ArticleDetails>().Subject;
@@ -131,7 +191,7 @@ namespace JunsBlog.Test.UnitTests
         }
 
         [Fact]
-        public async void Get_ValidArticleWithRanking_Success()
+        public async void GetArticleDetails_ValidArticleWithRanking_Success()
         {
             var result = await ariclesController.CreateArticle(validArticleRequest);
             var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -147,7 +207,7 @@ namespace JunsBlog.Test.UnitTests
             articleRankingResponse.DislikesCount.Should().Be(0);
             articleRankingResponse.LikesCount.Should().Be(1);
 
-            result = await ariclesController.GetArticle(articleResponse.Id);
+            result = await ariclesController.GetArticleDetails(articleResponse.Id);
             result.Should().BeOfType<OkObjectResult>();
             okResult = result.Should().BeOfType<OkObjectResult>().Subject;
             var articleDetailsResponse = okResult.Value.Should().BeAssignableTo<ArticleDetails>().Subject;

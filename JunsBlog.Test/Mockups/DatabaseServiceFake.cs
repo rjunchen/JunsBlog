@@ -75,6 +75,12 @@ namespace JunsBlog.Test.Mockups
                 return articles.ReplaceOne(article);
             });
         }
+        public async Task<Article> GetArticleAsync(string articleId)
+        {
+            return await Task.Run(() => {
+                return articles.Find(x => x.Id == articleId);
+            });
+        }
         #endregion
 
 
@@ -172,6 +178,7 @@ namespace JunsBlog.Test.Mockups
                 return articleDetails;
             });
         }
+
 
         public async Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId)
         {

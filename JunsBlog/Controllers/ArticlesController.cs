@@ -38,9 +38,9 @@ namespace JunsBlog.Controllers
                 if (String.IsNullOrWhiteSpace(model.Title) || String.IsNullOrWhiteSpace(model.Content) || String.IsNullOrWhiteSpace(model.Abstract))
                     return BadRequest(new { message = "Incomplete article information" });
 
-                var artile = await databaseService.SaveArticleAsync(new Article(model, currentUserId));
+                var article = await databaseService.SaveArticleAsync(new Article(model, currentUserId));
 
-                return Ok(artile);
+                return Ok(article);
             }
             catch (Exception ex)
             {
@@ -51,6 +51,53 @@ namespace JunsBlog.Controllers
 
         [HttpGet("get")]
         public async Task<IActionResult> GetArticle(string articleId)
+        {
+            try
+            {
+                if (String.IsNullOrWhiteSpace(articleId))
+                    return BadRequest(new { message = "Invalid articleId" });
+
+                var article = await databaseService.GetArticleAsync(articleId);
+
+                if (article == null) return BadRequest(new { message = "Article does not exist" });
+
+                return Ok(article);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+
+        [HttpPost("update")]
+        public async Task<IActionResult> UpdateArticle(ArticleRequest article)
+        {
+            try
+            {
+                if (article == null || String.IsNullOrWhiteSpace(article.Id) || String.IsNullOrWhiteSpace(article.Title) 
+                    || String.IsNullOrWhiteSpace(article.Abstract) || String.IsNullOrWhiteSpace(article.Content))
+                    return BadRequest(new { message = "Invalid article" });
+
+                var existingArticle = await databaseService.GetArticleAsync(article.Id);
+
+                existingArticle.UpdateContents(article);
+
+                var updatedArticle = await databaseService.SaveArticleAsync(existingArticle);
+
+                return Ok(updatedArticle);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+
+        [HttpGet("details/get")]
+        public async Task<IActionResult> GetArticleDetails(string articleId)
         {
             try
             {

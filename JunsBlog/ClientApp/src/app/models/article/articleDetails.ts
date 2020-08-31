@@ -9,7 +9,6 @@ export class ArticleDetails extends Article{
     createdOn: string;
     views: number;
     content: string;
-    id: string;
     IsApproved: boolean;
     commentsCount: number;
 }

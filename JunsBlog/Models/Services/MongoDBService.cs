@@ -81,6 +81,10 @@ namespace JunsBlog.Models.Services
             await articles.ReplaceOneAsync(s => s.Id == article.Id, article, new ReplaceOptions { IsUpsert = true });
             return article;
         }
+        public async Task<Article> GetArticleAsync(string articleId)
+        {
+            return await articles.Find(s => s.Id == articleId).SingleOrDefaultAsync();
+        }
         #endregion
 
 
@@ -169,6 +173,7 @@ namespace JunsBlog.Models.Services
                                 Views = a.article.Views,
                                 Content = a.article.Content,
                                 AuthorId = a.article.AuthorId,
+                                Categories =  a.article.Categories,
                                 commentsCount = a.comments.Count()
                             }).Join(users.AsQueryable(), x => x.AuthorId, y => y.Id, (x, y) => new ArticleDetails
                             {
@@ -182,6 +187,7 @@ namespace JunsBlog.Models.Services
                                 IsPrivate = x.IsPrivate,
                                 Views = x.Views,
                                 Content = x.Content,
+                                Categories = x.Categories,
                                 Author = y,
                                 CommentsCount = x.commentsCount
                             });
@@ -222,6 +228,7 @@ namespace JunsBlog.Models.Services
                 IsApproved = x.IsApproved,
                 IsPrivate = x.IsPrivate,
                 Views = x.Views,
+                Categories = x.Categories,
                 Author = x.Author,
                 CommentsCount = x.CommentsCount
             });

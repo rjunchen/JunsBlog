@@ -15,6 +15,9 @@
                     <span>{{article.updatedOn | date:'short'}}</span>
                 </div>
             </div>
+            <div class="article-categories">
+                <span class="chip-style" *ngFor="let category of article.categories">#{{category}}</span>
+            </div>
             <quill-view-html class="htmlViewer" [content]="article.content" theme="snow"></quill-view-html>
             <div *ngIf="ranking" class="rank-box">
                 <button matTooltip="Like" mat-mini-fab color="{{ranking.didILike ? 'success' : 'unrated'}}" mat-button (click)="like()"><mat-icon>thumb_up</mat-icon></button>
