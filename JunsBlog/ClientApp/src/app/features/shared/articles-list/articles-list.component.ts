@@ -43,6 +43,7 @@ export class ArticlesListComponent implements OnInit, OnDestroy {
   search(option: ArticleSearchPagingOption){
     this.loading = true;
     this.articleService.searchArticle(option).subscribe(x=>{
+      console.log(x);
       this.articles = x.documents;
       this.articlePagingResult = x;
       this.loading = false;
