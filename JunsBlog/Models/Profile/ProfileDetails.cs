@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JunsBlog.Models.Profile
 {
-    public class Profile
+    public class ProfileDetails
     {
         public User User { get; set; }
         public int FavorsCount { get; set; }

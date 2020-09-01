@@ -3,6 +3,7 @@ using JunsBlog.Interfaces.Services;
 using JunsBlog.Models.Articles;
 using JunsBlog.Models.Comments;
 using JunsBlog.Models.Enums;
+using JunsBlog.Models.Profile;
 using JunsBlog.Test.Helper;
 using System;
 using System.Collections.Generic;
@@ -231,6 +232,11 @@ namespace JunsBlog.Test.Mockups
         }
 
         public Task<CommentSearchPagingResult> SearchCommentsAsync(CommentSearchPagingOption options, string currentUserId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ProfileDetails> GetProfileDetailsAsync(string currentUserId)
         {
             throw new NotImplementedException();
         }

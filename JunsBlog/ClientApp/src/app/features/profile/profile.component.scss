@@ -32,7 +32,6 @@ $color-orange: #f44336;
     .summary-info{
      
         display: flex;
-        height: 100%;
         width: 100%;
         .my-list{
             .active{
@@ -46,17 +45,21 @@ $color-orange: #f44336;
                 display: flex;
                 align-items: center;
                 width: 200px;
+                height: 50px;
                 background-color: white;
                 box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
-                padding: 15px;
-                &:hover{
+                .mat-icon{
+                    margin-left: 15px;
+                }
+                 &:hover{
                     color: $color-orange;
                     cursor: pointer;
                 }
-                .mat-icon{
-                    margin-right: 5px;
-                }          
+                span{
+                    margin-left: 5px;
+                } 
             }
+
             .margin-top{
                 margin-top: 8px;
             }
@@ -85,6 +88,8 @@ $color-orange: #f44336;
 @media only screen and (max-width: 768px){
     .profile-container{ 
         .summary-info{
+            display: flex;
+            flex-direction: column;
             .my-list{
                 width: 100%;
                 .list-item{

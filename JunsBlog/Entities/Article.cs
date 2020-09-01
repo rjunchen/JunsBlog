@@ -49,6 +49,6 @@ namespace JunsBlog.Entities
             IsPrivate = model.IsPrivate;
             Title = model.Title;
             Categories = model.Categories;
-        }
+         }
     }
 }

@@ -2,6 +2,7 @@
 using JunsBlog.Models.Articles;
 using JunsBlog.Models.Comments;
 using JunsBlog.Models.Enums;
+using JunsBlog.Models.Profile;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -45,10 +46,11 @@ namespace JunsBlog.Interfaces.Services
 
 
         // Details
-        Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options, string currentUserId);
+        Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options);
         Task<ArticleDetails> GetArticleDetailsAsync(string articleId);
         Task<CommentSearchPagingResult> SearchCommentsAsync(CommentSearchPagingOption options, string currentUserId);
         Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId);
-        
+        Task<ProfileDetails> GetProfileDetailsAsync(string currentUserId);
+
     }
 }
