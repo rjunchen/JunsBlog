@@ -6,6 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ArticleSearchPagingOption } from 'src/app/models/article/articleSearchPagingOption';
 import { ArticleService } from 'src/app/services/article.service';
 import { ArticleFilterEnum } from 'src/app/models/enums/articleFilterEnum';
+import { User } from 'src/app/models/user';
 
 @Component({
   selector: 'app-profile',
@@ -21,6 +22,8 @@ export class ProfileComponent implements OnInit {
   pageSize: number = 10;
   selectedTab: string;
   profilerId: string;
+  showEditor: boolean;
+  currentUser: User;
 
   constructor(private auth: AuthenticationService, private route: ActivatedRoute,
     private articleService: ArticleService, private toastr: ToastrService) { }
@@ -39,6 +42,8 @@ export class ProfileComponent implements OnInit {
         }
       })
     });
+
+    this.currentUser = this.auth.getCurrentUser();
   }
   
   logout(){
