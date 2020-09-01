@@ -13,12 +13,15 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ArticlesListModule } from '../shared/articles-list/articles-list.modules';
+import { ProfileEditorComponent } from './profile-editor/profile-editor.component';
+import { ImageCropperModule } from 'ngx-image-cropper';
+
 
 @NgModule({
-  declarations: [ProfileComponent],
+  declarations: [ProfileComponent, ProfileEditorComponent],
   imports: [
     CommonModule,
-    ProfileRoutingModule,
+    ProfileRoutingModule, ImageCropperModule,
     FormsModule, ReactiveFormsModule, 
     MatDividerModule, MatIconModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatProgressSpinnerModule,
     MatTooltipModule, ArticlesListModule

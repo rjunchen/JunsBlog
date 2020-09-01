@@ -95,6 +95,35 @@ namespace JunsBlog.Controllers
         }
 
 
+        [HttpPost("user/update")]
+        public async Task<IActionResult> UpdateUserInfo(UserInfoUpdateRequest model)
+        {
+            try
+            {
+                if (model == null || String.IsNullOrWhiteSpace(model.Name) || String.IsNullOrWhiteSpace(model.Email))
+                    return BadRequest(new { message = "Incomplete user registration information" });
+
+                if (model.Id != userId) return BadRequest(new { message = "Invalid user update request" });
+
+               
+                var existingUser = await databaseService.GetUserAsync(model.Id);
+
+                if (existingUser == null) return BadRequest(new { message = "User doesn't exit" });
+
+                existingUser.UpdateUserInfo(model);
+
+                var insertedUser = await databaseService.SaveUserAsync(existingUser);
+
+                return Ok(insertedUser);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+
         [HttpPost("reset/password")]
         public async Task<IActionResult> ResetPassword(PasswordResetRequest model)
         {

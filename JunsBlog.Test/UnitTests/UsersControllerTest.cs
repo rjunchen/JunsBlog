@@ -147,7 +147,7 @@ namespace JunsBlog.Test.UnitTests
         public async void Reset_ResetTokenRequest_ValidRequest_Success()
         {
             await usersController.Register(validRegisterRquest);
-            var result = await usersController.ResetPassword(validRegisterRquest.Email);
+            var result = await usersController.VerifyResetEmail(validRegisterRquest.Email);
             var okResult = result.Should().BeOfType<OkResult>().Subject;
             okResult.StatusCode.Should().Be(StatusCodes.Status200OK);
         }
@@ -157,7 +157,7 @@ namespace JunsBlog.Test.UnitTests
         [InlineData("")]
         public async void Reset_ResetTokenRequestNonExistingUser_Failure(string email)
         {
-            var result = await usersController.ResetPassword(email);
+            var result = await usersController.VerifyResetEmail(email);
             var badResult = result.Should().BeOfType<StatusCodeResult>().Subject;
             badResult.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
         }

@@ -1,14 +1,21 @@
 <div class="profile-container" *ngIf="profile">
-    <div class="profile-stats-box">
+    <div *ngIf="!showEditor" class="profile-stats-box">
         <div class="avatar-box">
-            <img class="images profileImage image-link" [src]="profile.user.image ? profile.user.image : defaultAvatarUrl"/>
+            <img class="images profileImage"  [src]="profile.user.image ? profile.user.image : defaultAvatarUrl"/>
             <div class="grey-text">{{profile.user.role}}</div>    
         </div>   
         <div class="user-info">
             <div>{{profile.user.name}}</div>
             <div class="grey-text">{{profile.user.email}}</div>
             <div class="grey-text">Joined: {{profile.user.createdOn | date:'shortDate'}}</div>
+            <!-- <div (click)="showEditor = true"><mat-icon>edit</mat-icon><span>Edit</span></div> -->
+            <button *ngIf="profilerId == currentUser.id" class="edit-button" mat-icon-button (click)="showEditor = true">
+                <mat-icon>edit</mat-icon>Edit
+            </button>
         </div>      
+    </div>
+    <div *ngIf="showEditor" class="profile-editor-container">
+        <app-profile-editor [user]="profile.user"  (hideEditor)="showEditor = false"></app-profile-editor>
     </div>
     <div class="summary-info">
         <div class="my-list">
