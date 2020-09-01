@@ -23,8 +23,8 @@ namespace JunsBlog.Models.Articles
             Documents = articleDetailsList;
             TotalDocuments = totalDocument;
             TotalPages = (int)Math.Ceiling((double)totalDocument / options.PageSize);
-            HasNextPage = TotalPages > CurrentPage;
-            HasPreviousPage = CurrentPage > 1;
+            HasNextPage = TotalPages > options.CurrentPage;
+            HasPreviousPage = options.CurrentPage > 1;
             SearchOption = options;
             CurrentPage = options.CurrentPage;
             PageSize = options.PageSize;

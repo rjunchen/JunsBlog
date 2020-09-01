@@ -2,7 +2,7 @@ $color-orange: #f44336;
 
 .articles-container{
     .overlay{
-        margin-top: 20px;
+        padding-top: 20px;
         height: 100%;
         width: 100%;
         z-index: 900;
@@ -73,7 +73,7 @@ $color-orange: #f44336;
 
 @media only screen and (max-width: 768px){
     .articles-container{
-        margin-bottom: 64px;
+        padding-bottom: 64px;
         .article-info-box{
             margin-top: 0px;
             margin-bottom: 10px;

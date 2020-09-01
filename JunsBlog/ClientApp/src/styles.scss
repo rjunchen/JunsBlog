@@ -6,7 +6,7 @@
 
 $color-orange: #f44336;
 
-html, body { height: 100%; }
+html, body { height: 100%; box-sizing: border-box; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-color: #f5f5f5; padding-top: 64px;}  //padding-top for the sticky toolbar
 
 .mat-tooltip {
@@ -49,9 +49,8 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-
 @media only screen and (max-width: 768px){
     body{
         padding-top: 0px;
-        margin-bottom: 64px;
+        padding-bottom: 64px;
     }
-
     .ql-editor{
         font-size: 14px;
     }
