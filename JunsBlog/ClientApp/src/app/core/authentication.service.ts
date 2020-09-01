@@ -7,6 +7,7 @@ import { TokenResponse } from '../models/TokenResponse';
 import { User } from '../models/user';
 import { of } from 'rxjs';
 import { Profile } from '../models/profile/profile';
+import { PasswordResetRequest } from '../models/passwordResetRequest';
 
 @Injectable({
   providedIn: 'root'
@@ -100,4 +101,15 @@ export class AuthenticationService {
     return this.http.get(`/api/profile?userId=${userId}`).pipe(map(data => { return <Profile>data}));
   }
 
+  public sendResetToken(email: string){
+    return this.http.get(`/api/reset/verifyEmail?email=${email}`);
+  }
+
+  public verifyToken(email: string, token: string){
+    return this.http.get(`/api/reset/verifyToken?email=${email}&token=${token}`);
+  }
+
+  public resetPassword(resetRequest: PasswordResetRequest ){
+    return this.http.post('/api/reset/password', resetRequest);
+  }
 }

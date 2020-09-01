@@ -95,7 +95,7 @@ namespace JunsBlog.Controllers
         }
 
 
-        [HttpPost("reset")]
+        [HttpPost("reset/password")]
         public async Task<IActionResult> ResetPassword(PasswordResetRequest model)
         {
             try
@@ -126,8 +126,8 @@ namespace JunsBlog.Controllers
             }  
         }
 
-        [HttpGet("reset")]
-        public async Task<IActionResult> ResetPassword(string email)
+        [HttpGet("reset/verifyEmail")]
+        public async Task<IActionResult> VerifyResetEmail(string email)
         {
             try
             {
@@ -135,7 +135,7 @@ namespace JunsBlog.Controllers
 
                 var user = await databaseService.GetUserByEmailAsync(email);
 
-                if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "User not found");
+                if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "Invalid or expired reset token");
 
                 var userToken = await databaseService.GetUserTokenAsync(user.Id);
 
@@ -153,6 +153,33 @@ namespace JunsBlog.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
+
+        [HttpGet("reset/verifyToken")]
+        public async Task<IActionResult> VerifyResetToken(string email, string token)
+        {
+            try
+            {
+                if (String.IsNullOrWhiteSpace(email) || String.IsNullOrWhiteSpace(token)) return StatusCode(StatusCodes.Status400BadRequest);
+
+                var user = await databaseService.GetUserByEmailAsync(email);
+
+                if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "User not found");
+
+                var userToken = await databaseService.GetUserTokenAsync(user.Id);
+
+                if(userToken.ResetToken == token && userToken.ResetExpiry > DateTime.UtcNow)
+                    return Ok();
+                else
+                    return StatusCode(StatusCodes.Status400BadRequest, "Invalid reset token");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
 
         [HttpGet("profile")]
         public async Task<IActionResult> GetProfile(string userId)
