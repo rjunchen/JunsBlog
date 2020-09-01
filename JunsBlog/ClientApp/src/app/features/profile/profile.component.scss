@@ -1,8 +1,8 @@
 $color-orange: #f44336;
 
-.profile-container{ 
+.profile-container{    
     .profile-stats-box{
-        margin: 15px;
+        padding: 15px;
         display: flex;
         .grey-text{
             color: #999;
@@ -67,6 +67,7 @@ $color-orange: #f44336;
         .list-content{
             .search-control-container{
                 width: 100%;
+                background-color: white;
                 .mat-form-field{
                     width: 100%;
                     .mat-icon{
@@ -97,7 +98,7 @@ $color-orange: #f44336;
                 }
             }
             .list-content{
-                display: none;
+                margin-left: 0px;
             }
         }
     }
