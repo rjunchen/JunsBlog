@@ -12,7 +12,8 @@ const routes: Routes = [
     { path: 'social', loadChildren: () => import('./features/social/social.module').then(m => m.SocialModule) },
     { path: 'editor/:id', loadChildren: () => import('./features/editor/editor.module').then(m => m.EditorModule), canActivate: [AuthGuard] },
     { path: 'editor', loadChildren: () => import('./features/editor/editor.module').then(m => m.EditorModule), canActivate: [AuthGuard] },
-    { path: 'search', loadChildren: () => import('./features/search/search.module').then(m => m.SearchModule) } 
+    { path: 'search', loadChildren: () => import('./features/search/search.module').then(m => m.SearchModule) },
+    { path: 'reset', loadChildren: () => import('./features/reset/reset.module').then(m => m.ResetModule) } 
   ];
 
 @NgModule({
