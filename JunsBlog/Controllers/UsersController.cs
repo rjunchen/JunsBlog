@@ -161,14 +161,11 @@ namespace JunsBlog.Controllers
             {
                 if (String.IsNullOrWhiteSpace(userId)) return StatusCode(StatusCodes.Status400BadRequest);
 
-                var user = await databaseService.GetUserAsync(userId);
+                var profileDetails = await databaseService.GetProfileDetailsAsync(userId);
 
-                if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "User not found");
+                if (profileDetails == null) return StatusCode(StatusCodes.Status400BadRequest, "User not found");
 
-                var profile = new Profile();
-                profile.User = user;
-
-                return Ok(profile);
+                return Ok(profileDetails);
             }
             catch (Exception ex)
             {

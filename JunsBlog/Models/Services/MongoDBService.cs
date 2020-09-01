@@ -4,6 +4,7 @@ using JunsBlog.Interfaces.Settings;
 using JunsBlog.Models.Articles;
 using JunsBlog.Models.Comments;
 using JunsBlog.Models.Enums;
+using JunsBlog.Models.Profile;
 using MimeKit.Encodings;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
@@ -215,7 +216,7 @@ namespace JunsBlog.Models.Services
             return query;
         }
 
-        public async Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options, string currentUserId)
+        public async Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options)
         {
             var query = GenerateArticleDetailsQuery();
 
@@ -240,13 +241,13 @@ namespace JunsBlog.Models.Services
             switch (options.Filter)
             {
                 case ArticleFilterEnum.MyArticles:
-                    query = query.Where(x => x.Author.Id == currentUserId);
+                    query = query.Where(x => x.Author.Id == options.ProfilerId);
                     break;
                 case ArticleFilterEnum.MyLikes:
-                    query = query.Where(x => x.Rankings.Any(x=> x.DidILike == true && x.UserId == currentUserId));
+                    query = query.Where(x => x.Rankings.Any(x=> x.DidILike == true && x.UserId == options.ProfilerId));
                     break;
                 case ArticleFilterEnum.MyFavorites:
-                    query = query.Where(x => x.Rankings.Any(x => x.DidIFavor == true && x.UserId == currentUserId));
+                    query = query.Where(x => x.Rankings.Any(x => x.DidIFavor == true && x.UserId == options.ProfilerId));
                     break;
             }
 
@@ -274,7 +275,7 @@ namespace JunsBlog.Models.Services
                     Categories = item.Categories,
                     Author = item.Author,
                     CommentsCount = item.CommentsCount,
-                    Ranking = new ArticleRankingDetails(item.Id, currentUserId, item.Rankings)
+                    Ranking = new ArticleRankingDetails(item.Id, options.ProfilerId, item.Rankings)
                 };
                 articleDetailsList.Add(articleDetails);
             }
@@ -390,6 +391,41 @@ namespace JunsBlog.Models.Services
             }
 
             return new CommentSearchPagingResult(documents, docsCount, options);
+        }
+
+        public async Task<ProfileDetails> GetProfileDetailsAsync(string currentUserId)
+        {
+            var query = users.AsQueryable().Where(x => x.Id == currentUserId).GroupJoin(articles.AsQueryable(), x => x.Id, y => y.AuthorId, (x, y) => new { UserId = x.Id, Articles = y, })
+           .Select(a => new
+           {
+               Id = a.UserId,
+               ArticlesCount = a.Articles.Count()
+           }).GroupJoin(articleRankings.AsQueryable(), x => x.Id, y => y.UserId, (x, y) => new
+           {
+               Id = x.Id,
+               ArticlesCount = x.ArticlesCount,
+               Rankings = y
+           }).Select(a => new
+           {
+               Id = a.Id,
+               ArticlesCount = a.ArticlesCount,
+               FavorsCount = a.Rankings.Count(x => x.DidIFavor == true),
+               LikesCount = a.Rankings.Count(x => x.DidILike == true),
+           }).GroupJoin(users, x => x.Id, y => y.Id, (x, y) => new
+           {
+               Id = x.Id,
+               ArticlesCount = x.ArticlesCount,
+               FavorsCount = x.FavorsCount,
+               LikesCount = x.LikesCount,
+               Users = y
+           }).Select(a => new ProfileDetails
+           {
+               LikesCount = a.LikesCount,
+               ArticlesCount = a.ArticlesCount,
+               FavorsCount = a.FavorsCount,
+               User = a.Users.First()
+           });
+           return await query.FirstOrDefaultAsync();
         }
 
         #endregion

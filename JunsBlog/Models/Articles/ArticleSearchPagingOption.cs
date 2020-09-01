@@ -14,6 +14,7 @@ namespace JunsBlog.Models.Articles
         public int CurrentPage { get; set; }
         public int PageSize { get; set; }
         public ArticleFilterEnum Filter { get; set; }
+        public string ProfilerId { get; set; }
 
         public ArticleSearchPagingOption()
         {
@@ -23,6 +24,7 @@ namespace JunsBlog.Models.Articles
             CurrentPage = 1;
             PageSize = 10;
             Filter = ArticleFilterEnum.All;
+            ProfilerId = null;
         }
     }
 }

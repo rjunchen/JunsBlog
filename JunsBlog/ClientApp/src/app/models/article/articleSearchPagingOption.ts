@@ -10,14 +10,17 @@ export class ArticleSearchPagingOption {
     sortBy: SortByEnum;
     sortOrder: SortOrderEnum;
     filter: ArticleFilterEnum;
+    profilerId: string;
 
     constructor(currentPage: number = 1, pageSize: number = 10, searchKey: string = null, 
-        sortBy: SortByEnum = SortByEnum.CreatedOn, sortOrder: SortOrderEnum = SortOrderEnum.descending, filter: ArticleFilterEnum = ArticleFilterEnum.All){
+        sortBy: SortByEnum = SortByEnum.CreatedOn, sortOrder: SortOrderEnum = SortOrderEnum.descending,
+         filter: ArticleFilterEnum = ArticleFilterEnum.All, profilerId: string = null){
             this.currentPage = currentPage;
             this.pageSize = pageSize;
             this.searchKey = searchKey;
             this.sortBy = sortBy;
             this.sortOrder = sortOrder;
             this.filter = filter;
+            this.profilerId = profilerId;
     }
 }

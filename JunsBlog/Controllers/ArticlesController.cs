@@ -122,7 +122,11 @@ namespace JunsBlog.Controllers
         {
             try
             {
-                var searchResult = await databaseService.SearchArticlesAsyc(options, currentUserId);
+                if((options.Filter == ArticleFilterEnum.MyArticles || options.Filter == ArticleFilterEnum.MyFavorites 
+                    || options.Filter == ArticleFilterEnum.MyLikes) && String.IsNullOrEmpty(options.ProfilerId))
+                    return BadRequest(new { message = "ProfilerId is not specified in the search options" });
+
+                var searchResult = await databaseService.SearchArticlesAsyc(options);
 
                 return Ok(searchResult);
             }
