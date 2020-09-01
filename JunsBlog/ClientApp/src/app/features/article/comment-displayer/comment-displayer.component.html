@@ -1,9 +1,9 @@
 <div class="comment-item-container">
     <mat-divider></mat-divider>
     <div class="user-details">
-        <img class="images profileImage" [src]="comment.user.image ? comment.user.image : defaultAvatarUrl" />
+        <img class="images profileImage image-link" routerLink="{{'/profile/' + comment.user.id}}" [src]="comment.user.image ? comment.user.image : defaultAvatarUrl" />
         <div class="name-div">
-            <span class="reader-name" [ngClass]="{'chip-style': comment.user.id == article.author.id}">{{comment.user.name}}</span>
+            <span class="reader-name link" routerLink="{{'/profile/' + comment.user.id}}" [ngClass]="{'chip-style': comment.user.id == article.author.id}">{{comment.user.name}}</span>
             <span class="commented-time">{{comment.updatedOn | timeAgo }}</span>
         </div>
     </div>

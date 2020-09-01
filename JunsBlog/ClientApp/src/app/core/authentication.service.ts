@@ -8,6 +8,7 @@ import { User } from '../models/user';
 import { of } from 'rxjs';
 import { Profile } from '../models/profile/profile';
 import { PasswordResetRequest } from '../models/passwordResetRequest';
+import { UserInfoUpdateRequest } from '../models/userInfoUpdateRequest';
 
 @Injectable({
   providedIn: 'root'
@@ -99,6 +100,10 @@ export class AuthenticationService {
 
   public getProfile(userId: string){
     return this.http.get(`/api/profile?userId=${userId}`).pipe(map(data => { return <Profile>data}));
+  }
+
+  public updateUserInfo(userUpdateRequest: UserInfoUpdateRequest){
+    return this.http.post(`/api/user/update`, userUpdateRequest).pipe(map(data => { return <User>data}));
   }
 
   public sendResetToken(email: string){

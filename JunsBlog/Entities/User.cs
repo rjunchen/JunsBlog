@@ -40,5 +40,12 @@ namespace JunsBlog.Entities
             Type = model.Type;
             Image = model.Image;
         }
+
+        public void UpdateUserInfo(UserInfoUpdateRequest info)
+        {
+            this.Name = info.Name;
+            this.Email = info.Email;
+            this.Image = info.Image;
+        }
     }
 }

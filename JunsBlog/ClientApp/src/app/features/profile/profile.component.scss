@@ -27,6 +27,13 @@ $color-orange: #f44336;
             margin: 0px 20px 0px 5px;
             vertical-align: super;
         }
+
+        .edit-button{
+            &:hover{
+                color: $color-orange;
+                cursor: pointer;
+            }
+        }
     }
 
     .summary-info{
