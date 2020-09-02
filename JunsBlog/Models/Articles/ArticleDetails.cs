@@ -21,6 +21,7 @@ namespace JunsBlog.Models.Articles
         public bool IsPrivate { get; set; }
         public bool IsApproved { get; set; }
         public int CommentsCount { get; set; }
+        public List<GalleryImage> GalleryImages { get; set; }
         public ArticleRankingDetails Ranking { get; set; }
     }
 }

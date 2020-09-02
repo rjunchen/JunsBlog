@@ -29,6 +29,7 @@ namespace JunsBlog.Entities
         public bool IsApproved { get; set; }
         [BsonRequired]
         public int Views { get; set; }
+        public List<GalleryImage> GalleryImages { get; set; }
 
         public Article(ArticleRequest model, string authorId)
         {
@@ -39,6 +40,7 @@ namespace JunsBlog.Entities
             IsPrivate = model.IsPrivate;
             Title = model.Title;
             Categories = model.Categories;
+            GalleryImages = new List<GalleryImage>();
         }
 
         public void UpdateContents(ArticleRequest model)

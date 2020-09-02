@@ -35,6 +35,7 @@
                 <span class="chip-style" *ngFor="let category of article.categories">#{{category}}</span>
             </div>
             <div class="article-abstract">{{article.abstract}}</div>
+            <ngx-gallery *ngIf="article.galleryImages.length > 0" [options]="galleryOptions" [images]="article.galleryImages"></ngx-gallery>
         </div>
     </div>
     <div *ngIf="noSearchResult" class="no-result">

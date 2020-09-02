@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
+@import '~font-awesome/css/font-awesome.css';
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
 @import url("https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap");
 @import '~ngx-toastr/toastr';
@@ -37,6 +38,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-
 
 .ql-editor{
     font-size: 16px;
+}
+
+.mat-sidenav-container, .mat-sidenav-content, .mat-tab-body-content {
+    transform: none !important;
 }
 
 .search-control-container{
