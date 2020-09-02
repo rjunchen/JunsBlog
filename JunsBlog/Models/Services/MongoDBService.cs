@@ -181,6 +181,7 @@ namespace JunsBlog.Models.Services
                                 Content = a.article.Content,
                                 AuthorId = a.article.AuthorId,
                                 Categories =  a.article.Categories,
+                                GalleryImages = a.article.GalleryImages,
                                 commentsCount = a.comments.Count()
                             }).Join(users.AsQueryable(), x => x.AuthorId, y => y.Id, (x, y) => new ArticleDetails
                             {
@@ -195,6 +196,7 @@ namespace JunsBlog.Models.Services
                                 Views = x.Views,
                                 Content = x.Content,
                                 Categories = x.Categories,
+                                GalleryImages = x.GalleryImages,
                                 Author = y,
                                 CommentsCount = x.commentsCount
                             }).GroupJoin(articleRankings.AsQueryable(), x=> x.Id, y=> y.ArticleId, (x, y)=> new ArticleWithRankings {
@@ -209,6 +211,7 @@ namespace JunsBlog.Models.Services
                                 Views = x.Views,
                                 Content = x.Content,
                                 Categories = x.Categories,
+                                GalleryImages = x.GalleryImages,
                                 Author = x.Author,
                                 CommentsCount = x.CommentsCount,
                                 Rankings = y
@@ -273,6 +276,7 @@ namespace JunsBlog.Models.Services
                     Views = item.Views,
                     Content = item.Content,
                     Categories = item.Categories,
+                    GalleryImages = item.GalleryImages,
                     Author = item.Author,
                     CommentsCount = item.CommentsCount,
                     Ranking = new ArticleRankingDetails(item.Id, options.ProfilerId, item.Rankings)

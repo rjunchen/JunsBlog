@@ -13,6 +13,7 @@ import { RouterModule } from '@angular/router';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { TimeAgoModule } from 'src/app/services/time-ago/time-ago.module';
 import { MatChipsModule } from '@angular/material/chips';
+import { NgxGalleryModule } from 'ngx-gallery-9';
 
 @NgModule({
   declarations: [ArticlesListComponent],
@@ -21,7 +22,7 @@ import { MatChipsModule } from '@angular/material/chips';
     RouterModule,
     FormsModule, ReactiveFormsModule, 
     MatDividerModule, MatIconModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatProgressSpinnerModule,
-    InfiniteScrollModule, TimeAgoModule, MatChipsModule
+    InfiniteScrollModule, TimeAgoModule, MatChipsModule, NgxGalleryModule
   ],
   exports:[ArticlesListComponent]
 })
