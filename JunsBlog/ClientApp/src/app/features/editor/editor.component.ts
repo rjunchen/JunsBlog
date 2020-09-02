@@ -7,6 +7,11 @@ import { ToastrService } from 'ngx-toastr';
 import { Router, ActivatedRoute } from '@angular/router';
 import { mergeMap } from 'rxjs/operators';
 
+import Quill from 'quill'
+import ImageResize from 'quill-image-resize-module'
+Quill.register('modules/imageResize', ImageResize)
+
+
 export interface Category {
   name: string;
 }
@@ -18,6 +23,8 @@ export interface Category {
 })
 export class EditorComponent implements OnInit {
 
+  modules = {}
+
   article: Article;
 
   visible = true;
@@ -27,7 +34,17 @@ export class EditorComponent implements OnInit {
   updateMode = false;
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
 
-  constructor(private articleService: ArticleService, private toastr: ToastrService, private router: Router, private route: ActivatedRoute) { }
+  constructor(private articleService: ArticleService, private toastr: ToastrService, private router: Router, private route: ActivatedRoute) {
+    this.modules = {
+      imageResize: {},
+      toolbar: [
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+          [{ 'color': [] }], 
+          ['link', 'image', 'video'] 
+        ]
+    }
+   }
 
   ngOnInit(): void {
     

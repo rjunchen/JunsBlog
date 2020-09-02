@@ -21,6 +21,13 @@
  
 }
 
-:host ::ng-deep .ql-container {
-    height: 200px;
+// :host ::ng-deep .ql-container {
+//     height: 200px;
+// }
+
+@media only screen and (max-width: 768px){
+    .editor-container{
+        padding: 5px;  
+        margin-bottom: 64px;
+    }
 }
