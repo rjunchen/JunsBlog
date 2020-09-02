@@ -82,7 +82,6 @@ export class ProfileEditorComponent implements OnInit {
   }
   
   cropperReady() {
-    console.log('uploaded');
     this.uploading = false;
   }
 
