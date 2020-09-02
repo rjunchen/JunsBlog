@@ -5,6 +5,8 @@ import { ToastrService } from 'ngx-toastr';
 import { ArticleSearchPagingResult } from 'src/app/models/article/articleSearchPagingResult';
 import { ArticleSearchPagingOption } from 'src/app/models/article/articleSearchPagingOption';
 import { Subscription } from 'rxjs';
+import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from 'ngx-gallery-9';
+import { GalleryImage } from 'src/app/models/article/galleryImage';
 
 @Component({
   selector: 'app-articles-list',
@@ -25,6 +27,8 @@ export class ArticlesListComponent implements OnInit, OnDestroy {
   noSearchResult: boolean;
   searchSubscription: Subscription;
 
+  galleryOptions: NgxGalleryOptions[];
+
   constructor(private articleService: ArticleService, private toastr: ToastrService) { }
   ngOnDestroy(): void {
     this.searchSubscription.unsubscribe();  //Leave the page doesn't unsubscribe by default, need manually unsubscribe it
@@ -38,11 +42,13 @@ export class ArticlesListComponent implements OnInit, OnDestroy {
     if(this.loadOnInit){
       this.search(new ArticleSearchPagingOption());
     }
+     this.previewImageSetup();
   }
 
   search(option: ArticleSearchPagingOption){
     this.loading = true;
     this.articleService.searchArticle(option).subscribe(x=>{
+      
       this.articles = x.documents;
       this.articlePagingResult = x;
       this.loading = false;
@@ -76,6 +82,38 @@ export class ArticlesListComponent implements OnInit, OnDestroy {
         }
       )
     }
+  }
+
+  previewImageSetup(){
+    this.galleryOptions = [
+            {
+                // width: '900px',
+                height: '200px',
+                image: false,
+                thumbnailsMargin: 2,
+                thumbnailMargin: 2,
+                thumbnailsRemainingCount: true,
+                thumbnailsColumns: 3,
+                thumbnailsRows: 1, 
+                imageAnimation: NgxGalleryAnimation.Slide
+            },
+            // max-width 800
+            {
+                breakpoint: 768,
+                width: '100%',
+                height: '100px',
+                imagePercent: 80,
+                thumbnailsPercent: 20,
+                thumbnailsRows: 1, 
+                thumbnailsMargin: 2,
+                thumbnailMargin: 2
+            },
+            // max-width 400
+            {
+                breakpoint: 400,
+                preview: false
+            }
+        ];
   }
 
 }

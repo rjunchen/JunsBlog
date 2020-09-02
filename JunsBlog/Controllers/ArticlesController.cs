@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using JunsBlog.Entities;
+using JunsBlog.Helpers;
 using JunsBlog.Interfaces.Services;
 using JunsBlog.Models.Articles;
 using JunsBlog.Models.Enums;
@@ -38,9 +39,14 @@ namespace JunsBlog.Controllers
                 if (String.IsNullOrWhiteSpace(model.Title) || String.IsNullOrWhiteSpace(model.Content) || String.IsNullOrWhiteSpace(model.Abstract))
                     return BadRequest(new { message = "Incomplete article information" });
 
-                var article = await databaseService.SaveArticleAsync(new Article(model, currentUserId));
+                var newArticle = new Article(model, currentUserId); 
 
-                return Ok(article);
+                Utilities.MassageArticleImages(newArticle);
+
+     
+               var insertedArticle = await databaseService.SaveArticleAsync(newArticle);
+
+                return Ok(insertedArticle);
             }
             catch (Exception ex)
             {
