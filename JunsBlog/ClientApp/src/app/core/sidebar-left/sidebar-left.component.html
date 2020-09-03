@@ -1,0 +1,19 @@
+<mat-sidenav-container class="example-container">
+    <mat-sidenav #sidenav mode="side" [(opened)]="opened" class="example-sidenav"
+                [fixedInViewport]="true" [fixedTopGap]="gap"
+                [fixedBottomGap]="gap">
+    <p>side bar</p>
+    <p>side bar</p>
+    <p>side bar</p>
+    <p>side bar</p>
+    <p>side bar</p>
+    <p>side bar</p>
+    <button (click)="clicked()">Click</button>
+    </mat-sidenav>
+
+    <mat-sidenav-content >
+        <router-outlet></router-outlet>
+    </mat-sidenav-content>
+</mat-sidenav-container>
+
+  
