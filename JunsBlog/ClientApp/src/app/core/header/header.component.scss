@@ -1,3 +1,5 @@
+$color-warn: #f44336;
+
 .header{
     position: fixed;
     top: 0;
@@ -5,4 +7,44 @@
     right: 0;
     background-color: #ffffff;
     box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
+}
+
+.logo{
+    width: 40px;
+    height: 40px;
+}
+
+.spacer{
+    flex: 1 1 auto;
+}
+
+.app-title{
+    color: $color-warn;
+    font-size: 22px;
+    margin-left: 5px;
+}
+
+.link{
+    outline: none;
+    &:hover{
+        color: $color-warn;
+        cursor: pointer;
+    }
+}
+
+.action-button{
+    margin: 0px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .mat-icon {
+        font-size: 25px;
+        position: relative;
+    }
+    .icon-label{
+       font-size: 14px;
+       line-height: 20px;
+    }
 }

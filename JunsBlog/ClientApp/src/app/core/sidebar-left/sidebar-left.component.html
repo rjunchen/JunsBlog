@@ -1,14 +1,14 @@
-<mat-sidenav-container class="example-container">
-    <mat-sidenav #sidenav mode="side" [(opened)]="opened" class="example-sidenav"
-                [fixedInViewport]="true" [fixedTopGap]="gap"
-                [fixedBottomGap]="gap">
+<mat-sidenav-container class="sidebar-container">
+    <mat-sidenav #sidenav mode="side" [(opened)]="opened" class="sidenav"
+                [fixedInViewport]="true" [fixedTopGap]="0"
+                [fixedBottomGap]="0">
     <p>side bar</p>
     <p>side bar</p>
     <p>side bar</p>
     <p>side bar</p>
     <p>side bar</p>
     <p>side bar</p>
-    <button (click)="clicked()">Click</button>
+    <button (click)="toggleSidebar()">Click</button>
     </mat-sidenav>
 
     <mat-sidenav-content >
