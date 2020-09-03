@@ -10,7 +10,7 @@ import { User } from 'src/app/models/user';
 
 @Component({
   selector: 'app-profile',
-  templateUrl: './profile.component.html',
+  templateUrl: './profile.component.html', 
   styleUrls: ['./profile.component.scss']
 })
 export class ProfileComponent implements OnInit {
@@ -40,6 +40,7 @@ export class ProfileComponent implements OnInit {
         } else {
           this.toastr.error('Unknown error occurred, please try again later');
         }
+        this.logout();
       })
     });
 

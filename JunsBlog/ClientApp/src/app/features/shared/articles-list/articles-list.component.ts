@@ -6,7 +6,6 @@ import { ArticleSearchPagingResult } from 'src/app/models/article/articleSearchP
 import { ArticleSearchPagingOption } from 'src/app/models/article/articleSearchPagingOption';
 import { Subscription } from 'rxjs';
 import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from 'ngx-gallery-9';
-import { GalleryImage } from 'src/app/models/article/galleryImage';
 
 @Component({
   selector: 'app-articles-list',
