@@ -1,6 +1,6 @@
 <div class="registration-container" fxLayoutAlign="center">
     <form class="registration-form" fxLayout="column" [formGroup]="regForm" (ngSubmit)="onSubmit()">
-        <span class="reg-form-title">User Registration</span>
+        <span class="title">User Registration</span>
         <mat-form-field appearance="outline">
             <mat-label>Email</mat-label>
             <input matInput placeholder="Enter your email" id="email" type="email" formControlName="email"/>
@@ -45,8 +45,8 @@
             </mat-error > 
         </mat-form-field>
         <button [ngClass]="{'margin-top-15px': isInvalid(registerFormControl.confirmPassword)}" mat-raised-button color="warn" type="submit" [disabled]="regForm.invalid">Register!</button>
-        <div class="overlay" *ngIf="inProcess">
+        <div class="overlay" fxLayoutAlign="center center">
             <mat-spinner color="warn"></mat-spinner>
-          </div>
+        </div>
     </form>
 </div>

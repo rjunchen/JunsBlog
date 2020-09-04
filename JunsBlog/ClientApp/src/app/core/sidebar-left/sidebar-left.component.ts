@@ -9,7 +9,7 @@ import { Subscription } from 'rxjs';
 })
 export class SidebarLeftComponent implements OnInit, OnDestroy {
 
-  opened: boolean = true;
+  opened: boolean;
   sidebarToggleSub: Subscription;
 
   constructor(private eventService: EventService) { }

@@ -8,15 +8,16 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
 import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { FlexLayoutModule } from '@angular/flex-layout';
 
 @NgModule({
   declarations: [  ],
   imports: [
     CommonModule, MatButtonModule, MatCheckboxModule, FormsModule, ReactiveFormsModule, MatIconModule,
-    MatInputModule, FlexLayoutModule
+    MatInputModule, FlexLayoutModule, MatProgressSpinnerModule
   ],
   exports:[ MatButtonModule, MatCheckboxModule, FormsModule , ReactiveFormsModule, MatIconModule,
-    MatInputModule, MatFormFieldModule, FlexLayoutModule ]
+    MatInputModule, MatFormFieldModule, FlexLayoutModule, MatProgressSpinnerModule ]
 })
 export class SharedMaterialModule { }

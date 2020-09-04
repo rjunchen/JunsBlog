@@ -38,7 +38,6 @@ export class RegisterComponent implements OnInit {
   }
 
   get registerFormControl() {
-    console.log(this.regForm.controls);
     return this.regForm.controls;
   }
 

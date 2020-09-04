@@ -6,13 +6,25 @@ $color-warn: #f44336;
     background-color: white;
     box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
     padding: 30px;
+
+    position: relative;
+    .overlay{
+        position: absolute;
+        background-color: black;
+        opacity: 0.5;
+        height: 100%;
+        width: 100%;
+        top: 0px;
+        left: 0px;
+    }
+
+    .title{
+        color: $color-warn;
+        font-size: x-large;
+        margin-bottom: 20px; 
+    }
 }
 
-.reg-form-title{
-    color: $color-warn;
-    font-size: x-large;
-    margin-bottom: 20px; 
-}
 
 .link{
     outline: none;
