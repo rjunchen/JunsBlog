@@ -1,0 +1,33 @@
+$color-warn: #f44336;
+
+.registration-form{
+    width: 300px;
+    margin-top: 100px;
+    background-color: white;
+    box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+}
+
+.reg-form-title{
+    color: $color-warn;
+    font-size: x-large;
+    margin-bottom: 20px; 
+}
+
+.link{
+    outline: none;
+    &:hover{
+        color: $color-warn;
+        cursor: pointer;
+    }
+}
+
+.margin-top-15px{
+    margin-top: 15px !important;
+}
+
+.validation-error-message{
+    padding: 0 1em;
+    font-size: 10.5px;
+    font: color-warn;
+}

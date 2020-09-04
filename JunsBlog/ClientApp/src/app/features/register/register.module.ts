@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 
 import { RegisterRoutingModule } from './register-routing.module';
 import { RegisterComponent } from './register.component';
-
+import { SharedMaterialModule } from 'src/app/core/shared-material.module';
 
 @NgModule({
   declarations: [RegisterComponent],
   imports: [
     CommonModule,
-    RegisterRoutingModule
+    RegisterRoutingModule, SharedMaterialModule
   ]
 })
 export class RegisterModule { }

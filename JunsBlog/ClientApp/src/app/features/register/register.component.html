@@ -1,1 +1,52 @@
-<p>register works!</p>
+<div class="registration-container" fxLayoutAlign="center">
+    <form class="registration-form" fxLayout="column" [formGroup]="regForm" (ngSubmit)="onSubmit()">
+        <span class="reg-form-title">User Registration</span>
+        <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput placeholder="Enter your email" id="email" type="email" formControlName="email"/>
+            <mat-icon matSuffix>email</mat-icon>   
+            <mat-error class="validation-message" *ngIf="registerFormControl.email.hasError('required')">
+                Email is required
+            </mat-error > 
+            <mat-error  class="validation-message" *ngIf="registerFormControl.email.hasError('invalidPattern')">
+                Email is invalid
+            </mat-error >  
+        </mat-form-field>   
+        <mat-form-field [ngClass]="{'margin-top-15px': isInvalid(registerFormControl.email)}" appearance="outline">
+            <mat-label>Full Name</mat-label>
+            <input matInput placeholder="Enter your full name" formControlName="name"/>
+            <mat-icon matSuffix>account_box</mat-icon>
+            <mat-error class="validation-message" *ngIf="registerFormControl.name.hasError('required')">
+                Name is required
+            </mat-error > 
+        </mat-form-field>
+        <mat-form-field  [ngClass]="{'margin-top-15px': isInvalid(registerFormControl.name)}" appearance="outline" >
+            <mat-label>Password</mat-label>
+            <input matInput placeholder="Enter your password" formControlName="password" [type]="hidePassword ? 'password' : 'text'"/>
+            <mat-icon class="link" (click)="hidePassword = !hidePassword" matSuffix>{{ hidePassword ? "visibility" : "visibility_off" }}</mat-icon>
+            <mat-error class="validation-message" *ngIf="registerFormControl.password.hasError('required')">
+                Password is required
+            </mat-error > 
+        </mat-form-field>
+
+        <mat-error class="validation-error-message" *ngIf="registerFormControl.password.hasError('minlength')">* Password at least 8 characters in length</mat-error>
+        <mat-error class="validation-error-message" *ngIf="registerFormControl.password.hasError('hasUppercasePattern')">* Password must contains uppercase letter</mat-error>
+        <mat-error class="validation-error-message" *ngIf="registerFormControl.password.hasError('hasNumberPattern')">* Password must contains number</mat-error>
+
+        <mat-form-field  [ngClass]="{'margin-top-15px': isInvalid(registerFormControl.password)}" appearance="outline" >
+            <mat-label>Confirm Password</mat-label>
+            <input matInput placeholder="Re-enter your password" formControlName="confirmPassword" [type]="hideConfirmPassword ? 'password' : 'text'"/>
+            <mat-icon class="link" (click)="hideConfirmPassword = !hideConfirmPassword" matSuffix>{{ hideConfirmPassword ? "visibility" : "visibility_off" }}</mat-icon>
+            <mat-error class="validation-message" *ngIf="registerFormControl.confirmPassword.hasError('required')">
+                Password confirmation is required
+            </mat-error > 
+            <mat-error class="validation-message" *ngIf="registerFormControl.confirmPassword.hasError('passwordMismatch')">
+                Password does not match
+            </mat-error > 
+        </mat-form-field>
+        <button [ngClass]="{'margin-top-15px': isInvalid(registerFormControl.confirmPassword)}" mat-raised-button color="warn" type="submit" [disabled]="regForm.invalid">Register!</button>
+        <div class="overlay" *ngIf="inProcess">
+            <mat-spinner color="warn"></mat-spinner>
+          </div>
+    </form>
+</div>
