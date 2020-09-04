@@ -48,7 +48,7 @@ export class RegisterComponent implements OnInit {
 
   onSubmit(){
     this.inProcess = true;
-    this.auth.register(this.regForm.value).subscribe( res =>{
+    this.auth.register(this.regForm.value.email, this.regForm.value.password, this.regForm.value.name).subscribe( () =>{
       this.inProcess = false;
         this.router.navigateByUrl("/");
     }, err => {

@@ -104,22 +104,12 @@ namespace JunsBlog.Controllers
 
                 var googleUser = await databaseService.GetUserByEmailAsync(userInfo.Email);
 
-                UserToken userToken;
-
                 if(googleUser == null)
                 {
                     googleUser = await databaseService.SaveUserAsync(new User(userInfo));
-
-                    userToken = new UserToken(googleUser.Id);
-
-                    userToken = await databaseService.SaveUserTokenAsync(userToken);
                 }
-                else
-                {
-                    userToken = await databaseService.GetUserTokenAsync(googleUser.Id);
-                }
-
-                var response = new AuthenticateResponse(googleUser, jwtTokenHelper.GenerateJwtToken(googleUser), userToken.RefreshToken);
+    
+                var response = new AuthenticateResponse(googleUser, jwtTokenHelper.GenerateJwtToken(googleUser));
 
                 var baseUrl = $"{httpContextAccessor.HttpContext.Request.Scheme}://{httpContextAccessor.HttpContext.Request.Host.Value}";
 
@@ -170,9 +160,7 @@ namespace JunsBlog.Controllers
 
                 var user = await databaseService.GetUserAsync(claim.Value);
 
-                var userToken = await databaseService.GetUserTokenAsync(user.Id);
-
-                var response = new AuthenticateResponse(user, jwtTokenHelper.GenerateJwtToken(user), userToken.RefreshToken);
+                var response = new AuthenticateResponse(user, jwtTokenHelper.GenerateJwtToken(user));
 
                 return Ok(response);
             }

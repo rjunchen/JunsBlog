@@ -21,6 +21,11 @@ namespace JunsBlog.Entities
         public string Image { get; set; }
         [JsonIgnore]
         public string Password { get; set; }
+        [JsonIgnore]
+        public ResetToken ResetToken { get; set; }
+        [JsonIgnore]
+        [BsonRequired]
+        public RefreshToken RefreshToken { get; set; }
 
         public User(RegisterRequest model)
         {
@@ -29,6 +34,7 @@ namespace JunsBlog.Entities
             Role = Entities.Role.User;
             Password = Utilities.HashPassword(model.Password);
             Type = AccountType.Local;
+            RefreshToken = new RefreshToken();
         }
 
         public User(SocialUserAbstract model)
@@ -39,6 +45,7 @@ namespace JunsBlog.Entities
             Password = null;
             Type = model.Type;
             Image = model.Image;
+            RefreshToken = new RefreshToken();
         }
 
         public void UpdateUserInfo(UserInfoUpdateRequest info)
@@ -46,6 +53,16 @@ namespace JunsBlog.Entities
             this.Name = info.Name;
             this.Email = info.Email;
             this.Image = info.Image;
+        }
+
+        public void UpdatePassword(string password)
+        {
+           Password = Utilities.HashPassword(password);
+        }
+
+        public void RenewResetToken()
+        {
+            ResetToken = new ResetToken();
         }
     }
 }

@@ -20,7 +20,6 @@ namespace JunsBlog.Models.Services
     {
         private readonly IMongoCollection<User> users;
         private readonly IMongoCollection<Article> articles;
-        private readonly IMongoCollection<UserToken> userTokens;
         private readonly IMongoCollection<ArticleRanking> articleRankings;
         private readonly IMongoCollection<CommentRanking> commentRankings;
         private readonly IMongoCollection<Comment> comments;
@@ -30,7 +29,6 @@ namespace JunsBlog.Models.Services
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);
             users = database.GetCollection<User>(settings.UsersCollectionName);
-            userTokens = database.GetCollection<UserToken>(settings.UserTokensCollectionName);
             articles = database.GetCollection<Article>(settings.ArticleCollectionName);
             articleRankings = database.GetCollection<ArticleRanking>(settings.RankingCollectionName);
             comments = database.GetCollection<Comment>(settings.CommentCollectionName);
@@ -55,22 +53,6 @@ namespace JunsBlog.Models.Services
             user.UpdatedOn = DateTime.UtcNow;
             await users.ReplaceOneAsync(s => s.Id == user.Id, user, new ReplaceOptions { IsUpsert = true });
             return user;
-        }
-        #endregion
-
-
-        #region UserTokens
-        public async Task<UserToken> GetUserTokenAsync(string userId)
-        {
-            var userToken = await userTokens.Find<UserToken>(x => x.UserId == userId).SingleOrDefaultAsync();
-            return userToken;
-        }
-
-        public async Task<UserToken> SaveUserTokenAsync(UserToken userToken)
-        {
-            userToken.UpdatedOn = DateTime.UtcNow;
-            await userTokens.ReplaceOneAsync(s => s.Id == userToken.Id, userToken, new ReplaceOptions { IsUpsert = true });
-            return userToken;
         }
         #endregion
 

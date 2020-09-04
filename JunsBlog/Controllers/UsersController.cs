@@ -51,9 +51,7 @@ namespace JunsBlog.Controllers
 
                 if (!Utilities.ValidatePassword(model.Password, user.Password)) return BadRequest(new { message = "Incorrect password" });
 
-                var userToken = await databaseService.GetUserTokenAsync(user.Id);
-
-                var response = new AuthenticateResponse(user, jwtTokenHelper.GenerateJwtToken(user), userToken.RefreshToken);
+                var response = new AuthenticateResponse(user, jwtTokenHelper.GenerateJwtToken(user));
 
                 return Ok(response);
             }
@@ -64,7 +62,7 @@ namespace JunsBlog.Controllers
             }      
         }
 
-        [HttpPost("register")]
+        [HttpPost("register")]  
         public async Task<IActionResult> Register(RegisterRequest model)
         {
             try
@@ -79,9 +77,7 @@ namespace JunsBlog.Controllers
                 var insertedUser = await databaseService.SaveUserAsync(new User(model));
                 if (insertedUser == null) return BadRequest(new { message = "Failed to register user" });
 
-                var insertedUserToken = await databaseService.SaveUserTokenAsync(new UserToken(insertedUser.Id));
-
-                var response = new AuthenticateResponse(insertedUser, jwtTokenHelper.GenerateJwtToken(insertedUser), insertedUserToken.RefreshToken);
+                var response = new AuthenticateResponse(insertedUser, jwtTokenHelper.GenerateJwtToken(insertedUser));
 
                 notificationService.SendNotification(Notification.GenerateWelcomeNotification(insertedUser));
 
@@ -137,12 +133,10 @@ namespace JunsBlog.Controllers
 
                 if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "User not found");
 
-                var userToken = await databaseService.GetUserTokenAsync(user.Id);
-
-                if(model.ResetToken != userToken.ResetToken || userToken.ResetExpiry < DateTime.UtcNow) 
+                if(model.ResetToken != user.ResetToken.Token || user.ResetToken.Expiry < DateTime.UtcNow) 
                     return StatusCode(StatusCodes.Status400BadRequest, "Invalid or expired reset token");
 
-                user.Password = Utilities.HashPassword(model.Password);
+                user.UpdatePassword(model.Password);
 
                 await databaseService.SaveUserAsync(user);
 
@@ -166,14 +160,12 @@ namespace JunsBlog.Controllers
 
                 if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "Invalid or expired reset token");
 
-                var userToken = await databaseService.GetUserTokenAsync(user.Id);
+                user.RenewResetToken();
 
-                userToken.CreateResetToken();
-
-                var updatedUserToken = await databaseService.SaveUserTokenAsync(userToken);
+                var updatedUserToken = await databaseService.SaveUserAsync(user);
 
                 // Send the password reset email
-                notificationService.SendNotification(Notification.GeneratePasswordResetNotification(user, updatedUserToken));
+                notificationService.SendNotification(Notification.GeneratePasswordResetNotification(user));
                 return Ok();
             }
             catch (Exception ex)
@@ -195,9 +187,7 @@ namespace JunsBlog.Controllers
 
                 if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "User not found");
 
-                var userToken = await databaseService.GetUserTokenAsync(user.Id);
-
-                if(userToken.ResetToken == token && userToken.ResetExpiry > DateTime.UtcNow)
+                if(user.ResetToken.Token == token && user.ResetToken.Expiry > DateTime.UtcNow)
                     return Ok();
                 else
                     return StatusCode(StatusCodes.Status400BadRequest, "Invalid reset token");

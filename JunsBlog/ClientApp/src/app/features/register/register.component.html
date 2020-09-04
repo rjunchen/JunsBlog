@@ -45,7 +45,7 @@
             </mat-error > 
         </mat-form-field>
         <button [ngClass]="{'margin-top-15px': isInvalid(registerFormControl.confirmPassword)}" mat-raised-button color="warn" type="submit" [disabled]="regForm.invalid">Register!</button>
-        <div class="overlay" fxLayoutAlign="center center">
+        <div class="overlay" fxLayoutAlign="center center" *ngIf="inProcess">
             <mat-spinner color="warn"></mat-spinner>
         </div>
     </form>

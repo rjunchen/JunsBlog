@@ -10,4 +10,7 @@
       <mat-icon>how_to_reg</mat-icon>
       <span class="icon-label">Register</span>
     </div>
+    <div class="user-info" *ngIf="currentUser" fxLayout="row" fxLayoutAlign="space-between center">
+        <img class="profile-image"  [src]="currentUser.image"/>
+    </div>
 </mat-toolbar>

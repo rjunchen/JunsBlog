@@ -20,14 +20,14 @@ namespace JunsBlog.Models.Notifications
             };
         }
 
-        public static Notification GeneratePasswordResetNotification(User user, UserToken userToken)
+        public static Notification GeneratePasswordResetNotification(User user)
         {
             return new Notification()
             {
                 ReceiverName = user.Name,
                 ReceiverEmail = user.Email,
                 Subject = "Password Reset for Juns Blog",
-                Message = $"Please use the following reset token to complete to password reset process.  Reset Token: {userToken.ResetToken}"
+                Message = $"Please use the following reset token to complete to password reset process.  Reset Token: {user.ResetToken.Token}"
             };
         }
     }

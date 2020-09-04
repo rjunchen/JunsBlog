@@ -18,12 +18,6 @@ namespace JunsBlog.Interfaces.Services
         Task<User> GetUserAsync(string userId);
         Task<User> GetUserByEmailAsync(string email);
 
-
-        // UserTokens
-        Task<UserToken> GetUserTokenAsync(string userId);
-        Task<UserToken> SaveUserTokenAsync(UserToken userToken);
-
-
         // Articles
         Task<Article> SaveArticleAsync(Article article);
         Task<Article> GetArticleAsync(string articleId);
