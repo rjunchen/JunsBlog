@@ -30,29 +30,6 @@ namespace JunsBlog.Controllers
             this.currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
 
-        [Authorize(Roles = Role.User)]
-        [HttpPost("create")]
-        public async Task<IActionResult> CreateArticle(ArticleRequest model)
-        {
-            try
-            {
-                if (String.IsNullOrWhiteSpace(model.Title) || String.IsNullOrWhiteSpace(model.Content) || String.IsNullOrWhiteSpace(model.Abstract))
-                    return BadRequest(new { message = "Incomplete article information" });
-
-                var newArticle = new Article(model, currentUserId); 
-
-                Utilities.MassageArticleImages(newArticle);
-  
-               var insertedArticle = await databaseService.SaveArticleAsync(newArticle);
-
-                return Ok(insertedArticle);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
 
         [HttpGet("get")]
         public async Task<IActionResult> GetArticle(string articleId)
@@ -75,23 +52,34 @@ namespace JunsBlog.Controllers
             }
         }
 
-
-        [HttpPost("update")]
-        public async Task<IActionResult> UpdateArticle(ArticleRequest article)
+        [Authorize(Roles = Role.User)]
+        [HttpPost("save")]
+        public async Task<IActionResult> SaveArticle(ArticleRequest aricleModel)
         {
             try
             {
-                if (article == null || String.IsNullOrWhiteSpace(article.Id) || String.IsNullOrWhiteSpace(article.Title) 
-                    || String.IsNullOrWhiteSpace(article.Abstract) || String.IsNullOrWhiteSpace(article.Content))
+                if (aricleModel == null || String.IsNullOrWhiteSpace(aricleModel.Title) 
+                    || String.IsNullOrWhiteSpace(aricleModel.Abstract) || String.IsNullOrWhiteSpace(aricleModel.Content))
                     return BadRequest(new { message = "Invalid article" });
 
-                var existingArticle = await databaseService.GetArticleAsync(article.Id);
+                Article article;
 
-                existingArticle.UpdateContents(article);
+                // If the article model doesn't have an id then create a new article otherwise update the article
+                if (String.IsNullOrWhiteSpace(aricleModel.Id))
+                {
+                    article = new Article(aricleModel, currentUserId);
+                }
+                else
+                {
+                    article = await databaseService.GetArticleAsync(aricleModel.Id);
+                    article.UpdateContents(aricleModel);
+                }
 
-                var updatedArticle = await databaseService.SaveArticleAsync(existingArticle);
+                Utilities.MassageArticleImages(article);
 
-                return Ok(updatedArticle);
+                await databaseService.SaveArticleAsync(article);
+
+                return Ok(article);
             }
             catch (Exception ex)
             {

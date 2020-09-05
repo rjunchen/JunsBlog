@@ -3,6 +3,7 @@ import { FormGroup, Validators, AbstractControl, FormBuilder } from '@angular/fo
 import { Router } from '@angular/router';
 import { AuthenticationService } from './../../services/authentication.service'
 import { CustomValidationService } from './../../services/custom-validation.service'
+import { AlertService } from 'src/app/services/alert.service';
 
 @Component({
   selector: 'app-register',
@@ -19,7 +20,7 @@ export class RegisterComponent implements OnInit {
   inProcess: boolean;
 
   constructor(private auth: AuthenticationService, private router: Router, private fb: FormBuilder,
-    private customValidator: CustomValidationService) { 
+    private customValidator: CustomValidationService, private alertService: AlertService) { 
     this.createForm();
   }
 
@@ -53,7 +54,7 @@ export class RegisterComponent implements OnInit {
         this.router.navigateByUrl("/");
     }, err => {
       this.inProcess = false;
-
+      this.alertService.alertHttpError(err);
     })
   }
 

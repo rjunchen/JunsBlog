@@ -3,6 +3,7 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 import { ActivatedRoute } from '@angular/router';
 import { User } from 'src/app/models/authentication/user';
 import { Profile } from 'src/app/models/authentication/profile';
+import { AlertService } from 'src/app/services/alert.service';
 
 @Component({
   selector: 'app-profile',
@@ -15,7 +16,7 @@ export class ProfileComponent implements OnInit {
   showEditor: boolean;
   currentUser: User;
   
-  constructor(private auth: AuthenticationService, private route: ActivatedRoute) { }
+  constructor(private auth: AuthenticationService, private route: ActivatedRoute, private alertService: AlertService) { }
 
   ngOnInit(): void {
 
@@ -27,6 +28,7 @@ export class ProfileComponent implements OnInit {
         this.profile = data;
       }, err=>{
         this.logout();
+        this.alertService.alertHttpError(err);
       })
      });
   }

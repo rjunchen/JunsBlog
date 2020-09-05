@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/fo
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { Router } from '@angular/router';
 import { CustomValidationService } from 'src/app/services/custom-validation.service';
+import { AlertService } from 'src/app/services/alert.service';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +18,8 @@ export class LoginComponent implements OnInit {
   inProcess: boolean;
 
   constructor(private auth: AuthenticationService, private router: Router, 
-    private fb: FormBuilder, private customValidator: CustomValidationService) { this.createForm() }
+    private fb: FormBuilder, private customValidator: CustomValidationService,
+    private alertService: AlertService) { this.createForm() }
 
   createForm() {
     this.loginForm = this.fb.group({
@@ -52,7 +54,7 @@ export class LoginComponent implements OnInit {
       },
       (err) => {
         this.inProcess = false;
-        
+        this.alertService.alertHttpError(err);
       }
     );
   }

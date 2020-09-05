@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ArticleDetails } from 'src/app/models/article/articleDetails';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ArticleService } from 'src/app/services/article.service';
 import { mergeMap } from 'rxjs/operators';
+import { AlertService } from 'src/app/services/alert.service';
 
 @Component({
   selector: 'app-article-viewer',
@@ -15,7 +16,8 @@ export class ArticleViewerComponent implements OnInit {
   isProcessing: boolean;
   loading: boolean;
   
-  constructor(private route: ActivatedRoute,  private articleService: ArticleService) { }
+  constructor(private route: ActivatedRoute,  private articleService: ArticleService, private alertService: AlertService,
+    private router: Router) { }
 
   ngOnInit(): void {
     this.loading = true;
@@ -27,13 +29,13 @@ export class ArticleViewerComponent implements OnInit {
       },
       err => {
         this.loading = false;
-        // if (err.status === 400) {     
-        //   this.toastr.warning(err.error.message, err.statusText);
-        // } else {
-        //   this.toastr.error('Unknown error occurred, please try again later');
-        // }
+        this.alertService.alertHttpError(err);
       }
     )
+  }
+
+  edit(){
+    this.router.navigateByUrl(`/editor/${this.article.id}`);
   }
 
 }

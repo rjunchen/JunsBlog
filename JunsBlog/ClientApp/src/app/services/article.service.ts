@@ -12,14 +12,14 @@ export class ArticleService {
  
   constructor(private http: HttpClient) { }
 
-  public createArticle(article: Article): Observable<ArticleDetails>{
-    return this.http.post('/api/article/create', article).pipe(map(data => { return <ArticleDetails>data}));
+  public saveArticle(article: Article): Observable<Article>{
+    return this.http.post('/api/article/save', article).pipe(map(data => { return <Article>data}));
   }
 
-  public UpdateArticle(article: Article): Observable<Article>{
-    return this.http.post('/api/article/update', article).pipe(map(data => { return <Article>data}));
+  public getArticle(articleId: string): Observable<Article>{
+    return this.http.get(`/api/article/get?articleId=${articleId}`).pipe(map(data => { return <Article>data}));
   }
-  
+
   getArticleDetails(articleId: string): Observable<ArticleDetails> {
     return this.http.get(`/api/article/details/get?articleId=${articleId}`).pipe(map(data => { return <ArticleDetails>data}));
   }

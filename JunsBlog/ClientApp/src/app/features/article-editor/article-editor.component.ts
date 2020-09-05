@@ -7,6 +7,7 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
 
 import Quill from 'quill'
 import ImageResize from 'quill-image-resize-module'
+import { AlertService } from 'src/app/services/alert.service';
 Quill.register('modules/imageResize', ImageResize)
 
 export interface Category {
@@ -31,7 +32,8 @@ export class ArticleEditorComponent implements OnInit {
   updateMode = false;
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
 
-  constructor(private articleService: ArticleService, private router: Router, private route: ActivatedRoute) {
+  constructor(private articleService: ArticleService, private router: Router, private route: ActivatedRoute,
+    private alertService: AlertService) {
     this.modules = {
       imageResize: {},
       toolbar: [
@@ -48,17 +50,13 @@ export class ArticleEditorComponent implements OnInit {
     this.route.paramMap.subscribe(x=>{
       var articleId = x.get("id")
       if(articleId){
-        // // Update mode
-        // this.updateMode = true;
-        // this.articleService.getArticle(articleId).subscribe( ar=> {
-        //   this.article = ar;
-        // }, err=>{
-        //   // if (err.status === 400) {     
-        //   //   this.toastr.warning(err.error.message, err.statusText);
-        //   // } else {
-        //   //   this.toastr.error('Unknown error occurred, please try again later');
-        //   // }
-        // })
+        // Update mode
+        this.updateMode = true;
+        this.articleService.getArticle(articleId).subscribe( data=> {
+          this.article = data;
+        }, err=>{
+          this.alertService.alertHttpError(err);
+        })
       }else{
         // create mode
         this.article = new Article();
@@ -71,27 +69,11 @@ export class ArticleEditorComponent implements OnInit {
   }
 
   summit(){
-    if(this.updateMode){
-      this.articleService.UpdateArticle(this.article).subscribe( x=>{
-        this.router.navigateByUrl(`/article/${x.id}`);
-      }, err=>{
-        // if (err.status === 400) {     
-        //   this.toastr.warning(err.error.message, err.statusText);
-        // } else {
-        //   this.toastr.error('Unknown error occurred, please try again later');
-        // }
-      })
-    }else{
-      this.articleService.createArticle(this.article).subscribe( x=>{
-        this.router.navigateByUrl(`/article/${x.id}`);
-      }, err=>{
-        // if (err.status === 400) {     
-        //   this.toastr.warning(err.error.message, err.statusText);
-        // } else {
-        //   this.toastr.error('Unknown error occurred, please try again later');
-        // }
-      })
-    }
+    this.articleService.saveArticle(this.article).subscribe( x=>{
+      this.router.navigateByUrl(`/article/${x.id}`);
+    }, err=>{
+       this.alertService.alertHttpError(err);
+    })
   }
 
   add(event: MatChipInputEvent): void {
