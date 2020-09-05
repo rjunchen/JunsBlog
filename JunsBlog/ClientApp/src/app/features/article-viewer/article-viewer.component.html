@@ -13,7 +13,7 @@
                     <mat-icon class="view-icon">visibility</mat-icon>
                     <span>{{article.views}}</span>
                     <span>{{article.updatedOn | date:'short'}}</span>
-                    <button mat-icon-button (click)="edit()">
+                    <button *ngIf="article.author.id == currentUser?.id" mat-icon-button (click)="edit()">
                         <mat-icon>edit</mat-icon>Edit
                     </button>
                 </div>

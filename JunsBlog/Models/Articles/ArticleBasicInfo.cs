@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace JunsBlog.Models.Articles
 {
-    public class ArticleRequest
+    public class ArticleBasicInfo
     {
         public string Id { get; set; }
         public string Title { get; set; }

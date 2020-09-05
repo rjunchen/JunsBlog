@@ -68,6 +68,20 @@ namespace JunsBlog.Models.Services
         {
             return await articles.Find(s => s.Id == articleId).SingleOrDefaultAsync();
         }
+
+        public async Task<ArticleBasicInfo> GetArticleBasicInfoAsync(string articleId)
+        {
+            return await articles.Find(s => s.Id == articleId).Project(x => new ArticleBasicInfo()
+            {
+                Id = x.Id,
+                Title = x.Title,
+                Abstract = x.Abstract,
+                Categories = x.Categories,
+                Content = x.Content,
+                IsPrivate = x.IsPrivate
+            }).SingleOrDefaultAsync();
+        }
+
         #endregion
 
 

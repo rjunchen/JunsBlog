@@ -12,8 +12,8 @@ export class ArticleService {
  
   constructor(private http: HttpClient) { }
 
-  public saveArticle(article: Article): Observable<Article>{
-    return this.http.post('/api/article/save', article).pipe(map(data => { return <Article>data}));
+  public saveArticle(article: Article): Observable<string>{
+    return this.http.post('/api/article/save', article, {responseType: 'text'}).pipe(map(id => { return <string>id}));
   }
 
   public getArticle(articleId: string): Observable<Article>{

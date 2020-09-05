@@ -32,14 +32,14 @@ namespace JunsBlog.Controllers
 
 
         [HttpGet("get")]
-        public async Task<IActionResult> GetArticle(string articleId)
+        public async Task<IActionResult> GetArticleBasicInfo(string articleId)
         {
             try
             {
                 if (String.IsNullOrWhiteSpace(articleId))
                     return BadRequest(new { message = "Invalid articleId" });
 
-                var article = await databaseService.GetArticleAsync(articleId);
+                var article = await databaseService.GetArticleBasicInfoAsync(articleId);
 
                 if (article == null) return BadRequest(new { message = "Article does not exist" });
 
@@ -54,7 +54,7 @@ namespace JunsBlog.Controllers
 
         [Authorize(Roles = Role.User)]
         [HttpPost("save")]
-        public async Task<IActionResult> SaveArticle(ArticleRequest aricleModel)
+        public async Task<IActionResult> SaveArticle(ArticleBasicInfo aricleModel)
         {
             try
             {
@@ -79,7 +79,7 @@ namespace JunsBlog.Controllers
 
                 await databaseService.SaveArticleAsync(article);
 
-                return Ok(article);
+                return Ok(article.Id);
             }
             catch (Exception ex)
             {

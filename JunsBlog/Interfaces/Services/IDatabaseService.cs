@@ -21,6 +21,7 @@ namespace JunsBlog.Interfaces.Services
         // Articles
         Task<Article> SaveArticleAsync(Article article);
         Task<Article> GetArticleAsync(string articleId);
+        Task<ArticleBasicInfo> GetArticleBasicInfoAsync(string articleId);
 
         // ArticleRanking
         Task<ArticleRanking> SaveArticleRankingAsync(ArticleRanking ranking);
