@@ -24,7 +24,6 @@ export class ProfileComponent implements OnInit {
     this.route.paramMap.subscribe(x=>{
       const profilerId = x.get("id")
       this.auth.getProfile(profilerId).subscribe(data=>{
-        console.log(data);
         this.profile = data;
       }, err=>{
         this.logout();

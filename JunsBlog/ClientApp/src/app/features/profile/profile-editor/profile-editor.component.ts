@@ -3,6 +3,7 @@ import { User } from 'src/app/models/authentication/user';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { ImageCroppedEvent } from 'ngx-image-cropper';
 import { AuthenticationService } from 'src/app/services/authentication.service';
+import { CustomValidationService } from 'src/app/services/custom-validation.service';
 
 @Component({
   selector: 'app-profile-editor',
@@ -20,7 +21,7 @@ export class ProfileEditorComponent implements OnInit {
   uploading: boolean;
   isAvatarDirty: boolean;
 
-  constructor(private auth: AuthenticationService,  private fb: FormBuilder) {}
+  constructor(private auth: AuthenticationService,  private fb: FormBuilder, private customValidator: CustomValidationService) {}
 
   ngOnInit(): void {
     this.createForm();
@@ -30,8 +31,17 @@ export class ProfileEditorComponent implements OnInit {
   createForm() {
     this.userForm = this.fb.group({
       displayName: [this.user.name, Validators.required],
-      email: [this.user.email, Validators.compose([Validators.required, Validators.email])]
+      email: [this.user.email, Validators.compose([Validators.required, this.customValidator.emailPatternValidator()])]
     })
+  }
+
+  get userFormControl() {
+    return this.userForm.controls;
+  }
+
+  isInvalid(control: AbstractControl){
+    if(!control) return false;
+    if(control.invalid && control.dirty) return true;
   }
 
   onSave(){

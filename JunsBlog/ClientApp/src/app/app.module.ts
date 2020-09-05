@@ -7,6 +7,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { CoreModule } from './core/core.module'
 import { InterceptorService } from './services/interceptor.service'
+import { QuillModule } from 'ngx-quill';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,7 @@ import { InterceptorService } from './services/interceptor.service'
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    CoreModule, HttpClientModule
+    CoreModule, HttpClientModule,  QuillModule.forRoot()
   ],
   providers: [
     {

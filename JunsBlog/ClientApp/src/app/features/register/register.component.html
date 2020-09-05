@@ -3,7 +3,7 @@
         <span class="title">User Registration</span>
         <mat-form-field appearance="outline">
             <mat-label>Email</mat-label>
-            <input matInput placeholder="Enter your email" id="email" type="email" formControlName="email"/>
+            <input matInput placeholder="Enter your email" autocomplete="off" id="email" type="email" formControlName="email"/>
             <mat-icon matSuffix>email</mat-icon>   
             <mat-error class="validation-message" *ngIf="registerFormControl.email.hasError('required')">
                 Email is required
@@ -14,7 +14,7 @@
         </mat-form-field>   
         <mat-form-field [ngClass]="{'margin-top-15px': isInvalid(registerFormControl.email)}" appearance="outline">
             <mat-label>Full Name</mat-label>
-            <input matInput placeholder="Enter your full name" formControlName="name"/>
+            <input matInput placeholder="Enter your full name" autocomplete="off" formControlName="name"/>
             <mat-icon matSuffix>account_box</mat-icon>
             <mat-error class="validation-message" *ngIf="registerFormControl.name.hasError('required')">
                 Name is required
@@ -22,7 +22,7 @@
         </mat-form-field>
         <mat-form-field  [ngClass]="{'margin-top-15px': isInvalid(registerFormControl.name)}" appearance="outline" >
             <mat-label>Password</mat-label>
-            <input matInput placeholder="Enter your password" formControlName="password" [type]="hidePassword ? 'password' : 'text'"/>
+            <input matInput placeholder="Enter your password" autocomplete="off" formControlName="password" [type]="hidePassword ? 'password' : 'text'"/>
             <mat-icon class="link" (click)="hidePassword = !hidePassword" matSuffix>{{ hidePassword ? "visibility" : "visibility_off" }}</mat-icon>
             <mat-error class="validation-message" *ngIf="registerFormControl.password.hasError('required')">
                 Password is required
@@ -35,7 +35,7 @@
 
         <mat-form-field  [ngClass]="{'margin-top-15px': isInvalid(registerFormControl.password)}" appearance="outline" >
             <mat-label>Confirm Password</mat-label>
-            <input matInput placeholder="Re-enter your password" formControlName="confirmPassword" [type]="hideConfirmPassword ? 'password' : 'text'"/>
+            <input matInput placeholder="Re-enter your password" autocomplete="off" formControlName="confirmPassword" [type]="hideConfirmPassword ? 'password' : 'text'"/>
             <mat-icon class="link" (click)="hideConfirmPassword = !hideConfirmPassword" matSuffix>{{ hideConfirmPassword ? "visibility" : "visibility_off" }}</mat-icon>
             <mat-error class="validation-message" *ngIf="registerFormControl.confirmPassword.hasError('required')">
                 Password confirmation is required

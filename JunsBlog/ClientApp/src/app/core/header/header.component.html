@@ -10,6 +10,10 @@
       <mat-icon>how_to_reg</mat-icon>
       <span class="icon-label">Register</span>
     </div>
+    <div class="action-button link" *ngIf="currentUser"  [routerLink]="['/editor']" [routerLinkActive]="['is-active']">
+        <mat-icon>note_add</mat-icon>
+        <span class="icon-label">Post</span>
+      </div>
     <div class="user-info link" *ngIf="currentUser" fxLayout="row" fxLayoutAlign="space-between center" [routerLink]="['/profile', currentUser.id]"  [routerLinkActive]="['is-active']" >
         <img class="profile-image"  [src]="currentUser.image"/>
     </div>

@@ -14,7 +14,7 @@
       </mat-form-field>
       <mat-form-field [ngClass]="{'margin-top-15px': isInvalid(loginFormControl.email)}" appearance="outline">
         <mat-label>Password</mat-label>
-        <input matInput placeholder="Enter your password" formControlName="password" [type]="hidePassword ? 'password' : 'text'"/>
+        <input matInput placeholder="Enter your password" autocomplete="off" formControlName="password" [type]="hidePassword ? 'password' : 'text'"/>
         <mat-icon class="link" (click)="hidePassword = !hidePassword" matSuffix>{{ hidePassword ? "visibility" : "visibility_off" }}</mat-icon>
         <mat-error class="validation-message" *ngIf="loginFormControl.password.hasError('required')">
             Password is required
