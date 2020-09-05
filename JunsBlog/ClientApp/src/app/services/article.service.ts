@@ -9,7 +9,7 @@ import { ArticleDetails } from '../models/article/articleDetails'
   providedIn: 'root'
 })
 export class ArticleService {
-
+ 
   constructor(private http: HttpClient) { }
 
   public createArticle(article: Article): Observable<ArticleDetails>{
@@ -20,4 +20,7 @@ export class ArticleService {
     return this.http.post('/api/article/update', article).pipe(map(data => { return <Article>data}));
   }
   
+  getArticleDetails(articleId: string): Observable<ArticleDetails> {
+    return this.http.get(`/api/article/details/get?articleId=${articleId}`).pipe(map(data => { return <ArticleDetails>data}));
+  }
 }

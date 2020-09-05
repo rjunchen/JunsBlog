@@ -42,8 +42,7 @@ namespace JunsBlog.Controllers
                 var newArticle = new Article(model, currentUserId); 
 
                 Utilities.MassageArticleImages(newArticle);
-
-     
+  
                var insertedArticle = await databaseService.SaveArticleAsync(newArticle);
 
                 return Ok(insertedArticle);

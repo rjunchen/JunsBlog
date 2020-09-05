@@ -1,1 +1,36 @@
-<p>article-viewer works!</p>
+<div  class="article-container">
+    <div class="overlay" fxLayoutAlign="center top" *ngIf="loading" >
+        <mat-spinner color="warn"></mat-spinner>
+    </div>
+
+    <div *ngIf="article">
+        <div class="article-display-box">
+            <div class="header-info-box">
+                <h1 class="article-title">{{article.title}}</h1>
+                <div class="article-stats-box">
+                    <img class="images profile-image image-link" routerLink="{{'/profile/' + article.author.id}}" [src]="article.author.image"/>
+                    <span class="link" routerLink="{{'/profile/' + article.author.id}}">{{article.author.name}}</span>
+                    <mat-icon class="view-icon">visibility</mat-icon>
+                    <span>{{article.views}}</span>
+                    <span>{{article.updatedOn | date:'short'}}</span>
+                </div>
+            </div>
+            <div class="article-categories">
+                <span class="chip-style" *ngFor="let category of article.categories">#{{category}}</span>
+            </div>
+            <quill-view-html class="htmlViewer" [content]="article.content" theme="snow"></quill-view-html>
+            <div *ngIf="ranking" class="rank-box">
+                <button matTooltip="Like" mat-mini-fab color="{{ranking.didILike ? 'success' : 'unrated'}}" mat-button (click)="like()"><mat-icon>thumb_up</mat-icon></button>
+                <span >{{ranking.likesCount}}</span>
+                <button matTooltip="Dislike"  mat-mini-fab color="{{ranking.didIDislike ? 'success' : 'unrated'}}" mat-button (click)="dislike()"><mat-icon>thumb_down</mat-icon></button>
+                <span >{{ranking.dislikesCount}}</span>
+                <button matTooltip="Favorite"  mat-mini-fab color="{{ranking.didIFavor ? 'success' : 'unrated'}}" mat-button (click)="favor()"><mat-icon>favorite</mat-icon></button>
+                <button matTooltip="Comment" color="success"  mat-mini-fab mat-button (click)="showCommenter()"><mat-icon>comment</mat-icon></button>
+            </div>
+        </div>
+        <app-comments [article]="article"></app-comments>
+    </div>
+
+    <!-- <app-comment-control></app-comment-control> -->
+</div>
+
