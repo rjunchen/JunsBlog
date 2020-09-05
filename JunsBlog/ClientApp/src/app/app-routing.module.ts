@@ -5,7 +5,8 @@ const routes: Routes = [
   { path: '', loadChildren: () => import('./features/home/home.module').then(m => m.HomeModule) }, 
   { path: 'home', loadChildren: () => import('./features/home/home.module').then(m => m.HomeModule) }, 
   { path: 'login', loadChildren: () => import('./features/login/login.module').then(m => m.LoginModule) }, 
-  { path: 'register', loadChildren: () => import('./features/register/register.module').then(m => m.RegisterModule) }
+  { path: 'register', loadChildren: () => import('./features/register/register.module').then(m => m.RegisterModule) },
+  { path: 'profile/:id', loadChildren: () => import('./features/profile/profile.module').then(m => m.ProfileModule) }
 ];
 
 @NgModule({

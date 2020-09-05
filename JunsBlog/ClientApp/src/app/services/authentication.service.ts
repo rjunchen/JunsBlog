@@ -5,6 +5,7 @@ import { Observable, of } from 'rxjs';
 import { AuthResponse } from './../models/authentication/authResponse'
 import { User } from '../models/authentication/user';
 import { Router } from '@angular/router';
+import { Profile } from './../models/authentication/profile'
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ export class AuthenticationService {
   private currentUser: User;
   private googleAuthUrl: string;
   private defaultAvatarUrl = './assets/avatar.png';
-  
+
   constructor(private http: HttpClient, private router: Router) {
     try{
       this.token = localStorage.getItem('accessToken');
@@ -77,5 +78,22 @@ export class AuthenticationService {
 
   public getToken(): string{
     return this.token;
+  }
+
+  public getProfile(userId: string): Observable<Profile>{
+    return this.http.get(`/api/profile?userId=${userId}`).pipe(map( (data: Profile) => {
+      if(!data.user.image)
+        data.user.image = this.defaultAvatarUrl;
+        return data;
+      }));
+  }
+
+  public updateProfile(id: string, name: string, email: string, image: string): Observable<User> {
+    return this.http.post(`/api/profile/update`, { id, name, email, image }).pipe(map((user : User) => {
+      this.currentUser = user;
+      localStorage.setItem('user', JSON.stringify(user));
+       this.onUserInfoUpdated.emit(user);
+       return user;
+      }));
   }
 }

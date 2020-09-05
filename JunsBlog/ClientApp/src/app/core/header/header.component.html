@@ -1,5 +1,5 @@
 <mat-toolbar class="header">
-    <img class="logo link" src="./assets/logo.png" (click)="toggleSidebar()"/>
+    <img class="logo link" src="./assets/logo.png" (click)="toggleSidebar()" />
     <span class="app-title link" [routerLink]="['/']">Jun's Blog</span>
     <span class="spacer"></span>
     <div class="action-button link" *ngIf="!currentUser" [routerLink]="['/login']" [routerLinkActive]="['is-active']">
@@ -10,7 +10,7 @@
       <mat-icon>how_to_reg</mat-icon>
       <span class="icon-label">Register</span>
     </div>
-    <div class="user-info" *ngIf="currentUser" fxLayout="row" fxLayoutAlign="space-between center">
+    <div class="user-info link" *ngIf="currentUser" fxLayout="row" fxLayoutAlign="space-between center" [routerLink]="['/profile', currentUser.id]"  [routerLinkActive]="['is-active']" >
         <img class="profile-image"  [src]="currentUser.image"/>
     </div>
 </mat-toolbar>

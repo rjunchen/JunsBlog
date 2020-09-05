@@ -1,13 +1,24 @@
 <mat-sidenav-container class="sidebar-container">
-    <mat-sidenav #sidenav mode="side" [(opened)]="opened" class="sidenav"
+    <mat-sidenav #sidenav [mode]="mobileQuery.matches ? 'over' : 'side'" [(opened)]="opened" class="sidenav"
                 [fixedInViewport]="true" [fixedTopGap]="0"
                 [fixedBottomGap]="0">
-    <p>side bar</p>
-    <p>side bar</p>
-    <p>side bar</p>
-    <p>side bar</p>
-    <p>side bar</p>
-    <p>side bar</p>
+        <!-- <div class="my-list">
+            <div class="list-item" [ngClass]="{'active': selectedTab == 'myArticles'}" (click)="showMyArticles()">
+                <mat-icon>article</mat-icon><span>Articles</span><span>({{profile.articlesCount}})</span>
+            </div>
+            <div class="list-item" [ngClass]="{'active': selectedTab == 'myLikes'}" (click)="showMyLikes()">
+                <mat-icon>thumb_up</mat-icon><span>Likes</span><span>({{profile.likesCount}})</span>
+            </div>
+            <div class="list-item" [ngClass]="{'active': selectedTab == 'myFavorites'}" (click)="showMyFavorites()">
+                <mat-icon>favorite</mat-icon><span>Favorite</span><span>({{profile.favorsCount}})</span>
+            </div>
+            <div class="list-item margin-top" [ngClass]="{'active': selectedTab == 'settings'}" (click)="showSettings()">
+                <mat-icon>settings</mat-icon><span>Settings</span>
+            </div>
+            <div class="list-item" (click)="logout()">
+                <mat-icon>exit_to_app</mat-icon><span>Sign out</span>
+            </div>
+        </div> -->
     <button (click)="toggleSidebar()">Click</button>
     </mat-sidenav>
 

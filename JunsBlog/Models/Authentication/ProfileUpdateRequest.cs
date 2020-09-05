@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace JunsBlog.Models.Authentication
 {
-    public class UserInfoUpdateRequest
+    public class ProfileUpdateRequest
     {
         public string Id { get; set; }
         public string Name { get; set; }

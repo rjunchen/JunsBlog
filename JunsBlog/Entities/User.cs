@@ -48,7 +48,7 @@ namespace JunsBlog.Entities
             RefreshToken = new RefreshToken();
         }
 
-        public void UpdateUserInfo(UserInfoUpdateRequest info)
+        public void UpdateUserInfo(ProfileUpdateRequest info)
         {
             this.Name = info.Name;
             this.Email = info.Email;
