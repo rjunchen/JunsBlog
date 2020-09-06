@@ -19,26 +19,5 @@ namespace JunsBlog.Models.Articles
         public int Views { get; set; }
         public DateTime UpdatedOn { get; set; }
         public DateTime CreatedOn { get; set; }
-        public ArticleRankingDetails Ranking { get; set; }
-
-        public static ArticleDetails GenerateArticleDetails(ArticleWithUserInfo articleWithUser, string currentUserId)
-        {
-            return new ArticleDetails()
-            {
-                Id = articleWithUser.Id,
-                Title = articleWithUser.Title,
-                UpdatedOn = articleWithUser.UpdatedOn,
-                CreatedOn = articleWithUser.CreatedOn,
-                IsApproved = articleWithUser.IsApproved,
-                IsPrivate = articleWithUser.IsPrivate,
-                Views = articleWithUser.Views,
-                Content = articleWithUser.Content,
-                Categories = articleWithUser.Categories,
-                Author = articleWithUser.Author,
-                Ranking = ArticleRankingDetails.GenerateArticleRankingDetails(articleWithUser.Likes, articleWithUser.Dislikes, 
-                    articleWithUser.Favors, currentUserId)
-            };
-        }
-
     }
 }

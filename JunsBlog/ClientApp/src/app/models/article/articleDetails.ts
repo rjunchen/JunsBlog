@@ -10,6 +10,4 @@ export class ArticleDetails extends Article{
     content: string;
     IsApproved: boolean;
     commentsCount: number;
-    ranking: ArticleRankingDetails;
-
 }

@@ -14,16 +14,14 @@ namespace JunsBlog.Models.Articles
         public int DislikesCount { get; set; }
         public bool DidIFavor { get; set; }
 
-        public static ArticleRankingDetails GenerateArticleRankingDetails(List<string> likes, List<string> dislikes, List<string> favors, string currentUserId)
+        public ArticleRankingDetails(ArticleRanking ranking, string currentUserId)
         {
-            return new ArticleRankingDetails()
-            {
-                DidIFavor = favors.Contains(currentUserId),
-                DidIDislike = dislikes.Contains(currentUserId),
-                DidILike = likes.Contains(currentUserId),
-                LikesCount = likes.Count,
-                DislikesCount = dislikes.Count
-            };  
+
+            DidIFavor = ranking.Favors.Contains(currentUserId);
+            DidIDislike = ranking.Dislikes.Contains(currentUserId);
+            DidILike = ranking.Likes.Contains(currentUserId);
+            LikesCount = ranking.Likes.Count;
+            DislikesCount = ranking.Dislikes.Count;
         }
 
     }

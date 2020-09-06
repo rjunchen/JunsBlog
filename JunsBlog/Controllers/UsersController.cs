@@ -107,7 +107,7 @@ namespace JunsBlog.Controllers
                 if(model.ResetToken != user.ResetToken.Token || user.ResetToken.Expiry < DateTime.UtcNow) 
                     return StatusCode(StatusCodes.Status400BadRequest, "Invalid or expired reset token");
 
-                user.UpdatePassword(model.Password);
+                user.Password = Utilities.HashPassword(model.Password);
 
                 await databaseService.SaveUserAsync(user);
 
@@ -131,7 +131,7 @@ namespace JunsBlog.Controllers
 
                 if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "Invalid or expired reset token");
 
-                user.RenewResetToken();
+                user.ResetToken = new ResetToken();
 
                 var updatedUserToken = await databaseService.SaveUserAsync(user);
 
@@ -178,11 +178,11 @@ namespace JunsBlog.Controllers
             {
                 if (String.IsNullOrWhiteSpace(userId)) return StatusCode(StatusCodes.Status400BadRequest);
 
-                var profileDetails = await databaseService.GetProfileDetailsAsync(userId);
+                var user = await databaseService.GetUserAsync(userId);
 
-                if (profileDetails == null) return StatusCode(StatusCodes.Status400BadRequest, "User not found");
+                if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "User not found");
 
-                return Ok(profileDetails);
+                return Ok(user);
             }
             catch (Exception ex)
             {
@@ -205,7 +205,9 @@ namespace JunsBlog.Controllers
 
                 if (existingUser == null) return BadRequest(new { message = "User doesn't exit" });
 
-                existingUser.UpdateUserInfo(model);
+                existingUser.Email = model.Email;
+                existingUser.Name = model.Name;
+                existingUser.Image = model.Image;
 
                 var insertedUser = await databaseService.SaveUserAsync(existingUser);
 

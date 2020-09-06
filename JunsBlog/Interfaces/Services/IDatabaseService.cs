@@ -22,31 +22,29 @@ namespace JunsBlog.Interfaces.Services
         Task<Article> SaveArticleAsync(Article article);
         Task<Article> GetArticleAsync(string articleId);
         Task<ArticleBasicInfo> GetArticleBasicInfoAsync(string articleId);
-        Task<ArticleWithUserInfo> GetArticleWithUserInfoAsync(string articleId);
+        Task<ArticleDetails> GetArticleDetailsAsync(string articleId, string currentUserId);
 
         // ArticleRanking
         Task<ArticleRanking> SaveArticleRankingAsync(ArticleRanking ranking);
-        Task<List<ArticleRanking>> GetArticleRankingsAsync(string articleId);
-        Task<ArticleRanking> GetArticleRankingAsync(string articleId, string userId);
+        Task<ArticleRanking> GetArticleRankingAsync(string articleId);
+
+      //  // Comments
+      //  Task<Comment> SaveCommentAsync(Comment comment);
+      //  Task<List<Comment>> GetCommentsAsync(string articleId);
 
 
-        // Comments
-        Task<Comment> SaveCommentAsync(Comment comment);
-        Task<List<Comment>> GetCommentsAsync(string articleId);
+      //  // CommentRankings
+      //  Task<CommentRanking> GetCommentRankingAsync(string commentId, string userId);
+      //  Task<List<CommentRanking>> GetCommentRankingsAsync(string commentId);
+      //  Task<CommentRanking> SaveCommentRankingAsync(CommentRanking ranking);
 
 
-        // CommentRankings
-        Task<CommentRanking> GetCommentRankingAsync(string commentId, string userId);
-        Task<List<CommentRanking>> GetCommentRankingsAsync(string commentId);
-        Task<CommentRanking> SaveCommentRankingAsync(CommentRanking ranking);
-
-
-        // Details
-        //Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options);
-      //  Task<ArticleDetails> GetArticleDetailsAsync(string articleId);
-        Task<CommentSearchPagingResult> SearchCommentsAsync(CommentSearchPagingOption options, string currentUserId);
-        Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId);
-        Task<ProfileDetails> GetProfileDetailsAsync(string currentUserId);
+      //  // Details
+      //  //Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options);
+      ////  Task<ArticleDetails> GetArticleDetailsAsync(string articleId);
+      //  Task<CommentSearchPagingResult> SearchCommentsAsync(CommentSearchPagingOption options, string currentUserId);
+      //  Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId);
+      //  Task<ProfileDetails> GetProfileDetailsAsync(string currentUserId);
 
     }
 }

@@ -21,6 +21,7 @@ export class ArticleViewerComponent implements OnInit {
   isProcessing: boolean;
   loading: boolean;
   currentUser: User;
+  ranking: ArticleRankingDetails;
 
   constructor(private route: ActivatedRoute,  private articleService: ArticleService, private alertService: AlertService,
     private router: Router, private auth: AuthenticationService) { }
@@ -39,7 +40,21 @@ export class ArticleViewerComponent implements OnInit {
         this.loading = false;
         this.alertService.alertHttpError(err);
       }
-    )
+    );
+
+    this.route.params.pipe(mergeMap(params => this.articleService.getArticleRankingDetails(params['id']))
+    ).subscribe(
+      data => { 
+        this.ranking = data;
+        this.loading = false;
+        console.log(data);
+      },
+      err => {
+        this.loading = false;
+        this.alertService.alertHttpError(err);
+      }
+    );
+
   }
 
   edit(){
@@ -61,8 +76,7 @@ export class ArticleViewerComponent implements OnInit {
   rank(rank: RankEnum){
     this.isProcessing = true;
     this.articleService.rankArticle(this.article.id, rank).subscribe(data=> {
-      this.article.ranking = data;
-      console.log(data);
+      this.ranking = data;
       this.isProcessing = false;
     }, err=>{
       this.isProcessing = false;

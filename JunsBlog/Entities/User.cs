@@ -48,22 +48,5 @@ namespace JunsBlog.Entities
             Image = model.Image;
             RefreshToken = new RefreshToken();
         }
-
-        public void UpdateUserInfo(UserBasicInfo info)
-        {
-            this.Name = info.Name;
-            this.Email = info.Email;
-            this.Image = info.Image;
-        }
-
-        public void UpdatePassword(string password)
-        {
-           Password = Utilities.HashPassword(password);
-        }
-
-        public void RenewResetToken()
-        {
-            ResetToken = new ResetToken();
-        }
     }
 }

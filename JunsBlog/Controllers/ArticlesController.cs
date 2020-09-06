@@ -68,12 +68,17 @@ namespace JunsBlog.Controllers
                 // If the article model doesn't have an id then create a new article otherwise update the article
                 if (String.IsNullOrWhiteSpace(aricleModel.Id))
                 {
-                    article = Article.CreateArticle(aricleModel, currentUserId);
+                    article = new Article(aricleModel, currentUserId);
                 }
                 else
                 {
                     article = await databaseService.GetArticleAsync(aricleModel.Id);
-                    article.UpdateContents(aricleModel);
+                    article.Abstract = aricleModel.Abstract;
+                    article.Content = aricleModel.Content;
+                    article.CoverImage = aricleModel.CoverImage;
+                    article.IsPrivate = aricleModel.IsPrivate;
+                    article.Title = aricleModel.Title;
+                    article.Categories = aricleModel.Categories;
                 }
 
                 Utilities.MassageArticleImages(article);
@@ -98,13 +103,7 @@ namespace JunsBlog.Controllers
                 if (String.IsNullOrWhiteSpace(articleId))
                     return BadRequest(new { message = "Invalid articleId" });
 
-                var articleWithUser = await databaseService.GetArticleWithUserInfoAsync(articleId);
-
-                //TODO: increase article view
-
-                if(articleWithUser == null) return BadRequest(new { message = "Article does not exist" });
-
-                var articleDetails = ArticleDetails.GenerateArticleDetails(articleWithUser, currentUserId);
+                var articleDetails = await databaseService.GetArticleDetailsAsync(articleId, currentUserId);
 
                 return Ok(articleDetails);
             }
@@ -144,49 +143,72 @@ namespace JunsBlog.Controllers
                 if (model == null || String.IsNullOrWhiteSpace(model.ArticleId))
                     return BadRequest(new { message = "Incomplete ranking information" });
 
-                var article = await databaseService.GetArticleAsync(model.ArticleId);
+                var articleRanking = await databaseService.GetArticleRankingAsync(model.ArticleId);
+
+                if (articleRanking == null) articleRanking = new ArticleRanking(model.ArticleId);
 
                 switch (model.Rank)
                 {
                     case RankEnum.Like:
 
-                        if (article.Likes.Contains(currentUserId))
+                        if (articleRanking.Likes.Contains(currentUserId))
                         {
-                            article.Likes.Remove(currentUserId);
+                            articleRanking.Likes.Remove(currentUserId);
                         }
                         else
                         {
                             // If like the article then also need to remove the dislike from the article
-                            article.Likes.Add(currentUserId);
-                            article.Dislikes.Remove(currentUserId);
+                            articleRanking.Likes.Add(currentUserId);
+                            articleRanking.Dislikes.Remove(currentUserId);
                         }
                         break;
                     case RankEnum.Dislike:
 
-                        if (article.Dislikes.Contains(currentUserId))
+                        if (articleRanking.Dislikes.Contains(currentUserId))
                         {
-                            article.Dislikes.Remove(currentUserId);
+                            articleRanking.Dislikes.Remove(currentUserId);
                         }
                         else
                         {
-                            article.Dislikes.Add(currentUserId);
-                            article.Likes.Remove(currentUserId);
+                            articleRanking.Dislikes.Add(currentUserId);
+                            articleRanking.Likes.Remove(currentUserId);
                         }
                         break;
                     case RankEnum.Favor:
-                        if (article.Favors.Contains(currentUserId))
+                        if (articleRanking.Favors.Contains(currentUserId))
                         {
-                            article.Favors.Remove(currentUserId);
+                            articleRanking.Favors.Remove(currentUserId);
                         }
                         else
                         {
-                            article.Favors.Add(currentUserId);
+                            articleRanking.Favors.Add(currentUserId);
                         }
                         break;
                 }
 
-                await databaseService.SaveArticleAsync(article);
-                var rankingDetails = ArticleRankingDetails.GenerateArticleRankingDetails(article.Likes, article.Dislikes, article.Favors, currentUserId);
+                await databaseService.SaveArticleRankingAsync(articleRanking);
+                var rankingDetails = new ArticleRankingDetails(articleRanking, currentUserId);
+
+                return Ok(rankingDetails);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet("rank")]
+        public async Task<IActionResult> GetArticleRanking(string articleId)
+        {
+            try
+            {
+                if (String.IsNullOrWhiteSpace(articleId))
+                    return BadRequest(new { message = "Article ID is missing" });
+
+                var articleRanking = await databaseService.GetArticleRankingAsync(articleId);
+
+                var rankingDetails = new ArticleRankingDetails(articleRanking, currentUserId);
 
                 return Ok(rankingDetails);
             }

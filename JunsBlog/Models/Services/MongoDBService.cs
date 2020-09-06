@@ -5,6 +5,7 @@ using JunsBlog.Models.Articles;
 using JunsBlog.Models.Comments;
 using JunsBlog.Models.Enums;
 using JunsBlog.Models.Profile;
+using Microsoft.VisualBasic.CompilerServices;
 using MimeKit.Encodings;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
@@ -82,44 +83,48 @@ namespace JunsBlog.Models.Services
             }).SingleOrDefaultAsync();
         }
 
-        public async Task<ArticleWithUserInfo> GetArticleWithUserInfoAsync(string articleId)
+
+        public async Task<ArticleDetails> GetArticleDetailsAsync(string articleId, string currentUserId)
         {
-            var query = articles.AsQueryable().Where(x=> x.Id == articleId).GroupJoin(users.AsQueryable(), x => x.AuthorId, y => y.Id, (x, y) => new { article = x, authors = y })
-                            .Select(a => new ArticleWithUserInfo
-                            {
-                                Abstract = a.article.Abstract,
-                                CoverImage = a.article.CoverImage,
-                                Id = a.article.Id,
-                                Title = a.article.Title,
-                                UpdatedOn = a.article.UpdatedOn,
-                                CreatedOn = a.article.CreatedOn,
-                                IsApproved = a.article.IsApproved,
-                                IsPrivate = a.article.IsPrivate,
-                                Views = a.article.Views,
-                                Content = a.article.Content,
-                                AuthorId = a.article.AuthorId,
-                                Categories = a.article.Categories,
-                                GalleryImages = a.article.GalleryImages,
-                                Author = a.authors.First(),
-                                Favors = a.article.Favors,
-                                Dislikes = a.article.Dislikes,
-                                Likes = a.article.Likes
-                            });
-            return await query.FirstOrDefaultAsync();
+            var query = articles.AsQueryable().Where(x => x.Id == articleId).Join(users.AsQueryable(), x => x.AuthorId, y => y.Id, (x, y) => new { article = x, author = y })
+                        .Select(a => new ArticleDetails
+                        {
+                            Id = a.article.Id,
+                            Title = a.article.Title,
+                            UpdatedOn = a.article.UpdatedOn,
+                            CreatedOn = a.article.CreatedOn,
+                            IsApproved = a.article.IsApproved,
+                            IsPrivate = a.article.IsPrivate,
+                            Views = a.article.Views,
+                            Content = a.article.Content,
+                            Categories = a.article.Categories,
+                            Author = a.author
+                        }).GroupJoin(articleRankings.AsQueryable(), x => x.Id, y => y.Id, (x, y) => new { article = x, rankings = y})
+                        .Select(a => new ArticleDetails
+                        {
+                            Id = a.article.Id,
+                            Title = a.article.Title,
+                            UpdatedOn = a.article.UpdatedOn,
+                            CreatedOn = a.article.CreatedOn,
+                            IsApproved = a.article.IsApproved,
+                            IsPrivate = a.article.IsPrivate,
+                            Views = a.article.Views,
+                            Content = a.article.Content,
+                            Categories = a.article.Categories,
+                            Author = a.article.Author
+                        });
+            var articleDetails = await query.FirstOrDefaultAsync();
+            return articleDetails;
         }
 
+  
         #endregion
 
 
         #region ArtileRankings
-        public async Task<ArticleRanking> GetArticleRankingAsync(string articleId, string userId)
+        public async Task<ArticleRanking> GetArticleRankingAsync(string articleId)
         {
-            return await articleRankings.Find<ArticleRanking>(x => x.ArticleId == articleId && x.UserId == userId).FirstOrDefaultAsync();
-        }
-
-        public async Task<List<ArticleRanking>> GetArticleRankingsAsync(string articleId)
-        {
-            return await articleRankings.Find<ArticleRanking>(x => x.ArticleId == articleId).ToListAsync();
+            return await articleRankings.Find<ArticleRanking>(x => x.Id == articleId).FirstOrDefaultAsync();
         }
 
         public async Task<ArticleRanking> SaveArticleRankingAsync(ArticleRanking ranking)
@@ -131,195 +136,195 @@ namespace JunsBlog.Models.Services
         #endregion
 
 
-        #region Comments
-        public async Task<List<Comment>> GetCommentsAsync(string articleId)
-        {
-            return await comments.Find<Comment>(x => x.ArticleId == articleId).ToListAsync();
-        }
+        //#region Comments
+        //public async Task<List<Comment>> GetCommentsAsync(string articleId)
+        //{
+        //    return await comments.Find<Comment>(x => x.ArticleId == articleId).ToListAsync();
+        //}
 
-        public async Task<Comment> SaveCommentAsync(Comment comment)
-        {
-            comment.UpdatedOn = DateTime.UtcNow;
+        //public async Task<Comment> SaveCommentAsync(Comment comment)
+        //{
+        //    comment.UpdatedOn = DateTime.UtcNow;
 
-            await comments.ReplaceOneAsync(s => s.Id == comment.Id, comment, new ReplaceOptions { IsUpsert = true });
+        //    await comments.ReplaceOneAsync(s => s.Id == comment.Id, comment, new ReplaceOptions { IsUpsert = true });
 
-            return comment;
-        }
-        #endregion
-
-
-        #region CommentRanking
-        public async Task<CommentRanking> GetCommentRankingAsync(string commentId, string userId)
-        {
-            return await commentRankings.Find<CommentRanking>(x => x.CommentId == commentId && x.UserId == userId).FirstOrDefaultAsync();
-        }
-
-        public async Task<List<CommentRanking>> GetCommentRankingsAsync(string commentId)
-        {
-            return await commentRankings.Find<CommentRanking>(x => x.CommentId == commentId).ToListAsync();
-        }
-
-        public async Task<CommentRanking> SaveCommentRankingAsync(CommentRanking ranking)
-        {
-            ranking.UpdatedOn = DateTime.UtcNow;
-            await commentRankings.ReplaceOneAsync(s => s.Id == ranking.Id, ranking, new ReplaceOptions { IsUpsert = true });
-            return ranking;
-        }
-        #endregion
+        //    return comment;
+        //}
+        //#endregion
 
 
-        #region Details
+        //#region CommentRanking
+        //public async Task<CommentRanking> GetCommentRankingAsync(string commentId, string userId)
+        //{
+        //    return await commentRankings.Find<CommentRanking>(x => x.CommentId == commentId && x.UserId == userId).FirstOrDefaultAsync();
+        //}
+
+        //public async Task<List<CommentRanking>> GetCommentRankingsAsync(string commentId)
+        //{
+        //    return await commentRankings.Find<CommentRanking>(x => x.CommentId == commentId).ToListAsync();
+        //}
+
+        //public async Task<CommentRanking> SaveCommentRankingAsync(CommentRanking ranking)
+        //{
+        //    ranking.UpdatedOn = DateTime.UtcNow;
+        //    await commentRankings.ReplaceOneAsync(s => s.Id == ranking.Id, ranking, new ReplaceOptions { IsUpsert = true });
+        //    return ranking;
+        //}
+        //#endregion
+
+
+        //#region Details
   
-        private class ArticleWithRankings : ArticleDetails
-        {
-           public IEnumerable<ArticleRanking> Rankings { get; set; }
-        }
+        //private class ArticleWithRankings : ArticleDetails
+        //{
+        //   public IEnumerable<ArticleRanking> Rankings { get; set; }
+        //}
 
 
-        public async Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId)
-        {
-            var rankingDetails = await GetCommentRankingDetailsAsync(commentId, currentUserId);
+        //public async Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId)
+        //{
+        //    var rankingDetails = await GetCommentRankingDetailsAsync(commentId, currentUserId);
 
-            var query = GenerateCommentsDetailsQuery();
+        //    var query = GenerateCommentsDetailsQuery();
 
-            var commentDetail = await query.Where(x => x.Id == commentId).FirstOrDefaultAsync();
-            commentDetail.Ranking = rankingDetails;
-            return commentDetail;
-        }
+        //    var commentDetail = await query.Where(x => x.Id == commentId).FirstOrDefaultAsync();
+        //    commentDetail.Ranking = rankingDetails;
+        //    return commentDetail;
+        //}
 
-        private async Task<CommentRankingDetails> GetCommentRankingDetailsAsync(string commentId, string userId)
-        {
-            var rankings = await commentRankings.Find(x => x.CommentId == commentId).ToListAsync();
+        //private async Task<CommentRankingDetails> GetCommentRankingDetailsAsync(string commentId, string userId)
+        //{
+        //    var rankings = await commentRankings.Find(x => x.CommentId == commentId).ToListAsync();
 
-            var rankingResponse = new CommentRankingDetails() { CommentId = commentId };
+        //    var rankingResponse = new CommentRankingDetails() { CommentId = commentId };
 
-            foreach (var item in rankings)
-            {
-                if (item.DidIDislike) rankingResponse.DislikesCount++;
-                if (item.DidILike) rankingResponse.LikesCount++;
-                rankingResponse.DidIFavor = item.DidIFavor;
+        //    foreach (var item in rankings)
+        //    {
+        //        if (item.DidIDislike) rankingResponse.DislikesCount++;
+        //        if (item.DidILike) rankingResponse.LikesCount++;
+        //        rankingResponse.DidIFavor = item.DidIFavor;
 
-                if (item.UserId == userId)
-                {
-                    rankingResponse.DidIDislike = item.DidIDislike;
-                    rankingResponse.DidILike = item.DidILike;
-                    rankingResponse.DidIFavor = item.DidIFavor;
-                }
-            }
-            return rankingResponse;
-        }
+        //        if (item.UserId == userId)
+        //        {
+        //            rankingResponse.DidIDislike = item.DidIDislike;
+        //            rankingResponse.DidILike = item.DidILike;
+        //            rankingResponse.DidIFavor = item.DidIFavor;
+        //        }
+        //    }
+        //    return rankingResponse;
+        //}
 
-        private IMongoQueryable<CommentDetails> GenerateCommentsDetailsQuery()
-        {
-            var query = comments.AsQueryable().GroupJoin(comments.AsQueryable(), x => x.Id, y => y.ParentId, (x, y) => new { comment = x, childrenComments = y })
-                            .Select(a => new
-                            {
-                                Id = a.comment.Id,
-                                CommentText = a.comment.CommentText,
-                                UpdatedOn = a.comment.UpdatedOn,
-                                ArticleId = a.comment.ArticleId,
-                                ChildrenCommentsCount = a.childrenComments.Count(),
-                                ParentId = a.comment.ParentId,
-                                UserId = a.comment.UserId,
+        //private IMongoQueryable<CommentDetails> GenerateCommentsDetailsQuery()
+        //{
+        //    var query = comments.AsQueryable().GroupJoin(comments.AsQueryable(), x => x.Id, y => y.ParentId, (x, y) => new { comment = x, childrenComments = y })
+        //                    .Select(a => new
+        //                    {
+        //                        Id = a.comment.Id,
+        //                        CommentText = a.comment.CommentText,
+        //                        UpdatedOn = a.comment.UpdatedOn,
+        //                        ArticleId = a.comment.ArticleId,
+        //                        ChildrenCommentsCount = a.childrenComments.Count(),
+        //                        ParentId = a.comment.ParentId,
+        //                        UserId = a.comment.UserId,
 
-                            }).Join(users.AsQueryable(), x => x.UserId, y => y.Id, (x, y) => new CommentDetails
-                            {
-                                Id = x.Id,
-                                CommentText = x.CommentText,
-                                UpdatedOn = x.UpdatedOn,
-                                ArticleId = x.ArticleId,
-                                ChildrenCommentsCount = x.ChildrenCommentsCount,
-                                ParentId = x.ParentId,
-                                User = y
-                            });
-            return query;
-        } 
+        //                    }).Join(users.AsQueryable(), x => x.UserId, y => y.Id, (x, y) => new CommentDetails
+        //                    {
+        //                        Id = x.Id,
+        //                        CommentText = x.CommentText,
+        //                        UpdatedOn = x.UpdatedOn,
+        //                        ArticleId = x.ArticleId,
+        //                        ChildrenCommentsCount = x.ChildrenCommentsCount,
+        //                        ParentId = x.ParentId,
+        //                        User = y
+        //                    });
+        //    return query;
+        //} 
 
-        public async Task<CommentSearchPagingResult> SearchCommentsAsync(CommentSearchPagingOption options, string currentUserId)
-        {
-            var query = GenerateCommentsDetailsQuery();
+        //public async Task<CommentSearchPagingResult> SearchCommentsAsync(CommentSearchPagingOption options, string currentUserId)
+        //{
+        //    var query = GenerateCommentsDetailsQuery();
 
-            if (!string.IsNullOrEmpty(options.SearchKey))
-            {
-                switch (options.SearchOn)
-                {
-                    case CommentSearchOnEnum.ArticleId:
-                        query = query.Where(x => x.ArticleId == options.SearchKey.Trim());
-                        break;
-                    case CommentSearchOnEnum.ParentId:
-                        query = query.Where(x => x.ParentId == options.SearchKey.Trim());
-                        break;
-                    case CommentSearchOnEnum.CommentText:
-                        query = query.Where(x => x.CommentText.Contains(options.SearchKey.Trim()));
-                        break;
-                    default:
-                        break;
-                }
-            }
+        //    if (!string.IsNullOrEmpty(options.SearchKey))
+        //    {
+        //        switch (options.SearchOn)
+        //        {
+        //            case CommentSearchOnEnum.ArticleId:
+        //                query = query.Where(x => x.ArticleId == options.SearchKey.Trim());
+        //                break;
+        //            case CommentSearchOnEnum.ParentId:
+        //                query = query.Where(x => x.ParentId == options.SearchKey.Trim());
+        //                break;
+        //            case CommentSearchOnEnum.CommentText:
+        //                query = query.Where(x => x.CommentText.Contains(options.SearchKey.Trim()));
+        //                break;
+        //            default:
+        //                break;
+        //        }
+        //    }
 
-            switch (options.SortBy)
-            {
-                case SortByEnum.UpdatedOn:
-                    if (options.SortOrder == SortOrderEnum.Ascending)
-                        query = query.OrderBy(x => x.UpdatedOn);
-                    else
-                        query = query.OrderByDescending(x => x.UpdatedOn);
-                    break;
-                //case SortByEnum.Views:
-                //    if (sortOrder == SortOrderEnum.Ascending)
-                //        query = query.OrderBy(x => x.views);
-                //    else
-                //        query = query.OrderByDescending(x => x.Views);
-                //    break;
-            }
+        //    switch (options.SortBy)
+        //    {
+        //        case SortByEnum.UpdatedOn:
+        //            if (options.SortOrder == SortOrderEnum.Ascending)
+        //                query = query.OrderBy(x => x.UpdatedOn);
+        //            else
+        //                query = query.OrderByDescending(x => x.UpdatedOn);
+        //            break;
+        //        //case SortByEnum.Views:
+        //        //    if (sortOrder == SortOrderEnum.Ascending)
+        //        //        query = query.OrderBy(x => x.views);
+        //        //    else
+        //        //        query = query.OrderByDescending(x => x.Views);
+        //        //    break;
+        //    }
 
-            var docsCount = await query.CountAsync();
+        //    var docsCount = await query.CountAsync();
 
-            var documents = await query.Skip((options.CurrentPage - 1) * options.PageSize).Take(options.PageSize).ToListAsync();
+        //    var documents = await query.Skip((options.CurrentPage - 1) * options.PageSize).Take(options.PageSize).ToListAsync();
 
-            foreach (var item in documents)
-            {
-                item.Ranking = await GetCommentRankingDetailsAsync(item.Id, currentUserId);
-            }
+        //    foreach (var item in documents)
+        //    {
+        //        item.Ranking = await GetCommentRankingDetailsAsync(item.Id, currentUserId);
+        //    }
 
-            return new CommentSearchPagingResult(documents, docsCount, options);
-        }
+        //    return new CommentSearchPagingResult(documents, docsCount, options);
+        //}
 
-        public async Task<ProfileDetails> GetProfileDetailsAsync(string currentUserId)
-        {
-            var query = users.AsQueryable().Where(x => x.Id == currentUserId).GroupJoin(articles.AsQueryable(), x => x.Id, y => y.AuthorId, (x, y) => new { UserId = x.Id, Articles = y, })
-           .Select(a => new
-           {
-               Id = a.UserId,
-               ArticlesCount = a.Articles.Count()
-           }).GroupJoin(articleRankings.AsQueryable(), x => x.Id, y => y.UserId, (x, y) => new
-           {
-               Id = x.Id,
-               ArticlesCount = x.ArticlesCount,
-               Rankings = y
-           }).Select(a => new
-           {
-               Id = a.Id,
-               ArticlesCount = a.ArticlesCount,
-               FavorsCount = a.Rankings.Count(x => x.DidIFavor == true),
-               LikesCount = a.Rankings.Count(x => x.DidILike == true),
-           }).GroupJoin(users, x => x.Id, y => y.Id, (x, y) => new
-           {
-               Id = x.Id,
-               ArticlesCount = x.ArticlesCount,
-               FavorsCount = x.FavorsCount,
-               LikesCount = x.LikesCount,
-               Users = y
-           }).Select(a => new ProfileDetails
-           {
-               LikesCount = a.LikesCount,
-               ArticlesCount = a.ArticlesCount,
-               FavorsCount = a.FavorsCount,
-               User = a.Users.First()
-           });
-           return await query.FirstOrDefaultAsync();
-        }
+        //public async Task<ProfileDetails> GetProfileDetailsAsync(string currentUserId)
+        //{
+        //    var query = users.AsQueryable().Where(x => x.Id == currentUserId).GroupJoin(articles.AsQueryable(), x => x.Id, y => y.AuthorId, (x, y) => new { UserId = x.Id, Articles = y, })
+        //   .Select(a => new
+        //   {
+        //       Id = a.UserId,
+        //       ArticlesCount = a.Articles.Count()
+        //   }).GroupJoin(articleRankings.AsQueryable(), x => x.Id, y => y.UserId, (x, y) => new
+        //   {
+        //       Id = x.Id,
+        //       ArticlesCount = x.ArticlesCount,
+        //       Rankings = y
+        //   }).Select(a => new
+        //   {
+        //       Id = a.Id,
+        //       ArticlesCount = a.ArticlesCount,
+        //       FavorsCount = a.Rankings.Count(x => x.DidIFavor == true),
+        //       LikesCount = a.Rankings.Count(x => x.DidILike == true),
+        //   }).GroupJoin(users, x => x.Id, y => y.Id, (x, y) => new
+        //   {
+        //       Id = x.Id,
+        //       ArticlesCount = x.ArticlesCount,
+        //       FavorsCount = x.FavorsCount,
+        //       LikesCount = x.LikesCount,
+        //       Users = y
+        //   }).Select(a => new ProfileDetails
+        //   {
+        //       LikesCount = a.LikesCount,
+        //       ArticlesCount = a.ArticlesCount,
+        //       FavorsCount = a.FavorsCount,
+        //       User = a.Users.First()
+        //   });
+        //   return await query.FirstOrDefaultAsync();
+        //}
 
-        #endregion
+        //#endregion
     }
 }

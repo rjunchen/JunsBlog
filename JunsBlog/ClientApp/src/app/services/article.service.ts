@@ -29,4 +29,8 @@ export class ArticleService {
   public rankArticle(articleId: string, rank: RankEnum): Observable<ArticleRankingDetails>{
     return this.http.post('/api/article/rank', { articleId, rank }).pipe(map(data => { return <ArticleRankingDetails>data}));
   }
+
+  public getArticleRankingDetails(articleId: string): Observable<ArticleRankingDetails>{
+    return this.http.get(`/api/article/rank?articleId=${articleId}`).pipe(map(data => { return <ArticleRankingDetails>data}));
+  }
 }
