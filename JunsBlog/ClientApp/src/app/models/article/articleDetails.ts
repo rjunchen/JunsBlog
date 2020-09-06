@@ -1,5 +1,6 @@
 import { User } from '../authentication/user';
 import { Article } from '../article/article';
+import { ArticleRankingDetails } from './articleRankingDetails'
 
 export class ArticleDetails extends Article{
     author: User;
@@ -9,5 +10,6 @@ export class ArticleDetails extends Article{
     content: string;
     IsApproved: boolean;
     commentsCount: number;
+    ranking: ArticleRankingDetails;
 
 }

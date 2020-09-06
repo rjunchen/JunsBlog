@@ -192,12 +192,12 @@ namespace JunsBlog.Controllers
         }
 
         [HttpPost("profile/update")]
-        public async Task<IActionResult> UpdateProfile(ProfileUpdateRequest model)
+        public async Task<IActionResult> UpdateProfile(UserBasicInfo model)
         {
             try
             {
                 if (model == null || String.IsNullOrWhiteSpace(model.Id) || String.IsNullOrWhiteSpace(model.Name) || String.IsNullOrWhiteSpace(model.Email))
-                    return BadRequest(new { message = "Incomplete user registration information" });
+                    return BadRequest(new { message = "Incomplete user information" });
 
                 if (model.Id != userId) return BadRequest(new { message = "Invalid user update request" });
 

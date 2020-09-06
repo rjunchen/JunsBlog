@@ -6,6 +6,9 @@ import { mergeMap } from 'rxjs/operators';
 import { AlertService } from 'src/app/services/alert.service';
 import { User } from 'src/app/models/authentication/user';
 import { AuthenticationService } from 'src/app/services/authentication.service';
+import { RankEnum } from '../../models/enums/rankEnum'
+import { ArticleRankingDetails } from 'src/app/models/article/articleRankingDetails';
+
 
 @Component({
   selector: 'app-article-viewer',
@@ -18,7 +21,7 @@ export class ArticleViewerComponent implements OnInit {
   isProcessing: boolean;
   loading: boolean;
   currentUser: User;
-  
+
   constructor(private route: ActivatedRoute,  private articleService: ArticleService, private alertService: AlertService,
     private router: Router, private auth: AuthenticationService) { }
 
@@ -41,6 +44,30 @@ export class ArticleViewerComponent implements OnInit {
 
   edit(){
     this.router.navigateByUrl(`/editor/${this.article.id}`);
+  }
+
+  like(){
+    this.rank(RankEnum.Like);
+  }
+
+  favor(){
+    this.rank(RankEnum.Favor);
+  }
+
+  dislike(){
+    this.rank(RankEnum.Dislike);
+  }
+
+  rank(rank: RankEnum){
+    this.isProcessing = true;
+    this.articleService.rankArticle(this.article.id, rank).subscribe(data=> {
+      this.article.ranking = data;
+      console.log(data);
+      this.isProcessing = false;
+    }, err=>{
+      this.isProcessing = false;
+      this.alertService.alertHttpError(err);
+    })
   }
 
 }

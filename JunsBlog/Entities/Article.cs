@@ -19,7 +19,6 @@ namespace JunsBlog.Entities
         [BsonRequired]
         public string Abstract { get; set; }
         [BsonRequired]
-        [BsonRepresentation(BsonType.ObjectId)]
         public string AuthorId { get; set; }
         [BsonRequired]
         public string[] Categories { get; set; }
@@ -30,22 +29,27 @@ namespace JunsBlog.Entities
         [BsonRequired]
         public int Views { get; set; }
         public List<GalleryImage> GalleryImages { get; set; }
+        public List<string> Likes { get; set; }
+        public List<string> Dislikes { get; set; }
+        public List<string> Favors { get; set; }
 
-        public Article(ArticleBasicInfo model, string authorId)
-        {
-            Abstract = model.Abstract;
-            AuthorId = authorId;
-            Content = model.Content;
-            CoverImage = model.CoverImage;
-            IsPrivate = model.IsPrivate;
-            Title = model.Title;
-            Categories = model.Categories;
-            GalleryImages = new List<GalleryImage>();
-        }
 
-        public Article()
+        public static Article CreateArticle(ArticleBasicInfo model, string authorId)
         {
-            GalleryImages = new List<GalleryImage>();
+            return new Article()
+            {
+                Abstract = model.Abstract,
+                AuthorId = authorId,
+                Content = model.Content,
+                CoverImage = model.CoverImage,
+                IsPrivate = model.IsPrivate,
+                Title = model.Title,
+                Categories = model.Categories,
+                GalleryImages = new List<GalleryImage>(),
+                Likes = new List<string>(),
+                Dislikes = new List<string>(),
+                Favors = new List<string>()
+            };
         }
 
         public void UpdateContents(ArticleBasicInfo model)

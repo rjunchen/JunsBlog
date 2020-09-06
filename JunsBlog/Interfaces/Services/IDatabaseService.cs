@@ -22,6 +22,7 @@ namespace JunsBlog.Interfaces.Services
         Task<Article> SaveArticleAsync(Article article);
         Task<Article> GetArticleAsync(string articleId);
         Task<ArticleBasicInfo> GetArticleBasicInfoAsync(string articleId);
+        Task<ArticleWithUserInfo> GetArticleWithUserInfoAsync(string articleId);
 
         // ArticleRanking
         Task<ArticleRanking> SaveArticleRankingAsync(ArticleRanking ranking);
@@ -41,8 +42,8 @@ namespace JunsBlog.Interfaces.Services
 
 
         // Details
-        Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options);
-        Task<ArticleDetails> GetArticleDetailsAsync(string articleId);
+        //Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options);
+      //  Task<ArticleDetails> GetArticleDetailsAsync(string articleId);
         Task<CommentSearchPagingResult> SearchCommentsAsync(CommentSearchPagingOption options, string currentUserId);
         Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId);
         Task<ProfileDetails> GetProfileDetailsAsync(string currentUserId);

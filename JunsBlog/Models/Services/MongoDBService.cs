@@ -82,6 +82,32 @@ namespace JunsBlog.Models.Services
             }).SingleOrDefaultAsync();
         }
 
+        public async Task<ArticleWithUserInfo> GetArticleWithUserInfoAsync(string articleId)
+        {
+            var query = articles.AsQueryable().Where(x=> x.Id == articleId).GroupJoin(users.AsQueryable(), x => x.AuthorId, y => y.Id, (x, y) => new { article = x, authors = y })
+                            .Select(a => new ArticleWithUserInfo
+                            {
+                                Abstract = a.article.Abstract,
+                                CoverImage = a.article.CoverImage,
+                                Id = a.article.Id,
+                                Title = a.article.Title,
+                                UpdatedOn = a.article.UpdatedOn,
+                                CreatedOn = a.article.CreatedOn,
+                                IsApproved = a.article.IsApproved,
+                                IsPrivate = a.article.IsPrivate,
+                                Views = a.article.Views,
+                                Content = a.article.Content,
+                                AuthorId = a.article.AuthorId,
+                                Categories = a.article.Categories,
+                                GalleryImages = a.article.GalleryImages,
+                                Author = a.authors.First(),
+                                Favors = a.article.Favors,
+                                Dislikes = a.article.Dislikes,
+                                Likes = a.article.Likes
+                            });
+            return await query.FirstOrDefaultAsync();
+        }
+
         #endregion
 
 
@@ -143,144 +169,10 @@ namespace JunsBlog.Models.Services
 
 
         #region Details
-        public async Task<ArticleDetails> GetArticleDetailsAsync(string articleId)
-        {
-            // Increase the view count by 1
-            var updateDef = Builders<Article>.Update.Inc(x => x.Views, 1);
-            await articles.UpdateOneAsync<Article>(x => x.Id == articleId, updateDef);
-
-            var query = GenerateArticleDetailsQuery();
-
-            return await query.Where(x => x.Id == articleId).FirstOrDefaultAsync();
-        }
-
-
+  
         private class ArticleWithRankings : ArticleDetails
         {
            public IEnumerable<ArticleRanking> Rankings { get; set; }
-        }
-
-        private IMongoQueryable<ArticleWithRankings> GenerateArticleDetailsQuery()
-        {
-            var query = articles.AsQueryable().GroupJoin(comments.AsQueryable(), x => x.Id, y => y.ArticleId, (x, y) => new { article = x, comments = y })
-                            .Select(a => new
-                            {
-                                Abstract = a.article.Abstract,
-                                CoverImage = a.article.CoverImage,
-                                Id = a.article.Id,
-                                Title = a.article.Title,
-                                UpdatedOn = a.article.UpdatedOn,
-                                CreatedOn = a.article.CreatedOn,
-                                IsApproved = a.article.IsApproved,
-                                IsPrivate = a.article.IsPrivate,
-                                Views = a.article.Views,
-                                Content = a.article.Content,
-                                AuthorId = a.article.AuthorId,
-                                Categories =  a.article.Categories,
-                                GalleryImages = a.article.GalleryImages,
-                                commentsCount = a.comments.Count()
-                            }).Join(users.AsQueryable(), x => x.AuthorId, y => y.Id, (x, y) => new ArticleDetails
-                            {
-                                Abstract = x.Abstract,
-                                CoverImage = x.CoverImage,
-                                Id = x.Id,
-                                Title = x.Title,
-                                UpdatedOn = x.UpdatedOn,
-                                CreatedOn = x.CreatedOn,
-                                IsApproved = x.IsApproved,
-                                IsPrivate = x.IsPrivate,
-                                Views = x.Views,
-                                Content = x.Content,
-                                Categories = x.Categories,
-                                GalleryImages = x.GalleryImages,
-                                Author = y,
-                                CommentsCount = x.commentsCount
-                            }).GroupJoin(articleRankings.AsQueryable(), x=> x.Id, y=> y.ArticleId, (x, y)=> new ArticleWithRankings {
-                                Abstract = x.Abstract,
-                                CoverImage = x.CoverImage,
-                                Id = x.Id,
-                                Title = x.Title,
-                                UpdatedOn = x.UpdatedOn,
-                                CreatedOn = x.CreatedOn,
-                                IsApproved = x.IsApproved,
-                                IsPrivate = x.IsPrivate,
-                                Views = x.Views,
-                                Content = x.Content,
-                                Categories = x.Categories,
-                                GalleryImages = x.GalleryImages,
-                                Author = x.Author,
-                                CommentsCount = x.CommentsCount,
-                                Rankings = y
-                            });
-            return query;
-        }
-
-        public async Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options)
-        {
-            var query = GenerateArticleDetailsQuery();
-
-            if (!string.IsNullOrEmpty(options.SearchKey)) query = query.Where(x => x.Content.ToLower().Contains(options.SearchKey.ToLower()));
-
-            switch (options.SortBy)
-            {
-                case SortByEnum.UpdatedOn:
-                    if (options.SortOrder == SortOrderEnum.Ascending)
-                        query = query.OrderBy(x => x.UpdatedOn);
-                    else
-                        query = query.OrderByDescending(x => x.UpdatedOn);
-                    break;
-                case SortByEnum.Views:
-                    if (options.SortOrder == SortOrderEnum.Ascending)
-                        query = query.OrderBy(x => x.Views);
-                    else
-                        query = query.OrderByDescending(x => x.Views);
-                    break;
-            }
-
-            switch (options.Filter)
-            {
-                case ArticleFilterEnum.MyArticles:
-                    query = query.Where(x => x.Author.Id == options.ProfilerId);
-                    break;
-                case ArticleFilterEnum.MyLikes:
-                    query = query.Where(x => x.Rankings.Any(x=> x.DidILike == true && x.UserId == options.ProfilerId));
-                    break;
-                case ArticleFilterEnum.MyFavorites:
-                    query = query.Where(x => x.Rankings.Any(x => x.DidIFavor == true && x.UserId == options.ProfilerId));
-                    break;
-            }
-
-            var docsCount = await query.CountAsync();
-
-            var documents = await query.Skip((options.CurrentPage - 1) * options.PageSize).Take(options.PageSize).ToListAsync();
-
-            var articleDetailsList = new List<ArticleDetails>();
-
-            foreach (var item in documents)
-            {
-                item.Content = null; // Don't return the content
-                var articleDetails = new ArticleDetails()
-                {
-                    Abstract = item.Abstract,
-                    CoverImage = item.CoverImage,
-                    Id = item.Id,
-                    Title = item.Title,
-                    UpdatedOn = item.UpdatedOn,
-                    CreatedOn = item.CreatedOn,
-                    IsApproved = item.IsApproved,
-                    IsPrivate = item.IsPrivate,
-                    Views = item.Views,
-                    Content = item.Content,
-                    Categories = item.Categories,
-                    GalleryImages = item.GalleryImages,
-                    Author = item.Author,
-                    CommentsCount = item.CommentsCount,
-                    Ranking = new ArticleRankingDetails(item.Id, options.ProfilerId, item.Rankings)
-                };
-                articleDetailsList.Add(articleDetails);
-            }
-
-            return new ArticleSearchPagingResult(articleDetailsList, docsCount, options);
         }
 
 

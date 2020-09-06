@@ -29,6 +29,27 @@ $color-warn: #f44336;
     }
 }
 
+.rank-box{
+    button{
+        margin-left: 15px;;
+    }
+    span{
+        margin-left: 5px;
+        color: $color-warn;
+        font-weight: bold;
+        vertical-align: sub;
+    }
+    .mat-success {
+        background-color: white;
+        color: $color-warn;
+    }
+    
+    .mat-unrated {
+        background-color: white;
+        color: #999;
+    }
+}
+
 .article-categories{
     .chip-style {
         background-color: $color-warn;

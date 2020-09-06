@@ -9,12 +9,9 @@ namespace JunsBlog.Entities
 {
     public class CommentRanking : EntityBase
     {
-        
         [BsonRequired]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string CommentId { get; set; }    
+        public string CommentId { get; set; }
         [BsonRequired]
-        [BsonRepresentation(BsonType.ObjectId)]
         public string UserId { get; set; }
         [BsonRequired]
         [BsonDefaultValue(false)]

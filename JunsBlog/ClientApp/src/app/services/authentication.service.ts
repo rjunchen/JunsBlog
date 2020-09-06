@@ -27,7 +27,7 @@ export class AuthenticationService {
    }
 
   public register(email: string, password: string, name: string): Observable<boolean>{
-    return this.http.post('/api/register', {email, password, name}).pipe(map((data: AuthResponse)=>{
+    return this.http.post('/api/register', {email, password, name, image: this.defaultAvatarUrl }).pipe(map((data: AuthResponse)=>{
       if(data){
         this.saveToken(data);
       }
@@ -64,7 +64,6 @@ export class AuthenticationService {
   public saveToken(authResponse: AuthResponse){
     if(authResponse){
       this.token = authResponse.accessToken;
-      if(!authResponse.user.image) authResponse.user.image = this.defaultAvatarUrl;
       this.currentUser = authResponse.user;
       localStorage.setItem('accessToken', this.token);
       localStorage.setItem('user', JSON.stringify(authResponse.user));
@@ -81,11 +80,7 @@ export class AuthenticationService {
   }
 
   public getProfile(userId: string): Observable<Profile>{
-    return this.http.get(`/api/profile?userId=${userId}`).pipe(map( (data: Profile) => {
-      if(!data.user.image)
-        data.user.image = this.defaultAvatarUrl;
-        return data;
-      }));
+    return this.http.get(`/api/profile?userId=${userId}`).pipe(map( (data: Profile) => { return data; }));
   }
 
   public updateProfile(id: string, name: string, email: string, image: string): Observable<User> {

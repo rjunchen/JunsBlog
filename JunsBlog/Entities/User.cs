@@ -32,6 +32,7 @@ namespace JunsBlog.Entities
             Name = model.Name;
             Email = model.Email;
             Role = Entities.Role.User;
+            Image = model.Image;
             Password = Utilities.HashPassword(model.Password);
             Type = AccountType.Local;
             RefreshToken = new RefreshToken();
@@ -48,7 +49,7 @@ namespace JunsBlog.Entities
             RefreshToken = new RefreshToken();
         }
 
-        public void UpdateUserInfo(ProfileUpdateRequest info)
+        public void UpdateUserInfo(UserBasicInfo info)
         {
             this.Name = info.Name;
             this.Email = info.Email;
