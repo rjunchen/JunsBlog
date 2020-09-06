@@ -1,0 +1,22 @@
+<div class="comments-container"
+    infiniteScroll [infiniteScrollDistance]="scrollDistance" 
+    [infiniteScrollUpDistance]="scrollUpDistance" 
+    [infiniteScrollThrottle]="throttle" 
+    (scrolled)="onScrollDown()">
+    <div class="article-comments-section">
+        <div class="comment-title" fxLayout="row" fxLayoutAlign="start center">
+            <span>0</span><span>Comments</span>
+            <span fxFlex></span>
+            <button mat-stroked-button color="warn"(click)="showCommenter()">REPLY</button>
+        </div>
+    </div>
+    <div>
+        <div class="comment-item" *ngFor="let comment of displayComments">
+            <app-comment-displayer [comment]="comment"  [article]="article"></app-comment-displayer>
+        </div>
+    </div>
+</div>
+
+<div class="overlay" fxLayoutAlign="center top" *ngIf="loading" >
+    <mat-spinner color="warn"></mat-spinner>
+</div>

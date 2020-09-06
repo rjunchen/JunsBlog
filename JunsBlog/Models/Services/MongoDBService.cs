@@ -136,21 +136,22 @@ namespace JunsBlog.Models.Services
         #endregion
 
 
-        //#region Comments
-        //public async Task<List<Comment>> GetCommentsAsync(string articleId)
-        //{
-        //    return await comments.Find<Comment>(x => x.ArticleId == articleId).ToListAsync();
-        //}
+        #region Comments
+        public async Task<List<Comment>> GetCommentsAsync(string articleId)
+        {
+            return await comments.Find<Comment>(x => x.ArticleId == articleId).ToListAsync();
+        }
 
-        //public async Task<Comment> SaveCommentAsync(Comment comment)
-        //{
-        //    comment.UpdatedOn = DateTime.UtcNow;
+        public async Task<Comment> SaveCommentAsync(Comment comment)
+        {
+            comment.UpdatedOn = DateTime.UtcNow;
 
-        //    await comments.ReplaceOneAsync(s => s.Id == comment.Id, comment, new ReplaceOptions { IsUpsert = true });
+            await comments.ReplaceOneAsync(s => s.Id == comment.Id, comment, new ReplaceOptions { IsUpsert = true });
 
-        //    return comment;
-        //}
-        //#endregion
+            return comment;
+        }
+
+        #endregion
 
 
         //#region CommentRanking
@@ -174,7 +175,7 @@ namespace JunsBlog.Models.Services
 
 
         //#region Details
-  
+
         //private class ArticleWithRankings : ArticleDetails
         //{
         //   public IEnumerable<ArticleRanking> Rankings { get; set; }

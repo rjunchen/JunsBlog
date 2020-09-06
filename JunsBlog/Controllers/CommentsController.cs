@@ -31,27 +31,36 @@ namespace JunsBlog.Controllers
         }
 
 
-        //[Authorize(Roles = Role.User)]
-        //[HttpPost("reply")]
-        //public async Task<IActionResult> PostComment(CommentRequest model)
-        //{
-        //    try
-        //    {
-        //        if (String.IsNullOrWhiteSpace(model.ArticleId) || String.IsNullOrWhiteSpace(model.CommentText) || String.IsNullOrWhiteSpace(model.ParentId))
-        //            return BadRequest(new { message = "Incomplete comment information" });
+        [Authorize(Roles = Role.User)]
+        [HttpPost("reply")]
+        public async Task<IActionResult> PostComment(CommentRequest model)
+        {
+            try
+            {
+                if (String.IsNullOrWhiteSpace(model.ArticleId) || String.IsNullOrWhiteSpace(model.CommentText) || String.IsNullOrWhiteSpace(model.ParentId))
+                    return BadRequest(new { message = "Incomplete comment information" });
 
-        //        var insertedComment = await databaseService.SaveCommentAsync(new Comment(model, currentUserId));
+                var insertedComment = await databaseService.SaveCommentAsync(new Comment(model, currentUserId));
 
-        //        var commentDetails = await databaseService.GetCommentDetialsAsync(insertedComment.Id, currentUserId);
+                var commentDetails = new CommentDetails()
+                {
+                    ArticleId = insertedComment.ArticleId,
+                    ChildrenCommentsCount = 0,
+                    CommentText = insertedComment.CommentText,
+                    ParentId = insertedComment.ParentId,
+                    UpdatedOn = insertedComment.UpdatedOn,
+                    User = await databaseService.GetUserAsync(insertedComment.UserId),
+                    Ranking = new CommentRankingDetails()
+                };
 
-        //        return Ok(commentDetails);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        logger.LogError(ex, ex.Message);
-        //        return StatusCode(StatusCodes.Status500InternalServerError);
-        //    }
-        //}
+                return Ok(commentDetails);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
 
         //[HttpPost("search")]
         //public async Task<IActionResult> SearchComments(CommentSearchPagingOption options)

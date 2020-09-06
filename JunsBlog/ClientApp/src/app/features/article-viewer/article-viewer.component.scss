@@ -1,10 +1,12 @@
 $color-warn: #f44336;
 
 .article-container{
-    background-color: white;
-    margin: 20px;
-    padding: 10px;
-    box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
+    background-color: white;  
+    .article-display-box{
+        padding: 10px;
+        margin: 20px;
+        box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
+    }
 }
 
 .header-info-box{ 

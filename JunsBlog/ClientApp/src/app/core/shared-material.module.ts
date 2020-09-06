@@ -11,14 +11,15 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatSnackBarModule } from "@angular/material/snack-bar";
+import { MatTooltipModule } from "@angular/material/tooltip";
 
 @NgModule({
   declarations: [  ],
   imports: [
     CommonModule, MatButtonModule, MatCheckboxModule, FormsModule, ReactiveFormsModule, MatIconModule,
-    MatInputModule, FlexLayoutModule, MatProgressSpinnerModule, MatSnackBarModule
+    MatInputModule, FlexLayoutModule, MatProgressSpinnerModule, MatSnackBarModule, MatTooltipModule
   ],
   exports:[ MatButtonModule, MatCheckboxModule, FormsModule , ReactiveFormsModule, MatIconModule,
-    MatInputModule, MatFormFieldModule, FlexLayoutModule, MatProgressSpinnerModule, MatSnackBarModule ]
+    MatInputModule, MatFormFieldModule, FlexLayoutModule, MatProgressSpinnerModule, MatSnackBarModule, MatTooltipModule ]
 })
 export class SharedMaterialModule { }
