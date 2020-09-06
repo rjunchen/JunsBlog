@@ -30,10 +30,11 @@ namespace JunsBlog.Interfaces.Services
 
         // Comments
         Task<Comment> SaveCommentAsync(Comment comment);
+        Task<CommentSearchPagingResult> SearchCommentsAsync(CommentSearchPagingOption options, string currentUserId);
         //  Task<List<Comment>> GetCommentsAsync(string articleId);
 
 
-        //  // CommentRankings
+        // CommentRankings
         //  Task<CommentRanking> GetCommentRankingAsync(string commentId, string userId);
         //  Task<List<CommentRanking>> GetCommentRankingsAsync(string commentId);
         //  Task<CommentRanking> SaveCommentRankingAsync(CommentRanking ranking);

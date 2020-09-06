@@ -4,6 +4,10 @@ import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { CommentDetails } from '../models/comment/commentDetails'
 import { CommentRequest } from '../models/comment/commentRequest'
+import { CommentSearchPagingOption } from '../models/comment/commentSearchPagingOption'
+import { CommentSearchPagingResult } from '../models/comment/CommentSearchPagingResult'
+import { CommentRankingRequest } from '../models/comment/commentRankingRequest';
+import { CommentRankingDetails } from '../models/comment/commentRankingDetails';
 
 @Injectable({
   providedIn: 'root'
@@ -23,5 +27,13 @@ export class CommentService {
 
   public commentPosted(comment: CommentDetails){
     this.onCommentPosted.emit(comment);
+  }
+
+  public searchComments(option: CommentSearchPagingOption) : Observable<CommentSearchPagingResult> {
+    return this.http.post('/api/comment/search', option).pipe(map(data => { return <CommentSearchPagingResult>data}));
+  }
+
+  public rankComment(rankRequest: CommentRankingRequest): Observable<CommentRankingDetails>{
+    return this.http.post('/api/comment/rank', rankRequest).pipe(map(data => { return <CommentRankingDetails>data}));
   }
 }

@@ -17,6 +17,7 @@ namespace JunsBlog.Models.Articles
         public bool IsPrivate { get; set; }
         public bool IsApproved { get; set; }
         public int Views { get; set; }
+        public int CommentsCount { get; set; }
         public DateTime UpdatedOn { get; set; }
         public DateTime CreatedOn { get; set; }
     }

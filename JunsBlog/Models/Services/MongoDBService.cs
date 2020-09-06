@@ -99,7 +99,7 @@ namespace JunsBlog.Models.Services
                             Content = a.article.Content,
                             Categories = a.article.Categories,
                             Author = a.author
-                        }).GroupJoin(articleRankings.AsQueryable(), x => x.Id, y => y.Id, (x, y) => new { article = x, rankings = y})
+                        }).GroupJoin(articleRankings.AsQueryable(), x => x.Id, y => y.Id, (x, y) => new { article = x, rankings = y })
                         .Select(a => new ArticleDetails
                         {
                             Id = a.article.Id,
@@ -112,7 +112,22 @@ namespace JunsBlog.Models.Services
                             Content = a.article.Content,
                             Categories = a.article.Categories,
                             Author = a.article.Author
+                        }).GroupJoin(comments.AsQueryable(), x => x.Id, y => y.ArticleId, (x, y) => new { article = x, comments = y })
+                        .Select(a => new ArticleDetails
+                        {
+                            Id = a.article.Id,
+                            Title = a.article.Title,
+                            UpdatedOn = a.article.UpdatedOn,
+                            CreatedOn = a.article.CreatedOn,
+                            IsApproved = a.article.IsApproved,
+                            IsPrivate = a.article.IsPrivate,
+                            Views = a.article.Views,
+                            Content = a.article.Content,
+                            Categories = a.article.Categories,
+                            Author = a.article.Author,
+                            CommentsCount = a.comments.Count()
                         });
+
             var articleDetails = await query.FirstOrDefaultAsync();
             return articleDetails;
         }
@@ -150,6 +165,77 @@ namespace JunsBlog.Models.Services
 
             return comment;
         }
+
+        private IMongoQueryable<CommentDetails> GenerateCommentsDetailsQuery()
+        {
+            var query = comments.AsQueryable().GroupJoin(comments.AsQueryable(), x => x.Id, y => y.ParentId, (x, y) => new { comment = x, childrenComments = y })
+                            .Select(a => new
+                            {
+                                Id = a.comment.Id,
+                                CommentText = a.comment.CommentText,
+                                UpdatedOn = a.comment.UpdatedOn,
+                                ArticleId = a.comment.ArticleId,
+                                ChildrenCommentsCount = a.childrenComments.Count(),
+                                ParentId = a.comment.ParentId,
+                                UserId = a.comment.UserId,
+
+                            }).Join(users.AsQueryable(), x => x.UserId, y => y.Id, (x, y) => new CommentDetails
+                            {
+                                Id = x.Id,
+                                CommentText = x.CommentText,
+                                UpdatedOn = x.UpdatedOn,
+                                ArticleId = x.ArticleId,
+                                ChildrenCommentsCount = x.ChildrenCommentsCount,
+                                ParentId = x.ParentId,
+                                User = y
+                            });
+            return query;
+        }
+
+        public async Task<CommentSearchPagingResult> SearchCommentsAsync(CommentSearchPagingOption options, string currentUserId)
+        {
+            var query = GenerateCommentsDetailsQuery();
+
+            if (!string.IsNullOrEmpty(options.SearchKey))
+            {
+                switch (options.SearchOn)
+                {
+                    case CommentSearchOnEnum.ArticleId:
+                        query = query.Where(x => x.ArticleId == options.SearchKey.Trim());
+                        break;
+                    case CommentSearchOnEnum.ParentId:
+                        query = query.Where(x => x.ParentId == options.SearchKey.Trim());
+                        break;
+                    case CommentSearchOnEnum.CommentText:
+                        query = query.Where(x => x.CommentText.Contains(options.SearchKey.Trim()));
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            switch (options.SortBy)
+            {
+                case SortByEnum.UpdatedOn:
+                    if (options.SortOrder == SortOrderEnum.Ascending)
+                        query = query.OrderBy(x => x.UpdatedOn);
+                    else
+                        query = query.OrderByDescending(x => x.UpdatedOn);
+                    break;
+            }
+
+            var docsCount = await query.CountAsync();
+
+            var documents = await query.Skip((options.CurrentPage - 1) * options.PageSize).Take(options.PageSize).ToListAsync();
+
+            foreach (var item in documents)
+            {
+                item.Ranking = await GetCommentRankingDetailsAsync(item.Id, currentUserId);
+            }
+
+            return new CommentSearchPagingResult(documents, docsCount, options);
+        }
+
 
         #endregion
 
@@ -193,27 +279,27 @@ namespace JunsBlog.Models.Services
         //    return commentDetail;
         //}
 
-        //private async Task<CommentRankingDetails> GetCommentRankingDetailsAsync(string commentId, string userId)
-        //{
-        //    var rankings = await commentRankings.Find(x => x.CommentId == commentId).ToListAsync();
+        private async Task<CommentRankingDetails> GetCommentRankingDetailsAsync(string commentId, string userId)
+        {
+            var rankings = await commentRankings.Find(x => x.CommentId == commentId).ToListAsync();
 
-        //    var rankingResponse = new CommentRankingDetails() { CommentId = commentId };
+            var rankingResponse = new CommentRankingDetails();
 
-        //    foreach (var item in rankings)
-        //    {
-        //        if (item.DidIDislike) rankingResponse.DislikesCount++;
-        //        if (item.DidILike) rankingResponse.LikesCount++;
-        //        rankingResponse.DidIFavor = item.DidIFavor;
+            foreach (var item in rankings)
+            {
+                if (item.DidIDislike) rankingResponse.DislikesCount++;
+                if (item.DidILike) rankingResponse.LikesCount++;
+                rankingResponse.DidIFavor = item.DidIFavor;
 
-        //        if (item.UserId == userId)
-        //        {
-        //            rankingResponse.DidIDislike = item.DidIDislike;
-        //            rankingResponse.DidILike = item.DidILike;
-        //            rankingResponse.DidIFavor = item.DidIFavor;
-        //        }
-        //    }
-        //    return rankingResponse;
-        //}
+                if (item.UserId == userId)
+                {
+                    rankingResponse.DidIDislike = item.DidIDislike;
+                    rankingResponse.DidILike = item.DidILike;
+                    rankingResponse.DidIFavor = item.DidIFavor;
+                }
+            }
+            return rankingResponse;
+        }
 
         //private IMongoQueryable<CommentDetails> GenerateCommentsDetailsQuery()
         //{
@@ -239,57 +325,9 @@ namespace JunsBlog.Models.Services
         //                        User = y
         //                    });
         //    return query;
-        //} 
-
-        //public async Task<CommentSearchPagingResult> SearchCommentsAsync(CommentSearchPagingOption options, string currentUserId)
-        //{
-        //    var query = GenerateCommentsDetailsQuery();
-
-        //    if (!string.IsNullOrEmpty(options.SearchKey))
-        //    {
-        //        switch (options.SearchOn)
-        //        {
-        //            case CommentSearchOnEnum.ArticleId:
-        //                query = query.Where(x => x.ArticleId == options.SearchKey.Trim());
-        //                break;
-        //            case CommentSearchOnEnum.ParentId:
-        //                query = query.Where(x => x.ParentId == options.SearchKey.Trim());
-        //                break;
-        //            case CommentSearchOnEnum.CommentText:
-        //                query = query.Where(x => x.CommentText.Contains(options.SearchKey.Trim()));
-        //                break;
-        //            default:
-        //                break;
-        //        }
-        //    }
-
-        //    switch (options.SortBy)
-        //    {
-        //        case SortByEnum.UpdatedOn:
-        //            if (options.SortOrder == SortOrderEnum.Ascending)
-        //                query = query.OrderBy(x => x.UpdatedOn);
-        //            else
-        //                query = query.OrderByDescending(x => x.UpdatedOn);
-        //            break;
-        //        //case SortByEnum.Views:
-        //        //    if (sortOrder == SortOrderEnum.Ascending)
-        //        //        query = query.OrderBy(x => x.views);
-        //        //    else
-        //        //        query = query.OrderByDescending(x => x.Views);
-        //        //    break;
-        //    }
-
-        //    var docsCount = await query.CountAsync();
-
-        //    var documents = await query.Skip((options.CurrentPage - 1) * options.PageSize).Take(options.PageSize).ToListAsync();
-
-        //    foreach (var item in documents)
-        //    {
-        //        item.Ranking = await GetCommentRankingDetailsAsync(item.Id, currentUserId);
-        //    }
-
-        //    return new CommentSearchPagingResult(documents, docsCount, options);
         //}
+
+
 
         //public async Task<ProfileDetails> GetProfileDetailsAsync(string currentUserId)
         //{

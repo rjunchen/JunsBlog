@@ -12,14 +12,15 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { MatTooltipModule } from "@angular/material/tooltip";
+import { MatDividerModule } from "@angular/material/divider";
 
 @NgModule({
   declarations: [  ],
   imports: [
     CommonModule, MatButtonModule, MatCheckboxModule, FormsModule, ReactiveFormsModule, MatIconModule,
-    MatInputModule, FlexLayoutModule, MatProgressSpinnerModule, MatSnackBarModule, MatTooltipModule
+    MatInputModule, FlexLayoutModule, MatProgressSpinnerModule, MatSnackBarModule, MatTooltipModule, MatDividerModule
   ],
   exports:[ MatButtonModule, MatCheckboxModule, FormsModule , ReactiveFormsModule, MatIconModule,
-    MatInputModule, MatFormFieldModule, FlexLayoutModule, MatProgressSpinnerModule, MatSnackBarModule, MatTooltipModule ]
+    MatInputModule, MatFormFieldModule, FlexLayoutModule, MatProgressSpinnerModule, MatSnackBarModule, MatTooltipModule, MatDividerModule ]
 })
 export class SharedMaterialModule { }

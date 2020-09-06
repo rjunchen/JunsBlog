@@ -62,21 +62,21 @@ namespace JunsBlog.Controllers
             }
         }
 
-        //[HttpPost("search")]
-        //public async Task<IActionResult> SearchComments(CommentSearchPagingOption options)
-        //{
-        //    try
-        //    {
-        //        var searchResult = await databaseService.SearchCommentsAsync(options, currentUserId);
+        [HttpPost("search")]
+        public async Task<IActionResult> SearchComments(CommentSearchPagingOption options)
+        {
+            try
+            {
+                var searchResult = await databaseService.SearchCommentsAsync(options, currentUserId);
 
-        //        return Ok(searchResult);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        logger.LogError(ex, ex.Message);
-        //        return StatusCode(StatusCodes.Status500InternalServerError);
-        //    }
-        //}
+                return Ok(searchResult);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
 
 
         //[Authorize(Roles = Role.User)]

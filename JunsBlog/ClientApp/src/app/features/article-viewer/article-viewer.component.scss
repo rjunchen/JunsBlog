@@ -1,8 +1,8 @@
 $color-warn: #f44336;
 
 .article-container{
-    background-color: white;  
     .article-display-box{
+        background-color: white;  
         padding: 10px;
         margin: 20px;
         box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
@@ -70,6 +70,7 @@ $color-warn: #f44336;
 .overlay{
     margin-top: 20px;
     z-index: 900;
+    background-color: transparent;
 }
 
 .image-link{

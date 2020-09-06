@@ -8,6 +8,11 @@ import { AlertService } from '../../services/alert.service'
 })
 export class HomeComponent implements OnInit {
 
+  
+  throttle = 300;
+  scrollDistance = 1;
+  scrollUpDistance = 2;
+  
   constructor(private alertService: AlertService) { }
 
   ngOnInit(): void {
@@ -26,5 +31,8 @@ export class HomeComponent implements OnInit {
 
   success(){
     this.alertService.success('Tis is a testThis is a testThis is a testThis is a test', 'Ok', 0);
+  }
+  onScrollDown(){
+    console.log('i am goog');
   }
 }
