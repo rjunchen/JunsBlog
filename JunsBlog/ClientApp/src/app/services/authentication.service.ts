@@ -91,4 +91,17 @@ export class AuthenticationService {
        return user;
       }));
   }
+
+  public sendResetToken(email: string){
+    return this.http.get(`/api/reset/verifyEmail?email=${email}`);
+  }
+
+  public verifyToken(email: string, token: string){
+    return this.http.get(`/api/reset/verifyToken?email=${email}&token=${token}`);
+  }
+
+  public resetPassword(email: string, password: string, resetToken: string ){
+    return this.http.post('/api/reset/password', {email, password, resetToken});
+  }
+
 }
