@@ -141,7 +141,7 @@ namespace JunsBlog.Controllers
             try
             {
                 if (model == null || String.IsNullOrWhiteSpace(model.ArticleId))
-                    return BadRequest(new { message = "Incomplete ranking information" });
+                    return BadRequest(new { message = "Incomplete ranking information" }); 
 
                 var ranking = await databaseService.GetArticleRankingAsync(model.ArticleId, currentUserId);
 
