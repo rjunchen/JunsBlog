@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using JunsBlog.Entities;
@@ -12,7 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
+using Microsoft.Net.Http.Headers;
 
 namespace JunsBlog.Controllers
 {
@@ -84,8 +82,8 @@ namespace JunsBlog.Controllers
                 Utilities.MassageArticleImages(article);
 
                 await databaseService.SaveArticleAsync(article);
-
-                return Ok(article.Id);
+    
+                return Ok(new ArticleId(article.Id));
             }
             catch (Exception ex)
             {

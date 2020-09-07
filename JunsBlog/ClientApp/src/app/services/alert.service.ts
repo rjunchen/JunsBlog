@@ -48,9 +48,13 @@ export class AlertService {
   
   alertHttpError(err: any){
     if (err.status === 400) {     
-      this.warning(err.error);
+      if(err.error.message)
+        this.warning(err.error.message);
+      else
+        this.warning(err.error);
     } else {
       this.error('Unknown error occurred, please try again later');
+      console.log(err);
     }
   }
 

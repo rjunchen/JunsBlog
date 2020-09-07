@@ -69,8 +69,8 @@ export class ArticleEditorComponent implements OnInit {
   }
 
   summit(){
-    this.articleService.saveArticle(this.article).subscribe( id=>{
-      this.router.navigateByUrl(`/article/${id}`);
+    this.articleService.saveArticle(this.article).subscribe( article=>{
+      this.router.navigateByUrl(`/article/${article.id}`);
     }, err=>{
        this.alertService.alertHttpError(err);
     })
