@@ -1,5 +1,5 @@
-import { SortOrderEnum } from '../Enums/sortOrderEnum';
-import { SortByEnum } from '../Enums/sortByEnum';
+import { SortOrderEnum } from '../enums/sortOrderEnum';
+import { SortByEnum } from '../enums/sortByEnum';
 import { ArticleFilterEnum } from '../enums/articleFilterEnum';
 
 

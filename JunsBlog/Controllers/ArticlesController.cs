@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 
 namespace JunsBlog.Controllers
 {
@@ -30,40 +31,16 @@ namespace JunsBlog.Controllers
             this.currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
 
-        [Authorize(Roles = Role.User)]
-        [HttpPost("create")]
-        public async Task<IActionResult> CreateArticle(ArticleRequest model)
-        {
-            try
-            {
-                if (String.IsNullOrWhiteSpace(model.Title) || String.IsNullOrWhiteSpace(model.Content) || String.IsNullOrWhiteSpace(model.Abstract))
-                    return BadRequest(new { message = "Incomplete article information" });
-
-                var newArticle = new Article(model, currentUserId); 
-
-                Utilities.MassageArticleImages(newArticle);
-
-     
-               var insertedArticle = await databaseService.SaveArticleAsync(newArticle);
-
-                return Ok(insertedArticle);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
 
         [HttpGet("get")]
-        public async Task<IActionResult> GetArticle(string articleId)
+        public async Task<IActionResult> GetArticleBasicInfo(string articleId)
         {
             try
             {
                 if (String.IsNullOrWhiteSpace(articleId))
                     return BadRequest(new { message = "Invalid articleId" });
 
-                var article = await databaseService.GetArticleAsync(articleId);
+                var article = await databaseService.GetArticleBasicInfoAsync(articleId);
 
                 if (article == null) return BadRequest(new { message = "Article does not exist" });
 
@@ -76,23 +53,39 @@ namespace JunsBlog.Controllers
             }
         }
 
-
-        [HttpPost("update")]
-        public async Task<IActionResult> UpdateArticle(ArticleRequest article)
+        [Authorize(Roles = Role.User)]
+        [HttpPost("save")]
+        public async Task<IActionResult> SaveArticle(ArticleBasicInfo aricleModel)
         {
             try
             {
-                if (article == null || String.IsNullOrWhiteSpace(article.Id) || String.IsNullOrWhiteSpace(article.Title) 
-                    || String.IsNullOrWhiteSpace(article.Abstract) || String.IsNullOrWhiteSpace(article.Content))
+                if (aricleModel == null || String.IsNullOrWhiteSpace(aricleModel.Title) 
+                    || String.IsNullOrWhiteSpace(aricleModel.Abstract) || String.IsNullOrWhiteSpace(aricleModel.Content))
                     return BadRequest(new { message = "Invalid article" });
 
-                var existingArticle = await databaseService.GetArticleAsync(article.Id);
+                Article article;
 
-                existingArticle.UpdateContents(article);
+                // If the article model doesn't have an id then create a new article otherwise update the article
+                if (String.IsNullOrWhiteSpace(aricleModel.Id))
+                {
+                    article = new Article(aricleModel, currentUserId);
+                }
+                else
+                {
+                    article = await databaseService.GetArticleAsync(aricleModel.Id);
+                    article.Abstract = aricleModel.Abstract;
+                    article.Content = aricleModel.Content;
+                    article.CoverImage = aricleModel.CoverImage;
+                    article.IsPrivate = aricleModel.IsPrivate;
+                    article.Title = aricleModel.Title;
+                    article.Categories = aricleModel.Categories;
+                }
 
-                var updatedArticle = await databaseService.SaveArticleAsync(existingArticle);
+                Utilities.MassageArticleImages(article);
 
-                return Ok(updatedArticle);
+                await databaseService.SaveArticleAsync(article);
+
+                return Ok(article.Id);
             }
             catch (Exception ex)
             {
@@ -110,9 +103,7 @@ namespace JunsBlog.Controllers
                 if (String.IsNullOrWhiteSpace(articleId))
                     return BadRequest(new { message = "Invalid articleId" });
 
-                var articleDetails = await databaseService.GetArticleDetailsAsync(articleId);
-
-                if(articleDetails == null) return BadRequest(new { message = "Article does not exist" });
+                var articleDetails = await databaseService.GetArticleDetailsAsync(articleId, currentUserId);
 
                 return Ok(articleDetails);
             }
@@ -150,7 +141,7 @@ namespace JunsBlog.Controllers
             try
             {
                 if (model == null || String.IsNullOrWhiteSpace(model.ArticleId))
-                    return BadRequest(new { message = "Incomplete ranking information" });
+                    return BadRequest(new { message = "Incomplete ranking information" }); 
 
                 var ranking = await databaseService.GetArticleRankingAsync(model.ArticleId, currentUserId);
 
@@ -164,7 +155,7 @@ namespace JunsBlog.Controllers
                         break;
                     case RankEnum.Dislike:
                         ranking.DidIDislike = !ranking.DidIDislike;
-                        if(ranking.DidIDislike) ranking.DidILike = false;
+                        if (ranking.DidIDislike) ranking.DidILike = false;
                         break;
                     case RankEnum.Favor:
                         ranking.DidIFavor = !ranking.DidIFavor;
@@ -185,14 +176,13 @@ namespace JunsBlog.Controllers
             }
         }
 
-
         [HttpGet("rank")]
         public async Task<IActionResult> GetArticleRanking(string articleId)
         {
             try
             {
                 if (String.IsNullOrWhiteSpace(articleId))
-                    return BadRequest(new { message = "Incomplete ranking information" });
+                    return BadRequest(new { message = "Article ID is missing" });
 
                 var rankings = await databaseService.GetArticleRankingsAsync(articleId);
 

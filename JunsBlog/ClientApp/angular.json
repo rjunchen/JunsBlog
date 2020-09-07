@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist",
+            "outputPath": "dist/ClientApp",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -28,7 +28,9 @@
               "src/assets"
             ],
             "styles": [
+              "src/app-theme.scss",
               "src/styles.scss",
+              "./node_modules/font-awesome/css/font-awesome.css",
               "./node_modules/quill/dist/quill.snow.css"
             ],
             "scripts": ["./node_modules/quill/dist/quill.min.js"]
@@ -57,8 +59,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "800kb",
-                  "maximumError": "900kb"
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
                 }
               ]
             }

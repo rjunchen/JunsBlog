@@ -1,10 +1,10 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { User } from 'src/app/models/user';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
+import { User } from 'src/app/models/authentication/user';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
-import { ToastrService } from 'ngx-toastr';
-import { AuthenticationService } from 'src/app/core/authentication.service';
 import { ImageCroppedEvent } from 'ngx-image-cropper';
-import { UserInfoUpdateRequest } from 'src/app/models/userInfoUpdateRequest';
+import { AuthenticationService } from 'src/app/services/authentication.service';
+import { CustomValidationService } from 'src/app/services/custom-validation.service';
+import { AlertService } from 'src/app/services/alert.service';
 
 @Component({
   selector: 'app-profile-editor',
@@ -13,80 +13,77 @@ import { UserInfoUpdateRequest } from 'src/app/models/userInfoUpdateRequest';
 })
 export class ProfileEditorComponent implements OnInit {
   @Input() user: User;
-  @Output() hideEditor = new EventEmitter<string>();
-  defaultAvatarUrl = './assets/avatar.png';
+  @Output() onEditorExit = new EventEmitter<string>();
 
   imageChangedEvent: any = '';
   croppedImage: any = '';
   userForm: FormGroup;
   avatarSrc: any;
   uploading: boolean;
+  isAvatarDirty: boolean;
 
-  constructor(private auth: AuthenticationService,  private fb: FormBuilder, private toastr: ToastrService) { 
-    this.createForm();
-  }
+  constructor(private auth: AuthenticationService, private alertService: AlertService, private fb: FormBuilder, private customValidator: CustomValidationService) {}
 
   ngOnInit(): void {
-    this.openCloseEditor();
+    this.createForm();
+    this.avatarSrc = this.user.image;
   }
 
   createForm() {
     this.userForm = this.fb.group({
-      displayName: ['', Validators.required],
-      email: ['', Validators.compose([Validators.required, Validators.email])]
+      displayName: [this.user.name, Validators.required],
+      email: [this.user.email, Validators.compose([Validators.required, this.customValidator.emailPatternValidator()])]
     })
   }
 
-  openCloseEditor(){
-    this.avatarSrc = this.user.image;
-    const displayNameControl: AbstractControl = this.userForm.controls['displayName']; 
-    const emailControl: AbstractControl = this.userForm.controls['email']; 
-    displayNameControl.setValue(this.user.name); 
-    emailControl.setValue(this.user.email); 
+  get userFormControl() {
+    return this.userForm.controls;
+  }
+
+  isInvalid(control: AbstractControl){
+    if(!control) return false;
+    if(control.invalid && control.dirty) return true;
   }
 
   onSave(){
     const displayNameControl: AbstractControl = this.userForm.controls['displayName']; 
     const emailControl: AbstractControl = this.userForm.controls['email']; 
-
- 
-    var userRequest = new UserInfoUpdateRequest(this.user.id, displayNameControl.value, emailControl.value, this.avatarSrc);
-
-    this.auth.updateUserInfo(userRequest).subscribe(x=>{
+    
+    this.auth.updateProfile(this.user.id, displayNameControl.value, emailControl.value, this.avatarSrc).subscribe(x=>{
       this.user.email = x.email;
       this.user.name = x.name;
       this.user.image = x.image;
-      this.hideEditor.emit();
+      this.onEditorExit.emit();
     }, err=>{
-      if (err.status === 400) {     
-        this.toastr.warning(err.error.message, err.statusText);
-      } else {
-        this.toastr.error('Unknown error occurred, please try again later');
-      }
+      this.alertService.alertHttpError(err);
     });
+    this.onEditorExit.emit();
   }
 
-  onClick(){
- 
+  canSave(){
+    return (this.isAvatarDirty || this.userForm.controls['email'].dirty 
+    || this.userForm.controls['displayName'].dirty) && !this.uploading && this.userForm.valid;
   }
+
   onCancel(){
-    this.hideEditor.emit();
+    this.onEditorExit.emit();
   }
 
   fileChangeEvent(event: any): void {
-      this.imageChangedEvent = event;
-      this.uploading = true;
+    this.imageChangedEvent = event;
+    this.uploading = true;
   }
   imageCropped(event: ImageCroppedEvent) {
     this.avatarSrc = event.base64;
+    this.isAvatarDirty = true;
   }
-  
+
   cropperReady() {
     this.uploading = false;
   }
 
   loadImageFailed() {
-    this.toastr.error('Failed to load image');
+    this.alertService.error('Failed to load image');
   }
 
 }

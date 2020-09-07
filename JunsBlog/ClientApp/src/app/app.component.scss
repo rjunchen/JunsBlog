@@ -1,0 +1,10 @@
+.page-content{
+    padding-top: 60px;
+}
+
+@media only screen and (max-width: 768px){
+    .page-content{
+        padding-top: 0px;
+        padding-bottom: 60px;
+    }
+}

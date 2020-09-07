@@ -51,9 +51,7 @@ namespace JunsBlog.Controllers
 
                 if (!Utilities.ValidatePassword(model.Password, user.Password)) return BadRequest(new { message = "Incorrect password" });
 
-                var userToken = await databaseService.GetUserTokenAsync(user.Id);
-
-                var response = new AuthenticateResponse(user, jwtTokenHelper.GenerateJwtToken(user), userToken.RefreshToken);
+                var response = new AuthenticateResponse(user, jwtTokenHelper.GenerateJwtToken(user));
 
                 return Ok(response);
             }
@@ -64,7 +62,7 @@ namespace JunsBlog.Controllers
             }      
         }
 
-        [HttpPost("register")]
+        [HttpPost("register")]  
         public async Task<IActionResult> Register(RegisterRequest model)
         {
             try
@@ -79,9 +77,7 @@ namespace JunsBlog.Controllers
                 var insertedUser = await databaseService.SaveUserAsync(new User(model));
                 if (insertedUser == null) return BadRequest(new { message = "Failed to register user" });
 
-                var insertedUserToken = await databaseService.SaveUserTokenAsync(new UserToken(insertedUser.Id));
-
-                var response = new AuthenticateResponse(insertedUser, jwtTokenHelper.GenerateJwtToken(insertedUser), insertedUserToken.RefreshToken);
+                var response = new AuthenticateResponse(insertedUser, jwtTokenHelper.GenerateJwtToken(insertedUser));
 
                 notificationService.SendNotification(Notification.GenerateWelcomeNotification(insertedUser));
 
@@ -92,35 +88,6 @@ namespace JunsBlog.Controllers
                 logger.LogError(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }        
-        }
-
-
-        [HttpPost("user/update")]
-        public async Task<IActionResult> UpdateUserInfo(UserInfoUpdateRequest model)
-        {
-            try
-            {
-                if (model == null || String.IsNullOrWhiteSpace(model.Name) || String.IsNullOrWhiteSpace(model.Email))
-                    return BadRequest(new { message = "Incomplete user registration information" });
-
-                if (model.Id != userId) return BadRequest(new { message = "Invalid user update request" });
-
-               
-                var existingUser = await databaseService.GetUserAsync(model.Id);
-
-                if (existingUser == null) return BadRequest(new { message = "User doesn't exit" });
-
-                existingUser.UpdateUserInfo(model);
-
-                var insertedUser = await databaseService.SaveUserAsync(existingUser);
-
-                return Ok(insertedUser);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
         }
 
 
@@ -137,9 +104,7 @@ namespace JunsBlog.Controllers
 
                 if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "User not found");
 
-                var userToken = await databaseService.GetUserTokenAsync(user.Id);
-
-                if(model.ResetToken != userToken.ResetToken || userToken.ResetExpiry < DateTime.UtcNow) 
+                if(model.ResetToken != user.ResetToken.Token || user.ResetToken.Expiry < DateTime.UtcNow) 
                     return StatusCode(StatusCodes.Status400BadRequest, "Invalid or expired reset token");
 
                 user.Password = Utilities.HashPassword(model.Password);
@@ -166,14 +131,12 @@ namespace JunsBlog.Controllers
 
                 if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "Invalid or expired reset token");
 
-                var userToken = await databaseService.GetUserTokenAsync(user.Id);
+                user.ResetToken = new ResetToken();
 
-                userToken.CreateResetToken();
-
-                var updatedUserToken = await databaseService.SaveUserTokenAsync(userToken);
+                var updatedUserToken = await databaseService.SaveUserAsync(user);
 
                 // Send the password reset email
-                notificationService.SendNotification(Notification.GeneratePasswordResetNotification(user, updatedUserToken));
+                notificationService.SendNotification(Notification.GeneratePasswordResetNotification(user));
                 return Ok();
             }
             catch (Exception ex)
@@ -195,9 +158,7 @@ namespace JunsBlog.Controllers
 
                 if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "User not found");
 
-                var userToken = await databaseService.GetUserTokenAsync(user.Id);
-
-                if(userToken.ResetToken == token && userToken.ResetExpiry > DateTime.UtcNow)
+                if(user.ResetToken.Token == token && user.ResetToken.Expiry > DateTime.UtcNow)
                     return Ok();
                 else
                     return StatusCode(StatusCodes.Status400BadRequest, "Invalid reset token");
@@ -217,11 +178,40 @@ namespace JunsBlog.Controllers
             {
                 if (String.IsNullOrWhiteSpace(userId)) return StatusCode(StatusCodes.Status400BadRequest);
 
-                var profileDetails = await databaseService.GetProfileDetailsAsync(userId);
+                var user = await databaseService.GetProfileDetailsAsync(userId);
 
-                if (profileDetails == null) return StatusCode(StatusCodes.Status400BadRequest, "User not found");
+                if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "User not found");
 
-                return Ok(profileDetails);
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpPost("profile/update")]
+        public async Task<IActionResult> UpdateProfile(UserBasicInfo model)
+        {
+            try
+            {
+                if (model == null || String.IsNullOrWhiteSpace(model.Id) || String.IsNullOrWhiteSpace(model.Name) || String.IsNullOrWhiteSpace(model.Email))
+                    return BadRequest(new { message = "Incomplete user information" });
+
+                if (model.Id != userId) return BadRequest(new { message = "Invalid user update request" });
+
+                var existingUser = await databaseService.GetUserAsync(model.Id);
+
+                if (existingUser == null) return BadRequest(new { message = "User doesn't exit" });
+
+                existingUser.Email = model.Email;
+                existingUser.Name = model.Name;
+                existingUser.Image = model.Image;
+
+                var insertedUser = await databaseService.SaveUserAsync(existingUser);
+
+                return Ok(insertedUser);
             }
             catch (Exception ex)
             {

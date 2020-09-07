@@ -54,7 +54,7 @@ namespace JunsBlog.Test.UnitTests
 
             var currentUser = databaseService.SaveUserAsync(user).Result;
 
-            var articleRequest = new ArticleRequest() { Title = "title", Abstract = "abstract", Content = "content" };
+            var articleRequest = new ArticleBasicInfo() { Title = "title", Abstract = "abstract", Content = "content" };
             var article = new Article(articleRequest, currentUserId);
             article.Id = SAMPLE_ARTICLE_ID;
             var sampleArticle = databaseService.SaveArticleAsync(article).Result;

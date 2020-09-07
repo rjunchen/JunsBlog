@@ -16,6 +16,5 @@ namespace JunsBlog.Models.Comments
         public string ArticleId { get; set; }
         public string ParentId { get; set; }
         public CommentRankingDetails Ranking { get; set; }
-
     }
 }

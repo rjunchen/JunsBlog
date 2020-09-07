@@ -7,7 +7,6 @@ namespace JunsBlog.Models.Comments
 {
     public class CommentRankingDetails
     {
-        public string CommentId { get; set; }
         public bool DidILike { get; set; }
         public int LikesCount { get; set; }
         public bool DidIDislike { get; set; }

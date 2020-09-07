@@ -42,7 +42,17 @@ namespace JunsBlog.Controllers
 
                 var insertedComment = await databaseService.SaveCommentAsync(new Comment(model, currentUserId));
 
-                var commentDetails = await databaseService.GetCommentDetialsAsync(insertedComment.Id, currentUserId);
+                var commentDetails = new CommentDetails()
+                {
+                    Id = insertedComment.Id,
+                    ArticleId = insertedComment.ArticleId,
+                    ChildrenCommentsCount = 0,
+                    CommentText = insertedComment.CommentText,
+                    ParentId = insertedComment.ParentId,
+                    UpdatedOn = insertedComment.UpdatedOn,
+                    User = await databaseService.GetUserAsync(insertedComment.UserId),
+                    Ranking = new CommentRankingDetails()
+                };
 
                 return Ok(commentDetails);
             }
@@ -68,7 +78,6 @@ namespace JunsBlog.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
-
 
         [Authorize(Roles = Role.User)]
         [HttpPost("rank")]
@@ -99,7 +108,7 @@ namespace JunsBlog.Controllers
                 }
                 await databaseService.SaveCommentRankingAsync(ranking);
 
-                var rankingDetails = await GetCommentRankingDetails(model.CommentId, currentUserId);
+                var rankingDetails = await databaseService.GetCommentRankingDetailsAsync(model.CommentId, currentUserId);
 
                 return Ok(rankingDetails);
             }
@@ -108,28 +117,6 @@ namespace JunsBlog.Controllers
                 logger.LogError(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
-        }
-
-        private async Task<CommentRankingDetails> GetCommentRankingDetails(string commentId, string userId)
-        {
-            var rankings = await databaseService.GetCommentRankingsAsync(commentId);
-
-            var rankingResponse = new CommentRankingDetails() { CommentId = commentId };
-
-            foreach (var item in rankings)
-            {
-                if (item.DidIDislike) rankingResponse.DislikesCount++;
-                if (item.DidILike) rankingResponse.LikesCount++;
-                rankingResponse.DidIFavor = item.DidIFavor;
-
-                if (item.UserId == userId)
-                {
-                    rankingResponse.DidIDislike = item.DidIDislike;
-                    rankingResponse.DidILike = item.DidILike;
-                    rankingResponse.DidIFavor = item.DidIFavor;
-                }
-            }
-            return rankingResponse;
         }
     }
 }

@@ -1,26 +1,30 @@
-<div class="user-info-editor">
-    <div *ngIf="user" class="profile-stats-box">
-        <div class="avatar-box">
-            <img class="images profileImage image-link" [src]="avatarSrc ? avatarSrc : defaultAvatarUrl"/>
-            <div class="grey-text">{{user.role}}</div>    
-        </div>   
-        <div class="user-info">
-            <form class="user-info-form" [formGroup]="userForm">
+<div class="profile-editor-container">
+    <div class="profile-info" fxLayout="row" fxLayoutAlign="start top">
+        <img class="profile-image"  [src]="avatarSrc"/>
+        <div class="profile-details">
+            <form class="user-info-form" [formGroup]="userForm" fxLayout="column">
                 <mat-form-field class="display-name-field" >
                   <mat-label>Display name</mat-label>
-                  <input matInput placeholder="Display name" formControlName="displayName" value="{{user.name}}">
-                </mat-form-field>
-              
-                <mat-form-field class="email-field" >
+                  <input matInput placeholder="Display name" autocomplete="off" formControlName="displayName" value="user.name">
+                  <mat-error class="validation-message" *ngIf="userFormControl.displayName.hasError('required')">
+                    Name is required
+                </mat-error > 
+                </mat-form-field>          
+                <mat-form-field class="email-field"  [ngClass]="{'margin-top-15px': isInvalid(userFormControl.displayName)}">
                   <mat-label>Email</mat-label>
-                  <input matInput placeholder="Email" formControlName="email" value="{{user.email}}">
+                  <input matInput placeholder="Email" autocomplete="off" formControlName="email" value="{{user.email}}">
+                     <mat-error class="validation-message" *ngIf="userFormControl.email.hasError('required')">
+                        Email is required
+                    </mat-error > 
+                    <mat-error  class="validation-message" *ngIf="userFormControl.email.hasError('invalidPattern')">
+                        Email is invalid
+                    </mat-error > 
                 </mat-form-field>
             </form>
-        </div>      
+        </div>     
     </div>
 
-
-    <div class="editor">
+    <div class="profile-editor">
         <input type="file" (change)="fileChangeEvent($event)" #uploadInput hidden/>
 
         <div>
@@ -38,10 +42,9 @@
         </div>
        
         <div class="action-buttons">
-            <button mat-raised-button color="warn" [disabled]="uploading" type="file" (click)="uploadInput.click()"><mat-icon>file_upload</mat-icon>Upload Photo</button>  
-            <button mat-raised-button color="warn" [disabled]="userForm.invalid || uploading"  (click)="onSave()"><mat-icon>save</mat-icon>Save</button>  
-            <button mat-raised-button [disabled]="uploading" (click)="onCancel()"><mat-icon>cancel</mat-icon>Cancel</button> 
+            <button mat-flat-button color="primary" [disabled]="uploading" type="file" (click)="uploadInput.click()">Upload Photo</button>  
+            <button mat-flat-button color="warn" [disabled]="!canSave()"  (click)="onSave()">Save</button>  
+            <button mat-stroked-button [disabled]="uploading" (click)="onCancel()">Cancel</button> 
         </div>
     </div>
-
 </div>

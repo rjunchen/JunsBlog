@@ -1,0 +1,30 @@
+<div *ngIf="article" class="editor-container">
+    <mat-form-field class="full-width">
+        <mat-label>Article Title</mat-label>
+        <input name="titleInput" autocomplete="off" matInput placeholder="Article Title" [(ngModel)]="article.title" >
+    </mat-form-field>   
+    <mat-form-field class="full-width">
+        <mat-label>Abstract</mat-label>
+        <input name="AbstractInput" autocomplete="off" matInput placeholder="Abstract" [(ngModel)]="article.abstract" >
+    </mat-form-field> 
+    <mat-form-field class="category-chip-list full-width">
+        <mat-chip-list #chipList aria-label="category selection">
+          <mat-chip *ngFor="let category of article.categories" [selectable]="selectable" [removable]="removable" (removed)="remove(category)">
+            {{category}}
+            <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+          </mat-chip>
+          <input autocomplete="off" placeholder="New category..."
+                 [matChipInputFor]="chipList"
+                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                 [matChipInputAddOnBlur]="addOnBlur"
+                 (matChipInputTokenEnd)="add($event)">
+        </mat-chip-list>
+      </mat-form-field>
+    <quill-editor [(ngModel)]="article.content" [modules]="modules"></quill-editor>
+    <div class="action-buttons" fxLayout="row" fxLayoutAlign="space-between center">
+        <mat-checkbox class="example-margin" color="warn" [(ngModel)]="article.isPrivate">Private</mat-checkbox>
+        <span class="spacer"></span>
+        <button mat-stroked-button (click)="cancel()">Cancel</button>
+        <button mat-flat-button color="warn" (click)="summit()">{{ updateMode? "Update" : "Submit" }}</button>
+    </div>
+</div>

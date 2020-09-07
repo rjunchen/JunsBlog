@@ -17,40 +17,30 @@ namespace JunsBlog.Interfaces.Services
         Task<User> SaveUserAsync(User user);
         Task<User> GetUserAsync(string userId);
         Task<User> GetUserByEmailAsync(string email);
-
-
-        // UserTokens
-        Task<UserToken> GetUserTokenAsync(string userId);
-        Task<UserToken> SaveUserTokenAsync(UserToken userToken);
-
+        Task<ProfileDetails> GetProfileDetailsAsync(string currentUserId);
 
         // Articles
         Task<Article> SaveArticleAsync(Article article);
         Task<Article> GetArticleAsync(string articleId);
+        Task<ArticleBasicInfo> GetArticleBasicInfoAsync(string articleId);
+        Task<ArticleDetails> GetArticleDetailsAsync(string articleId, string currentUserId);
+        Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options);
 
         // ArticleRanking
         Task<ArticleRanking> SaveArticleRankingAsync(ArticleRanking ranking);
         Task<List<ArticleRanking>> GetArticleRankingsAsync(string articleId);
         Task<ArticleRanking> GetArticleRankingAsync(string articleId, string userId);
 
-
         // Comments
         Task<Comment> SaveCommentAsync(Comment comment);
-        Task<List<Comment>> GetCommentsAsync(string articleId);
+        Task<CommentSearchPagingResult> SearchCommentsAsync(CommentSearchPagingOption options, string currentUserId);
+        //  Task<List<Comment>> GetCommentsAsync(string articleId);
 
 
         // CommentRankings
         Task<CommentRanking> GetCommentRankingAsync(string commentId, string userId);
         Task<List<CommentRanking>> GetCommentRankingsAsync(string commentId);
         Task<CommentRanking> SaveCommentRankingAsync(CommentRanking ranking);
-
-
-        // Details
-        Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options);
-        Task<ArticleDetails> GetArticleDetailsAsync(string articleId);
-        Task<CommentSearchPagingResult> SearchCommentsAsync(CommentSearchPagingOption options, string currentUserId);
-        Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId);
-        Task<ProfileDetails> GetProfileDetailsAsync(string currentUserId);
-
+        Task<CommentRankingDetails> GetCommentRankingDetailsAsync(string commentId, string userId);
     }
 }

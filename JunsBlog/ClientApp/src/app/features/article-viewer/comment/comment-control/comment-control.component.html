@@ -1,0 +1,14 @@
+<div class="comment-control-container" fxLayout="column" *ngIf="isVisibleCommenter">
+    <div class="overlay" fxFlex (click)=" cancel()"></div>
+    <div class="comment-control">
+        <div class="comment-input-section" fxLayout="row" >
+            <img class="images profile-image" [src]="currentUser?.image ? currentUser.image : defaultAvatarUrl"/>
+            <mat-form-field class="comment-field" fxFlex>
+                <mat-label>Leave a comment</mat-label>
+                <textarea [(ngModel)]="commentRequest.commentText" matInput matTextareaAutosize [matAutosizeMaxRows]="10" [matAutosizeMinRows]="2" placeholder="Leave a footstep here..."></textarea>
+            </mat-form-field> 
+            <button class="comment-button" [disabled]="commentRequest.commentText.length == 0" color="warn" type="submit" (click)="submit()"  mat-button >REPLY</button>   
+        </div>     
+    </div>
+</div>
+

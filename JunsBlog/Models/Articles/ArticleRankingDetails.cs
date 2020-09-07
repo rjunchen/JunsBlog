@@ -8,7 +8,6 @@ namespace JunsBlog.Models.Articles
 {
     public class ArticleRankingDetails
     {
-        public string ArticleId { get; set; }
         public bool DidILike { get; set; }
         public int LikesCount { get; set; }
         public bool DidIDislike { get; set; }
@@ -17,7 +16,6 @@ namespace JunsBlog.Models.Articles
 
         public ArticleRankingDetails(string articleId, string userId, IEnumerable<ArticleRanking> rankings)
         {
-            this.ArticleId = articleId;
             foreach (var item in rankings)
             {
                 if (item.DidIDislike) DislikesCount++;
@@ -32,5 +30,6 @@ namespace JunsBlog.Models.Articles
                 }
             }
         }
+
     }
 }

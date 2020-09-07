@@ -1,12 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthenticationService } from 'src/app/core/authentication.service';
-import { Profile } from 'src/app/models/profile/profile';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 import { ActivatedRoute } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
-import { ArticleSearchPagingOption } from 'src/app/models/article/articleSearchPagingOption';
-import { ArticleService } from 'src/app/services/article.service';
-import { ArticleFilterEnum } from 'src/app/models/enums/articleFilterEnum';
-import { User } from 'src/app/models/user';
+import { User } from 'src/app/models/authentication/user';
+import { Profile } from 'src/app/models/authentication/profile';
+import { AlertService } from 'src/app/services/alert.service';
 
 @Component({
   selector: 'app-profile',
@@ -15,68 +12,32 @@ import { User } from 'src/app/models/user';
 })
 export class ProfileComponent implements OnInit {
 
-  defaultAvatarUrl = './assets/avatar.png';
   profile: Profile;
-  isProcessing: boolean;
-  searchOption: ArticleSearchPagingOption;
-  pageSize: number = 10;
-  selectedTab: string;
-  profilerId: string;
   showEditor: boolean;
   currentUser: User;
-
-  constructor(private auth: AuthenticationService, private route: ActivatedRoute,
-    private articleService: ArticleService, private toastr: ToastrService) { }
+  
+  constructor(private auth: AuthenticationService, private route: ActivatedRoute, private alertService: AlertService) { }
 
   ngOnInit(): void {
-    this.searchOption = new ArticleSearchPagingOption();
-    this.route.paramMap.subscribe(x=>{
-     this.profilerId = x.get("id")
-      this.auth.getProfile(this.profilerId).subscribe(data=>{
-        this.profile = data;
-      }, err=>{
-        if (err.status === 400) {     
-          this.toastr.warning(err.error.message, err.statusText);
-        } else {
-          this.toastr.error('Unknown error occurred, please try again later');
-        }
-      })
-    });
 
     this.currentUser = this.auth.getCurrentUser();
+
+    this.route.paramMap.subscribe(x=>{
+      const profilerId = x.get("id")
+      this.auth.getProfile(profilerId).subscribe(data=>{
+        this.profile = data;
+      }, err=>{
+        this.logout();
+        this.alertService.alertHttpError(err);
+      })
+     });
   }
-  
+
   logout(){
     this.auth.logout()
   }
 
-  showMyLikes(){
-    this.selectedTab = 'myLikes';
-    this.searchOption.filter = ArticleFilterEnum.MyLikes;
-    this.searchOption.profilerId = this.profilerId;
-    this.search();
+  toggleProfileEditor(){
+    this.showEditor = !this.showEditor;
   }
-
-  showMyArticles(){
-    this.selectedTab = 'myArticles';
-    this.searchOption.filter = ArticleFilterEnum.MyArticles;
-    this.searchOption.profilerId = this.profilerId;
-    this.search();
-  }
-
-  showMyFavorites(){
-    this.selectedTab = 'myFavorites';
-    this.searchOption.filter = ArticleFilterEnum.MyFavorites;
-    this.searchOption.profilerId = this.profilerId;
-    this.search();
-  }
-
-  showSettings(){
-    this.selectedTab = 'settings';
-  }
-
-  search(){
-    this.articleService.SearchClicked(this.searchOption);
-  }
-
 }

@@ -1,62 +1,47 @@
 /* You can add global styles to this file, and also import other style files */
-@import '~@angular/material/prebuilt-themes/indigo-pink.css';
-@import '~font-awesome/css/font-awesome.css';
-@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
-@import url("https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap");
-@import '~ngx-toastr/toastr';
 
-$color-orange: #f44336;
-
-html, body { height: 100%; box-sizing: border-box; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-color: #f5f5f5; padding-top: 64px;}  //padding-top for the sticky toolbar
+html, body { height: 100%; box-sizing: border-box;}
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-color: #f5f5f5; }
 
 .mat-tooltip {
     font-size: 15px;
 }
 
-.link{
-    text-decoration: none;
-    color: black;
-
-    &:hover{
-        color: $color-orange;
-        cursor: pointer;
-    }
-    &:focus{
-        outline: none;
-    }
+.ql-container{
+    .ql-editor{
+        font-size: 16px;
+    }  
 }
 
-.image-link{
-    &:hover{
-        cursor: pointer;
-    }
-    &:focus{
-        outline: none;
-    }
+.alert-success{
+    background-color: #388e3c;
+    color: white;
 }
 
-.ql-editor{
-    font-size: 16px;
+.alert-success .mat-simple-snackbar-action  {
+    color: aqua;
 }
 
-.mat-sidenav-container, .mat-sidenav-content, .mat-tab-body-content {
-    transform: none !important;
+.alert-warning{
+    background-color: #f57c00;
+    color: white;
 }
 
-.search-control-container{
-    .mat-form-field-wrapper{
-        margin: 8px 20px 0px 8px;
-    }
+.alert-warning .mat-simple-snackbar-action  {
+    color: #1976d2;
 }
 
+.alert-error{
+    background-color: #bd362f;
+    color: white;
+}
+
+.alert-error .mat-simple-snackbar-action  {
+    color: orange;
+}
 
 @media only screen and (max-width: 768px){
-    body{
-        padding-top: 0px;
-        padding-bottom: 64px;
-    }
     .ql-editor{
-        font-size: 14px;
+        font-size: 14px !important;
     }
 }

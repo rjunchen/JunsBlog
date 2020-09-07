@@ -1,49 +1,45 @@
-$color-orange: #f44336;
-@import '~@angular/material/prebuilt-themes/indigo-pink.css';
-@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
-@import url("https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap");
-@import '~ngx-toastr/toastr.css';
+$color-warn: #f44336;
 
-.reg-container{
-    display: flex;
-    justify-content: center;
+.registration-form{
+    width: 300px;
+    margin-top: 100px;
+    background-color: white;
+    box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
+    padding: 30px;
 
-    .reg-form{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        padding: 20px;
-        background-color: white;
-        height: 450px;
-        margin-top: 100px;
-
-        box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
-        padding: 30px;
-
-
-        position: relative;
-        .overlay{
-            position: absolute;
-            background-color: black;
-            opacity: 0.5;
-            height: 100%;
-            width: 100%;
-            z-index: 900;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        .reg-form-title{
-            color: $color-orange;
-            font-size: x-large;
-            margin-bottom: 30px; 
-        }
-
-        .form-item{
-            width: 100%;
-        }
+    position: relative;
+    .overlay{
+        position: absolute;
+        background-color: black;
+        opacity: 0.5;
+        height: 100%;
+        width: 100%;
+        top: 0px;
+        left: 0px;
     }
+
+    .title{
+        color: $color-warn;
+        font-size: x-large;
+        margin-bottom: 20px; 
+    }
+}
+
+
+.link{
+    outline: none;
+    &:hover{
+        color: $color-warn;
+        cursor: pointer;
+    }
+}
+
+.margin-top-15px{
+    margin-top: 15px !important;
+}
+
+.validation-error-message{
+    padding: 0 1em;
+    font-size: 10.5px;
+    font: color-warn;
 }

@@ -10,10 +10,8 @@ namespace JunsBlog.Entities
     public class ArticleRanking : EntityBase
     {
         [BsonRequired]
-        [BsonRepresentation(BsonType.ObjectId)]
         public string ArticleId { get; set; }
         [BsonRequired]
-        [BsonRepresentation(BsonType.ObjectId)]
         public string UserId { get; set; }
         [BsonRequired]
         [BsonDefaultValue(false)]
@@ -23,7 +21,7 @@ namespace JunsBlog.Entities
         public bool DidIDislike { get; set; }
         [BsonRequired]
         [BsonDefaultValue(false)]
-        public bool DidIFavor { get; set; }  
+        public bool DidIFavor { get; set; }
 
         public ArticleRanking(string articleId, string userId)
         {

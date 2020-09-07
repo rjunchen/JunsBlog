@@ -12,10 +12,10 @@ namespace JunsBlog.Models.Authentication
         public string AccessToken { get; set; }
         public string RefreshToken { get; set; }
 
-        public AuthenticateResponse(User user, string accessToken, string refreshToken)
+        public AuthenticateResponse(User user, string accessToken)
         {
             this.User = user;
-            this.RefreshToken = refreshToken;
+            this.RefreshToken = user.RefreshToken.Token;
             this.AccessToken = accessToken;
         }
     }

@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from "@angular/router";
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { AuthenticationService } from 'src/app/core/authentication.service';
-
-import { ToastrService } from 'ngx-toastr';
+import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
+import { AuthenticationService } from 'src/app/services/authentication.service';
+import { Router } from '@angular/router';
+import { CustomValidationService } from 'src/app/services/custom-validation.service';
+import { AlertService } from 'src/app/services/alert.service';
 
 @Component({
   selector: 'app-login',
@@ -18,11 +18,12 @@ export class LoginComponent implements OnInit {
   inProcess: boolean;
 
   constructor(private auth: AuthenticationService, private router: Router, 
-    private fb: FormBuilder, private toastr: ToastrService) { this.createForm() }
+    private fb: FormBuilder, private customValidator: CustomValidationService,
+    private alertService: AlertService) { this.createForm() }
 
   createForm() {
     this.loginForm = this.fb.group({
-      email: ['', Validators.compose([Validators.required, Validators.email])],
+      email: ['', Validators.compose([Validators.required, this.customValidator.emailPatternValidator()])],
       password: ['', Validators.required]
     })
   }
@@ -31,12 +32,17 @@ export class LoginComponent implements OnInit {
     this.auth.getGoogleAuthUrl().subscribe( x=>{
       this.googleAuthUrl = x;
     }, err =>{
-      if (err.status === 400) {     
-        this.toastr.warning(err.error.message, err.statusText);
-      } else {
-        this.toastr.error('Unknown error occurred, please try again later');
-      }
+      
     })
+  }
+
+  get loginFormControl() {
+    return this.loginForm.controls;
+  }
+
+  isInvalid(control: AbstractControl){
+    if(!control) return false;
+    if(control.invalid && control.touched) return true;
   }
 
   onSubmit(){
@@ -48,13 +54,8 @@ export class LoginComponent implements OnInit {
       },
       (err) => {
         this.inProcess = false;
-        if (err.status === 400) {     
-          this.toastr.warning(err.error.message, err.statusText);
-        } else {
-          this.toastr.error('Unknown error occurred, please try again later');
-        }
+        this.alertService.alertHttpError(err);
       }
     );
   }
-
 }

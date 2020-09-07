@@ -20,7 +20,7 @@ namespace JunsBlog.Test.UnitTests
     {
         private const int TWO_SECONDS_IN_MILLIONSECONDS = 2000;
 
-        private static readonly ArticleRequest validArticleRequest = new ArticleRequest()
+        private static readonly ArticleBasicInfo validArticleRequest = new ArticleBasicInfo()
         {
             Abstract = "abstract",
             Categories = new string[] { "Food", "Games" },
@@ -28,26 +28,26 @@ namespace JunsBlog.Test.UnitTests
             Content = "content",
         };
 
-        private readonly static ArticleRequest invalidArticleRequestOne = new ArticleRequest()
+        private readonly static ArticleBasicInfo invalidArticleRequestOne = new ArticleBasicInfo()
         {
             Content = "content",
             Categories = new string[] { "Food", "Games" },
             Title = "title"
         };
-        private readonly static ArticleRequest invalidArticleRequestTwo = new ArticleRequest()
+        private readonly static ArticleBasicInfo invalidArticleRequestTwo = new ArticleBasicInfo()
         {
             Abstract = "abstract",
             Categories = new string[] { "Food", "Games" },
             Title = "title"
         };
-        private readonly static ArticleRequest invalidArticleRequestThree = new ArticleRequest()
+        private readonly static ArticleBasicInfo invalidArticleRequestThree = new ArticleBasicInfo()
         {
             Abstract = "abstract",
             Categories = new string[] { "Food", "Games" },
             Content = "content"
         };
 
-        private readonly static ArticleRequest invalidArticleRequestFour = new ArticleRequest() { };
+        private readonly static ArticleBasicInfo invalidArticleRequestFour = new ArticleBasicInfo() { };
 
 
         public static IEnumerable<Object[]> GetBadArticleCreationRequest()
@@ -100,7 +100,7 @@ namespace JunsBlog.Test.UnitTests
 
         [Theory]
         [MemberData(nameof(GetBadArticleCreationRequest))]
-        public async void Create_InvalidArticleInput_Failure(ArticleRequest request)
+        public async void Create_InvalidArticleInput_Failure(ArticleBasicInfo request)
         {
             var result = await ariclesController.CreateArticle(request);
             result.Should().BeOfType<BadRequestObjectResult>();
@@ -113,7 +113,7 @@ namespace JunsBlog.Test.UnitTests
             var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
             var article = okResult.Value.Should().BeAssignableTo<Article>().Subject;
 
-            var updatedArticleRequest = new ArticleRequest() {
+            var updatedArticleRequest = new ArticleBasicInfo() {
                 Id = article.Id,
                 Abstract = "Updated Abstract",
                 Categories = new string[] {"1", "2"},

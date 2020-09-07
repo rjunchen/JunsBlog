@@ -1,14 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
-import { AuthenticationService } from 'src/app/core/authentication.service';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { FormGroup, Validators, AbstractControl, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
+import { AuthenticationService } from './../../services/authentication.service'
+import { CustomValidationService } from './../../services/custom-validation.service'
+import { AlertService } from 'src/app/services/alert.service';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss']
+  styleUrls: ['./register.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
+
 export class RegisterComponent implements OnInit {
 
   regForm: FormGroup;
@@ -16,8 +19,10 @@ export class RegisterComponent implements OnInit {
   hideConfirmPassword = true;
   inProcess: boolean;
 
-  constructor(private auth: AuthenticationService, private router: Router, 
-    private fb: FormBuilder, private toastr: ToastrService) { this.createForm()}
+  constructor(private auth: AuthenticationService, private router: Router, private fb: FormBuilder,
+    private customValidator: CustomValidationService, private alertService: AlertService) { 
+    this.createForm();
+  }
 
   ngOnInit(): void {
 
@@ -26,38 +31,30 @@ export class RegisterComponent implements OnInit {
   createForm() {
     this.regForm = this.fb.group({
       name: ['', Validators.required],
-      email: ['', Validators.compose([Validators.required, Validators.email])],
-      password: ['', Validators.compose([Validators.required, Validators.minLength(6)])],
-      confirmPassword: ['', Validators.compose([Validators.required, Validators.minLength(6)])],
-    }, { validator: this.passwordMatchValidator })
+      email: ['', Validators.compose([Validators.required, this.customValidator.emailPatternValidator()])],
+      password: ['', Validators.compose([Validators.required, Validators.minLength(8),
+         this.customValidator.hasNumber(), this.customValidator.hasUppercaseLetter()])],
+      confirmPassword: ['', Validators.required],
+    }, { validator: this.customValidator.MatchPassword('password', 'confirmPassword') });
   }
 
-  passwordMatchValidator(control:AbstractControl) {
-    const passwordControl: AbstractControl = control.get('password'); 
-    const confirmPasswordControl: AbstractControl = control.get('confirmPassword'); 
-
-    if(passwordControl.value !== confirmPasswordControl.value){
-       confirmPasswordControl.setErrors({NoPasswordMatch: true});
-    }
+  get registerFormControl() {
+    return this.regForm.controls;
   }
 
-  onPasswordChanged(){
-    this.regForm.get('confirmPassword').updateValueAndValidity();
+  isInvalid(control: AbstractControl){
+      if(!control) return false;
+      if(control.invalid && control.touched) return true;
   }
 
   onSubmit(){
     this.inProcess = true;
-    this.auth.register(this.regForm.value).subscribe( res =>{
+    this.auth.register(this.regForm.value.email, this.regForm.value.password, this.regForm.value.name).subscribe( () =>{
       this.inProcess = false;
         this.router.navigateByUrl("/");
     }, err => {
       this.inProcess = false;
-      if(err.status === 400){
-        this.toastr.warning(err.error.message, err.statusText);
-      }
-      else{
-        this.toastr.error('Unknown error occurred, please try again later');
-      }
+      this.alertService.alertHttpError(err);
     })
   }
 

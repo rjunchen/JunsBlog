@@ -1,0 +1,84 @@
+$color-warn: #f44336;
+
+.header{
+    position: fixed;
+    z-index:10;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
+    height:60px;
+}
+
+.logo{
+    width: 40px;
+    height: 40px;
+}
+
+.spacer{
+    flex: 1 1 auto;
+}
+
+.app-title{
+    color: $color-warn;
+    font-size: 22px;
+    margin-left: 5px;
+}
+
+.link{
+    outline: none;
+    &:hover{
+        color: $color-warn;
+        cursor: pointer;
+    }
+}
+
+.action-button{
+    margin: 0px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .mat-icon {
+        font-size: 25px;
+        position: relative;
+    }
+    .icon-label{
+       font-size: 14px;
+       line-height: 20px;
+    }
+}
+
+.user-info{
+    .profile-image{
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+    }
+}
+
+.mobile-button{
+    display: none;
+}
+
+.rotate180{
+    transform: rotate(180deg);
+}
+
+@media only screen and (max-width: 768px){
+    .header{
+        top:auto;
+        bottom: 0;
+    }
+    .app-title{
+        display: none;
+    }
+    .mobile-button{
+        display: flex;
+    }
+    .logo{
+        display: none;
+    }
+}

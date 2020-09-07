@@ -14,5 +14,6 @@ namespace JunsBlog.Models.Authentication
         public string Name { get; set; }
         [Required]
         public string Password { get; set; }
+        public string Image { get; set; }
     }
 }

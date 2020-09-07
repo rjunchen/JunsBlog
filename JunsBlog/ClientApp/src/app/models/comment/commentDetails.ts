@@ -1,5 +1,5 @@
-import { User } from '../user';
-import { CommentRankingDetails } from './commentRankingDetails';
+import { CommentRankingDetails } from "./commentRankingDetails";
+import { User } from '../../models/authentication/user'
 
 export class CommentDetails{
     ranking: CommentRankingDetails;

@@ -1,0 +1,25 @@
+.editor-container{
+    background-color: white;
+    box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    margin: 20px;
+    .full-width{
+        width: 100%;
+    }
+
+    .action-buttons{
+        margin-top: 10px;
+        .spacer{
+            flex: 1 1 auto;
+        }
+        button{
+            margin-left: 10px;
+        }
+    }
+}
+
+@media only screen and (max-width: 768px){
+    .editor-container{
+        margin: 0px;
+    }
+}

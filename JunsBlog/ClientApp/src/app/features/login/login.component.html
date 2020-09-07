@@ -1,23 +1,32 @@
-<div class="login-container">
-    <form class="login-form" [formGroup]="loginForm">
-      <span class="form-title">User Login</span>
-      <mat-form-field class="form-item" appearance="outline">
+<div class="login-container" fxLayoutAlign="center">
+    <form class="login-form" fxLayout="column" [formGroup]="loginForm">
+      <span class="title">User Login</span>
+      <mat-form-field appearance="outline">
         <mat-label>Email</mat-label>
         <input matInput placeholder="Enter your email" formControlName="email"/>
         <mat-icon matSuffix>account_box</mat-icon>  
+        <mat-error class="validation-message" *ngIf="loginFormControl.email.hasError('required')">
+            Email is required
+        </mat-error > 
+        <mat-error  class="validation-message" *ngIf="loginFormControl.email.hasError('invalidPattern')">
+            Email is invalid
+        </mat-error >  
       </mat-form-field>
-      <mat-form-field class="form-item" appearance="outline">
+      <mat-form-field [ngClass]="{'margin-top-15px': isInvalid(loginFormControl.email)}" appearance="outline">
         <mat-label>Password</mat-label>
-        <input matInput placeholder="Enter your password" formControlName="password" [type]="hidePassword ? 'password' : 'text'"/>
-        <mat-icon (click)="hidePassword = !hidePassword" matSuffix>{{ hidePassword ? "visibility_off" : "visibility" }}</mat-icon>
+        <input matInput placeholder="Enter your password" autocomplete="off" formControlName="password" [type]="hidePassword ? 'password' : 'text'"/>
+        <mat-icon class="link" (click)="hidePassword = !hidePassword" matSuffix>{{ hidePassword ? "visibility" : "visibility_off" }}</mat-icon>
+        <mat-error class="validation-message" *ngIf="loginFormControl.password.hasError('required')">
+            Password is required
+        </mat-error >
       </mat-form-field>
-      <span class="reset-link">
-        <a href="/reset">Forgot password?</a>
+      <span class="reset-link" [ngClass]="{'margin-top-15px': isInvalid(loginFormControl.password)}">
+        <a class="link" href="/reset">Forgot password?</a>
       </span>
-      <button class="form-item" mat-raised-button color="warn" type="submit" [disabled]="loginForm.invalid"  (click)="onSubmit()">Sign in!</button>
+      <button  mat-raised-button color="warn" type="submit" [disabled]="loginForm.invalid"  (click)="onSubmit()">Sign in!</button>
       <mat-divider class="divider"></mat-divider>
-      <a mat-flat-button class="form-item social-icon" *ngIf="googleAuthUrl" color="warn" href="{{googleAuthUrl}}"><i class="fa fa-google"></i>Login with Google</a>
-      <div class="overlay" *ngIf="inProcess">
+      <a mat-flat-button *ngIf="googleAuthUrl" color="warn" href="{{googleAuthUrl}}" ><i class="fa fa-google social-icon"></i>Login with Google</a>
+      <div class="overlay" fxLayoutAlign="center center" *ngIf="inProcess">
         <mat-spinner color="warn"></mat-spinner>
       </div>
     </form>

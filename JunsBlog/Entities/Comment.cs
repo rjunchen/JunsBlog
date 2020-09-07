@@ -13,13 +13,10 @@ namespace JunsBlog.Entities
         [BsonRequired]
         public string CommentText { get; set; }
         [BsonRequired]
-        [BsonRepresentation(BsonType.ObjectId)]
         public string ArticleId { get; set; }
         [BsonRequired]
-        [BsonRepresentation(BsonType.ObjectId)]
         public string UserId { get; set; }
         [BsonRequired]
-        [BsonRepresentation(BsonType.ObjectId)]
         public string ParentId { get; set; }
 
         public Comment(CommentRequest model, string userId)

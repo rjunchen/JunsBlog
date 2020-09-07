@@ -19,7 +19,6 @@ namespace JunsBlog.Entities
         [BsonRequired]
         public string Abstract { get; set; }
         [BsonRequired]
-        [BsonRepresentation(BsonType.ObjectId)]
         public string AuthorId { get; set; }
         [BsonRequired]
         public string[] Categories { get; set; }
@@ -31,7 +30,7 @@ namespace JunsBlog.Entities
         public int Views { get; set; }
         public List<GalleryImage> GalleryImages { get; set; }
 
-        public Article(ArticleRequest model, string authorId)
+        public Article(ArticleBasicInfo model, string authorId)
         {
             Abstract = model.Abstract;
             AuthorId = authorId;
@@ -41,16 +40,6 @@ namespace JunsBlog.Entities
             Title = model.Title;
             Categories = model.Categories;
             GalleryImages = new List<GalleryImage>();
-        }
-
-        public void UpdateContents(ArticleRequest model)
-        {
-            Abstract = model.Abstract;
-            Content = model.Content;
-            CoverImage = model.CoverImage;
-            IsPrivate = model.IsPrivate;
-            Title = model.Title;
-            Categories = model.Categories;
-         }
+        }   
     }
 }
