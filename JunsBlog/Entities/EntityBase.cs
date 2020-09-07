@@ -10,7 +10,8 @@ namespace JunsBlog.Entities
 {
     public class EntityBase
     {
-        [BsonId]
+        [BsonRequired]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
         [BsonRequired]
         public DateTime UpdatedOn { get; set; }

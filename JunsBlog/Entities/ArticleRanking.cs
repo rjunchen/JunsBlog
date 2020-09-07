@@ -10,8 +10,10 @@ namespace JunsBlog.Entities
     public class ArticleRanking : EntityBase
     {
         [BsonRequired]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string ArticleId { get; set; }
         [BsonRequired]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string UserId { get; set; }
         [BsonRequired]
         [BsonDefaultValue(false)]

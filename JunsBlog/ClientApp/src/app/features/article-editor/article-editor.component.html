@@ -1,11 +1,11 @@
 <div *ngIf="article" class="editor-container">
     <mat-form-field class="full-width">
         <mat-label>Article Title</mat-label>
-        <input name="titleInput" autocomplete="off" matInput placeholder="Article Title" [(ngModel)]="article.title" >
+        <input name="titleInput" autocomplete="off" matInput placeholder="Article Title" required [(ngModel)]="article.title" >
     </mat-form-field>   
     <mat-form-field class="full-width">
         <mat-label>Abstract</mat-label>
-        <input name="AbstractInput" autocomplete="off" matInput placeholder="Abstract" [(ngModel)]="article.abstract" >
+        <input name="AbstractInput" autocomplete="off" matInput placeholder="Abstract" required [(ngModel)]="article.abstract" >
     </mat-form-field> 
     <mat-form-field class="category-chip-list full-width">
         <mat-chip-list #chipList aria-label="category selection">
@@ -13,7 +13,7 @@
             {{category}}
             <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
           </mat-chip>
-          <input autocomplete="off" placeholder="New category..."
+          <input autocomplete="off" required placeholder="New category..."
                  [matChipInputFor]="chipList"
                  [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
                  [matChipInputAddOnBlur]="addOnBlur"

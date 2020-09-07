@@ -8,6 +8,7 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import Quill from 'quill'
 import ImageResize from 'quill-image-resize-module'
 import { AlertService } from 'src/app/services/alert.service';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 Quill.register('modules/imageResize', ImageResize)
 
 export interface Category {
@@ -24,7 +25,7 @@ export class ArticleEditorComponent implements OnInit {
   modules = {}
 
   article: Article;
-
+  articleForm: FormGroup;
   visible = true;
   selectable = true;
   removable = true;
@@ -33,7 +34,7 @@ export class ArticleEditorComponent implements OnInit {
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
 
   constructor(private articleService: ArticleService, private router: Router, private route: ActivatedRoute,
-    private alertService: AlertService) {
+    private alertService: AlertService, private fb: FormBuilder) {
     this.modules = {
       imageResize: {},
       toolbar: [
@@ -68,6 +69,7 @@ export class ArticleEditorComponent implements OnInit {
 
   }
 
+  
   summit(){
     this.articleService.saveArticle(this.article).subscribe( article=>{
       this.router.navigateByUrl(`/article/${article.id}`);
