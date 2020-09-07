@@ -49,14 +49,12 @@ export class CommentComponent implements OnInit, OnDestroy {
  
    this.commentSubscription = this.commentService.onCommentPosted.subscribe( (commentDetails : CommentDetails) => {
        this.article.commentsCount += 1; // counts the total comments including all the children comments
-       console.log(this.article.commentsCount);
        if(commentDetails.articleId == commentDetails.parentId)  // This is a comment on the article
          this.displayComments.unshift(commentDetails); 
     })
   }
 
   onScrollDown () {
-    console.log('scroll down');
     if(this.commentPagingResult && this.commentPagingResult.hasNextPage && !this.loading){
       this.loading = true;
       this.commentPagingResult.searchOption.currentPage += 1;
@@ -75,10 +73,4 @@ export class CommentComponent implements OnInit, OnDestroy {
       )
     }
   }
-
-  showCommenter(){
-    var request = new CommentRequest(this.article);
-    this.commentService.showCommentControl(request)
-  }
-
 }

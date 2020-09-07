@@ -3,3 +3,13 @@
    background-color: red;
    top: 0;
 }
+
+.home-container{
+   margin: 20px
+}
+
+@media only screen and (max-width: 768px){
+   .home-container{
+      margin: 0px
+   }
+}

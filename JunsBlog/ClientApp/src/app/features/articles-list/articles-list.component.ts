@@ -46,7 +46,7 @@ export class ArticlesListComponent implements OnInit, OnDestroy {
 
     if(this.loadOnInit){
       var searchOption = new ArticleSearchPagingOption();
-      searchOption.profilerId = this.currentUser.id;
+      searchOption.profilerId = this.currentUser?.id;
       this.search(searchOption);
     }
      this.previewImageSetup();
@@ -55,7 +55,6 @@ export class ArticlesListComponent implements OnInit, OnDestroy {
   search(option: ArticleSearchPagingOption){
     this.loading = true;
     this.articleService.searchArticle(option).subscribe(x=>{
-      console.log(x);
       this.articles = x.documents;
       this.articlePagingResult = x;
       this.loading = false;
@@ -68,7 +67,6 @@ export class ArticlesListComponent implements OnInit, OnDestroy {
 
 
   onScrollDown () {
-    console.log('scroll down');
     if(this.articlePagingResult && this.articlePagingResult.hasNextPage && !this.loading){
       this.loading = true;
       this.articlePagingResult.searchOption.currentPage += 1;

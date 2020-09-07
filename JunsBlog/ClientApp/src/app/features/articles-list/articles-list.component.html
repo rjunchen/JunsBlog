@@ -4,10 +4,7 @@
     [infiniteScrollUpDistance]="scrollUpDistance"
     [infiniteScrollThrottle]="throttle"
     (scrolled)="onScrollDown()">
-    <div class="article-item"  *ngFor="let article of articles">
-        <div class="images-container">
-            <img class="images" (error)="article.hideImage = true" [hidden]="article.hideImage" [src]="article.coverImage"/>
-        </div>
+    <div  *ngFor="let article of articles">
         <div class="article-info-box">
             <a class="article-title link" routerLink="{{'/article/' + article.id}}">{{article.title}}</a>
             <div class="article-status-container" fxLayout="row" fxLayoutAlign="start center">

@@ -52,6 +52,23 @@ export class AuthenticationService {
     this.router.navigateByUrl('/login');
   }
 
+  public isLoggedIn(): boolean{
+    if(this.currentUser){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  public getAuthenticationInfo(accessToken: string): Observable<AuthResponse> {
+    return this.http.post('/api/auth/info',{accessToken}).pipe(map((data: AuthResponse) => {
+      if(data){
+        this.saveToken(data);
+      }
+      return data;
+     }));
+  }
+
   public getGoogleAuthUrl(): Observable<string> {
     if(this.googleAuthUrl)
       return of(this.googleAuthUrl);

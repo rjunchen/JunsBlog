@@ -15,6 +15,11 @@ $color-orange: #f44336;
 }
 
 .article-info-box{
+    box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+}
+
+.article-info-box{
     padding: 10px;
     background-color: white;
     margin-top: 10px;

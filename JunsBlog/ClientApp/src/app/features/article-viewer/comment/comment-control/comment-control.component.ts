@@ -5,6 +5,7 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 import { AlertService } from 'src/app/services/alert.service';
 import { CommentService } from '../../../../services/comment.service'
 import { CommentRequest } from 'src/app/models/comment/commentRequest';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-comment-control',
@@ -19,7 +20,7 @@ export class CommentControlComponent implements OnInit {
   commentRequest: CommentRequest;
   commentSubscription: Subscription;
 
-  constructor(private auth: AuthenticationService, private commentService: CommentService, private alertService: AlertService) { }
+  constructor(private auth: AuthenticationService,  private router: Router, private commentService: CommentService, private alertService: AlertService) { }
   ngOnDestroy(): void {
     this.commentSubscription.unsubscribe();
   }
@@ -27,6 +28,9 @@ export class CommentControlComponent implements OnInit {
   ngOnInit(): void {
     this.currentUser = this.auth.getCurrentUser();
    this.commentSubscription = this.commentService.onShowCommentControl.subscribe( data =>{
+      if(!this.currentUser){
+        this.router.navigateByUrl('login');
+      }
       this.isVisibleCommenter = true;
       this.commentRequest = data;
     });

@@ -44,6 +44,7 @@ namespace JunsBlog.Controllers
 
                 var commentDetails = new CommentDetails()
                 {
+                    Id = insertedComment.Id,
                     ArticleId = insertedComment.ArticleId,
                     ChildrenCommentsCount = 0,
                     CommentText = insertedComment.CommentText,

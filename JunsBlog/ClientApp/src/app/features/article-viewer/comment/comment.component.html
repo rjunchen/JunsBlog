@@ -4,10 +4,8 @@
     [infiniteScrollThrottle]="throttle" 
     (scrolled)="onScrollDown()">
     <div class="article-comments-section">
-        <div class="comment-title" fxLayout="row" fxLayoutAlign="start center">
+        <div class="comment-title" >
             <span>{{article.commentsCount}}</span><span>Comments</span>
-            <span fxFlex></span>
-            <button mat-stroked-button color="warn"(click)="showCommenter()">REPLY</button>
         </div>
     </div>
     <div>

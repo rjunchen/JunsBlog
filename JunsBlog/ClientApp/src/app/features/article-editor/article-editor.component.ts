@@ -72,7 +72,6 @@ export class ArticleEditorComponent implements OnInit {
     this.articleService.saveArticle(this.article).subscribe( id=>{
       this.router.navigateByUrl(`/article/${id}`);
     }, err=>{
-      console.log(err);
        this.alertService.alertHttpError(err);
     })
   }

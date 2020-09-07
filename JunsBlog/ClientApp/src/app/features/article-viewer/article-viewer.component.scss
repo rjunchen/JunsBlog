@@ -1,11 +1,12 @@
 $color-warn: #f44336;
 
 .article-container{
-    .article-display-box{
-        background-color: white;  
-        padding: 10px;
-        margin: 20px;
+    margin: 20px;
+    .article-display-box{      
         box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: white;  
     }
 }
 
@@ -92,5 +93,14 @@ $color-warn: #f44336;
     }
     &:focus{
         outline: none;
+    }
+}
+
+@media only screen and (max-width: 768px){
+    .article-container{
+        margin: 0px;
+        .article-display-box{
+        padding: 10px 0px;   
+        }
     }
 }

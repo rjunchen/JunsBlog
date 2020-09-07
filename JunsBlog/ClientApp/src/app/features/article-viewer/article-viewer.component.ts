@@ -8,6 +8,8 @@ import { User } from 'src/app/models/authentication/user';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { RankEnum } from '../../models/enums/rankEnum'
 import { ArticleRankingDetails } from 'src/app/models/article/articleRankingDetails';
+import { CommentRequest } from 'src/app/models/comment/commentRequest';
+import { CommentService } from 'src/app/services/comment.service';
 
 
 @Component({
@@ -24,7 +26,7 @@ export class ArticleViewerComponent implements OnInit {
   ranking: ArticleRankingDetails;
 
   constructor(private route: ActivatedRoute,  private articleService: ArticleService, private alertService: AlertService,
-    private router: Router, private auth: AuthenticationService) { }
+    private router: Router, private auth: AuthenticationService, private commentService: CommentService) { }
 
   ngOnInit(): void {
     this.loading = true;
@@ -34,7 +36,6 @@ export class ArticleViewerComponent implements OnInit {
       data => { 
         this.article = data;
         this.loading = false;
-        console.log(data);
       },
       err => {
         this.loading = false;
@@ -47,7 +48,6 @@ export class ArticleViewerComponent implements OnInit {
       data => { 
         this.ranking = data;
         this.loading = false;
-        console.log(data);
       },
       err => {
         this.loading = false;
@@ -82,6 +82,11 @@ export class ArticleViewerComponent implements OnInit {
       this.isProcessing = false;
       this.alertService.alertHttpError(err);
     })
+  }
+
+  showCommenter(){
+    var request = new CommentRequest(this.article);
+    this.commentService.showCommentControl(request);
   }
 
 }
