@@ -58,3 +58,27 @@ $color-warn: #f44336;
         border-radius: 50%;
     }
 }
+
+.mobile-button{
+    display: none;
+}
+
+.rotate180{
+    transform: rotate(180deg);
+}
+
+@media only screen and (max-width: 768px){
+    .header{
+        top:auto;
+        bottom: 0;
+    }
+    .app-title{
+        display: none;
+    }
+    .mobile-button{
+        display: flex;
+    }
+    .logo{
+        display: none;
+    }
+}

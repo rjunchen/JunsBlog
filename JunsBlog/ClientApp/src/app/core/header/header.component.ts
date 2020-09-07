@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { EventService } from '../../services/event.service'
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { User } from 'src/app/models/authentication/user';
+import { Location } from '@angular/common'
 
 @Component({
   selector: 'app-header',
@@ -12,7 +13,7 @@ export class HeaderComponent implements OnInit {
 
   currentUser: User;
 
-  constructor(public auth: AuthenticationService, private eventService: EventService) { 
+  constructor(public auth: AuthenticationService, private eventService: EventService, private location: Location) { 
     this.auth.onUserInfoUpdated.subscribe(data => this.currentUser = data);
   }
 
@@ -22,5 +23,9 @@ export class HeaderComponent implements OnInit {
 
   toggleSidebar(){
     this.eventService.toggleSidebar();
+  }
+
+  goBack(){
+    this.location.back();
   }
 }
