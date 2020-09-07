@@ -178,7 +178,7 @@ namespace JunsBlog.Controllers
             {
                 if (String.IsNullOrWhiteSpace(userId)) return StatusCode(StatusCodes.Status400BadRequest);
 
-                var user = await databaseService.GetUserAsync(userId);
+                var user = await databaseService.GetProfileDetailsAsync(userId);
 
                 if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "User not found");
 

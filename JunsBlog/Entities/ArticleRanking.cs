@@ -9,16 +9,24 @@ namespace JunsBlog.Entities
 {
     public class ArticleRanking : EntityBase
     {
-        public List<string> Likes { get; set; }
-        public List<string> Dislikes { get; set; }
-        public List<string> Favors { get; set; }
+        [BsonRequired]
+        public string ArticleId { get; set; }
+        [BsonRequired]
+        public string UserId { get; set; }
+        [BsonRequired]
+        [BsonDefaultValue(false)]
+        public bool DidILike { get; set; }
+        [BsonRequired]
+        [BsonDefaultValue(false)]
+        public bool DidIDislike { get; set; }
+        [BsonRequired]
+        [BsonDefaultValue(false)]
+        public bool DidIFavor { get; set; }
 
-        public ArticleRanking(string articleId)
+        public ArticleRanking(string articleId, string userId)
         {
-            Id = articleId;
-            Likes = new List<string>();
-            Dislikes = new List<string>();
-            Favors = new List<string>();
+            UserId = userId;
+            ArticleId = articleId;
         }
     }
 }

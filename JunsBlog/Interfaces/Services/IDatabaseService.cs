@@ -17,6 +17,7 @@ namespace JunsBlog.Interfaces.Services
         Task<User> SaveUserAsync(User user);
         Task<User> GetUserAsync(string userId);
         Task<User> GetUserByEmailAsync(string email);
+        Task<ProfileDetails> GetProfileDetailsAsync(string currentUserId);
 
         // Articles
         Task<Article> SaveArticleAsync(Article article);
@@ -26,7 +27,8 @@ namespace JunsBlog.Interfaces.Services
 
         // ArticleRanking
         Task<ArticleRanking> SaveArticleRankingAsync(ArticleRanking ranking);
-        Task<ArticleRanking> GetArticleRankingAsync(string articleId);
+        Task<List<ArticleRanking>> GetArticleRankingsAsync(string articleId);
+        Task<ArticleRanking> GetArticleRankingAsync(string articleId, string userId);
 
         // Comments
         Task<Comment> SaveCommentAsync(Comment comment);
@@ -35,17 +37,17 @@ namespace JunsBlog.Interfaces.Services
 
 
         // CommentRankings
-        //  Task<CommentRanking> GetCommentRankingAsync(string commentId, string userId);
-        //  Task<List<CommentRanking>> GetCommentRankingsAsync(string commentId);
-        //  Task<CommentRanking> SaveCommentRankingAsync(CommentRanking ranking);
-
+        Task<CommentRanking> GetCommentRankingAsync(string commentId, string userId);
+        Task<List<CommentRanking>> GetCommentRankingsAsync(string commentId);
+        Task<CommentRanking> SaveCommentRankingAsync(CommentRanking ranking);
+        Task<CommentRankingDetails> GetCommentRankingDetailsAsync(string commentId, string userId);
 
         //  // Details
         //  //Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options);
         ////  Task<ArticleDetails> GetArticleDetailsAsync(string articleId);
         //  Task<CommentSearchPagingResult> SearchCommentsAsync(CommentSearchPagingOption options, string currentUserId);
 
-        //  Task<ProfileDetails> GetProfileDetailsAsync(string currentUserId);
+        
 
     }
 }

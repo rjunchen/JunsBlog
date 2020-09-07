@@ -78,67 +78,44 @@ namespace JunsBlog.Controllers
             }
         }
 
+        [Authorize(Roles = Role.User)]
+        [HttpPost("rank")]
+        public async Task<IActionResult> RankComments(CommentRankingRequest model)
+        {
+            try
+            {
+                if (model == null || String.IsNullOrWhiteSpace(model.CommentId))
+                    return BadRequest(new { message = "Incomplete ranking information" });
 
-        //[Authorize(Roles = Role.User)]
-        //[HttpPost("rank")]
-        //public async Task<IActionResult> RankComments(CommentRankingRequest model)
-        //{
-        //    try
-        //    {
-        //        if (model == null || String.IsNullOrWhiteSpace(model.CommentId))
-        //            return BadRequest(new { message = "Incomplete ranking information" });
+                var ranking = await databaseService.GetCommentRankingAsync(model.CommentId, currentUserId);
 
-        //        var ranking = await databaseService.GetCommentRankingAsync(model.CommentId, currentUserId);
+                if (ranking == null) ranking = new CommentRanking(model.CommentId, currentUserId);
 
-        //        if (ranking == null) ranking = new CommentRanking(model.CommentId, currentUserId);
+                switch (model.Rank)
+                {
+                    case RankEnum.Like:
+                        ranking.DidILike = !ranking.DidILike;
+                        if (ranking.DidILike) ranking.DidIDislike = false;
+                        break;
+                    case RankEnum.Dislike:
+                        ranking.DidIDislike = !ranking.DidIDislike;
+                        if (ranking.DidIDislike) ranking.DidILike = false;
+                        break;
+                    case RankEnum.Favor:
+                        ranking.DidIFavor = !ranking.DidIFavor;
+                        break;
+                }
+                await databaseService.SaveCommentRankingAsync(ranking);
 
-        //        switch (model.Rank)
-        //        {
-        //            case RankEnum.Like:
-        //                ranking.DidILike = !ranking.DidILike;
-        //                if (ranking.DidILike) ranking.DidIDislike = false;
-        //                break;
-        //            case RankEnum.Dislike:
-        //                ranking.DidIDislike = !ranking.DidIDislike;
-        //                if (ranking.DidIDislike) ranking.DidILike = false;
-        //                break;
-        //            case RankEnum.Favor:
-        //                ranking.DidIFavor = !ranking.DidIFavor;
-        //                break;
-        //        }
-        //        await databaseService.SaveCommentRankingAsync(ranking);
+                var rankingDetails = await databaseService.GetCommentRankingDetailsAsync(model.CommentId, currentUserId);
 
-        //        var rankingDetails = await GetCommentRankingDetails(model.CommentId, currentUserId);
-
-        //        return Ok(rankingDetails);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        logger.LogError(ex, ex.Message);
-        //        return StatusCode(StatusCodes.Status500InternalServerError);
-        //    }
-        //}
-
-        //private async Task<CommentRankingDetails> GetCommentRankingDetails(string commentId, string userId)
-        //{
-        //    var rankings = await databaseService.GetCommentRankingsAsync(commentId);
-
-        //    var rankingResponse = new CommentRankingDetails() { CommentId = commentId };
-
-        //    foreach (var item in rankings)
-        //    {
-        //        if (item.DidIDislike) rankingResponse.DislikesCount++;
-        //        if (item.DidILike) rankingResponse.LikesCount++;
-        //        rankingResponse.DidIFavor = item.DidIFavor;
-
-        //        if (item.UserId == userId)
-        //        {
-        //            rankingResponse.DidIDislike = item.DidIDislike;
-        //            rankingResponse.DidILike = item.DidILike;
-        //            rankingResponse.DidIFavor = item.DidIFavor;
-        //        }
-        //    }
-        //    return rankingResponse;
-        //}
+                return Ok(rankingDetails);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
     }
 }
