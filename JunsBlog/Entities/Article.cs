@@ -19,6 +19,7 @@ namespace JunsBlog.Entities
         [BsonRequired]
         public string Abstract { get; set; }
         [BsonRequired]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string AuthorId { get; set; }
         [BsonRequired]
         public string[] Categories { get; set; }
