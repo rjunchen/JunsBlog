@@ -20,8 +20,8 @@ export class ArticleService {
     this.onSearchClicked.emit(option);
   }
 
-  public saveArticle(article: Article): Observable<string>{
-    return this.http.post('/api/article/save', article, {responseType: 'text'}).pipe(map(id => { return <string>id}));
+  public saveArticle(article: Article): Observable<any>{
+    return this.http.post('/api/article/save', article).pipe(map(id => { return id}));
   }
 
   public getArticle(articleId: string): Observable<Article>{
