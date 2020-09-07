@@ -12,6 +12,7 @@ namespace JunsBlog.Models.Articles
         public string Id { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
+        public string Abstract { get; set; }
         public User Author { get; set; }
         public string[] Categories { get; set; }
         public bool IsPrivate { get; set; }
@@ -20,5 +21,7 @@ namespace JunsBlog.Models.Articles
         public int CommentsCount { get; set; }
         public DateTime UpdatedOn { get; set; }
         public DateTime CreatedOn { get; set; }
+        public List<GalleryImage> GalleryImages { get; set; }
+        public ArticleRankingDetails Ranking { get; set; }
     }
 }

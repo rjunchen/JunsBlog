@@ -9,12 +9,7 @@ import { BehaviorSubject } from 'rxjs';
 export class AppComponent {
   title = 'ClientApp';
 
-  items$ = [];
-
   constructor(){
-    for (let index = 0; index < 100; index++) {
-      this.items$.push(index);
-    }
+
   }
-  
 }

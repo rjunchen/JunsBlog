@@ -123,9 +123,9 @@ namespace JunsBlog.Controllers
                     || options.Filter == ArticleFilterEnum.MyLikes) && String.IsNullOrEmpty(options.ProfilerId))
                     return BadRequest(new { message = "ProfilerId is not specified in the search options" });
 
-                //var searchResult = await databaseService.SearchArticlesAsyc(options);
+                var searchResult = await databaseService.SearchArticlesAsyc(options);
 
-                return Ok();
+                return Ok(searchResult);
             }
             catch (Exception ex)
             {

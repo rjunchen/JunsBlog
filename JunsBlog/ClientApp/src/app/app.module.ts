@@ -9,9 +9,10 @@ import { CoreModule } from './core/core.module'
 import { InterceptorService } from './services/interceptor.service'
 import { QuillModule } from 'ngx-quill';
 
+
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     BrowserModule,

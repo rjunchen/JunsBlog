@@ -4,6 +4,7 @@ import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/fo
 import { ImageCroppedEvent } from 'ngx-image-cropper';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { CustomValidationService } from 'src/app/services/custom-validation.service';
+import { AlertService } from 'src/app/services/alert.service';
 
 @Component({
   selector: 'app-profile-editor',
@@ -21,7 +22,7 @@ export class ProfileEditorComponent implements OnInit {
   uploading: boolean;
   isAvatarDirty: boolean;
 
-  constructor(private auth: AuthenticationService,  private fb: FormBuilder, private customValidator: CustomValidationService) {}
+  constructor(private auth: AuthenticationService, private alertService: AlertService, private fb: FormBuilder, private customValidator: CustomValidationService) {}
 
   ngOnInit(): void {
     this.createForm();
@@ -54,11 +55,7 @@ export class ProfileEditorComponent implements OnInit {
       this.user.image = x.image;
       this.onEditorExit.emit();
     }, err=>{
-      // if (err.status === 400) {     
-      //   this.toastr.warning(err.error.message, err.statusText);
-      // } else {
-      //   this.toastr.error('Unknown error occurred, please try again later');
-      // }
+      this.alertService.alertHttpError(err);
     });
     this.onEditorExit.emit();
   }
@@ -86,7 +83,7 @@ export class ProfileEditorComponent implements OnInit {
   }
 
   loadImageFailed() {
-    //this.toastr.error('Failed to load image');
+    this.alertService.error('Failed to load image');
   }
 
 }

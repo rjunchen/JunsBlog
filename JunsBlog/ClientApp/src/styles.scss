@@ -10,6 +10,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-
     }  
 }
 
+.ngx-gallery-active{
+    position: absolute !important;
+}
 
 .alert-success{
     background-color: #388e3c;

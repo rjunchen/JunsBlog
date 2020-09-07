@@ -132,7 +132,166 @@ namespace JunsBlog.Models.Services
             return articleDetails;
         }
 
-  
+        private class ArticleWithRankings : ArticleDetails
+        {
+            public IEnumerable<ArticleRanking> Rankings { get; set; }
+        }
+
+        private IMongoQueryable<ArticleWithRankings> GenerateArticleDetailsQuery()
+        {
+            var query = articles.AsQueryable().GroupJoin(comments.AsQueryable(), x => x.Id, y => y.ArticleId, (x, y) => new { article = x, comments = y })
+                            .Select(a => new
+                            {
+                                Id = a.article.Id,
+                                Title = a.article.Title,
+                                Abstract = a.article.Abstract,
+                                UpdatedOn = a.article.UpdatedOn,
+                                CreatedOn = a.article.CreatedOn,
+                                IsApproved = a.article.IsApproved,
+                                IsPrivate = a.article.IsPrivate,
+                                Views = a.article.Views,
+                                Content = a.article.Content,
+                                AuthorId = a.article.AuthorId,
+                                Categories = a.article.Categories,
+                                GalleryImages = a.article.GalleryImages,
+                                commentsCount = a.comments.Count()
+                            }).Join(users.AsQueryable(), x => x.AuthorId, y => y.Id, (x, y) => new ArticleDetails
+                            {
+                                Id = x.Id,
+                                Title = x.Title,
+                                Abstract = x.Abstract,
+                                UpdatedOn = x.UpdatedOn,
+                                CreatedOn = x.CreatedOn,
+                                IsApproved = x.IsApproved,
+                                IsPrivate = x.IsPrivate,
+                                Views = x.Views,
+                                Content = x.Content,
+                                Categories = x.Categories,
+                                GalleryImages = x.GalleryImages,
+                                Author = y,
+                                CommentsCount = x.commentsCount
+                            }).GroupJoin(articleRankings.AsQueryable(), x => x.Id, y => y.ArticleId, (x, y) => new ArticleWithRankings
+                            {
+                                Id = x.Id,
+                                Title = x.Title,
+                                Abstract = x.Abstract,
+                                UpdatedOn = x.UpdatedOn,
+                                CreatedOn = x.CreatedOn,
+                                IsApproved = x.IsApproved,
+                                IsPrivate = x.IsPrivate,
+                                Views = x.Views,
+                                Content = x.Content,
+                                Categories = x.Categories,
+                                GalleryImages = x.GalleryImages,
+                                Author = x.Author,
+                                CommentsCount = x.CommentsCount,
+                                Rankings = y
+                            });
+            return query;
+        }
+
+        public async Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options)
+        {
+            var query = GenerateArticleDetailsQuery();
+
+            if (!string.IsNullOrEmpty(options.SearchKey)) query = query.Where(x => x.Content.ToLower().Contains(options.SearchKey.ToLower()));
+
+            switch (options.SortBy)
+            {
+                case SortByEnum.UpdatedOn:
+                    if (options.SortOrder == SortOrderEnum.Ascending)
+                        query = query.OrderBy(x => x.UpdatedOn);
+                    else
+                        query = query.OrderByDescending(x => x.UpdatedOn);
+                    break;
+                case SortByEnum.Views:
+                    if (options.SortOrder == SortOrderEnum.Ascending)
+                        query = query.OrderBy(x => x.Views);
+                    else
+                        query = query.OrderByDescending(x => x.Views);
+                    break;
+            }
+
+            switch (options.Filter)
+            {
+                case ArticleFilterEnum.MyArticles:
+                    query = query.Where(x => x.Author.Id == options.ProfilerId);
+                    break;
+                case ArticleFilterEnum.MyLikes:
+                    query = query.Where(x => x.Rankings.Any(x => x.DidILike == true && x.UserId == options.ProfilerId));
+                    break;
+                case ArticleFilterEnum.MyFavorites:
+                    query = query.Where(x => x.Rankings.Any(x => x.DidIFavor == true && x.UserId == options.ProfilerId));
+                    break;
+            }
+
+            var docsCount = await query.CountAsync();
+
+            var documents = await query.Skip((options.CurrentPage - 1) * options.PageSize).Take(options.PageSize).ToListAsync();
+
+            var articleDetailsList = new List<ArticleDetails>();
+
+            foreach (var item in documents)
+            {
+                item.Content = null; // Don't return the content
+                var articleDetails = new ArticleDetails()
+                {
+                    Id = item.Id,
+                    Title = item.Title,
+                    Abstract = item.Abstract,
+                    UpdatedOn = item.UpdatedOn,
+                    CreatedOn = item.CreatedOn,
+                    IsApproved = item.IsApproved,
+                    IsPrivate = item.IsPrivate,
+                    Views = item.Views,
+                    Content = item.Content,
+                    Categories = item.Categories,
+                    GalleryImages = item.GalleryImages,
+                    Author = item.Author,
+                    CommentsCount = item.CommentsCount,
+                    Ranking = new ArticleRankingDetails(item.Id, options.ProfilerId, item.Rankings)
+                };
+                articleDetailsList.Add(articleDetails);
+            }
+
+            return new ArticleSearchPagingResult(articleDetailsList, docsCount, options);
+        }
+
+        public async Task<ProfileDetails> GetProfileDetailsAsync(string currentUserId)
+        {
+            var query = users.AsQueryable().Where(x => x.Id == currentUserId).GroupJoin(articles.AsQueryable(), x => x.Id, y => y.AuthorId, (x, y) => new { UserId = x.Id, Articles = y, })
+           .Select(a => new
+           {
+               Id = a.UserId,
+               ArticlesCount = a.Articles.Count()
+           }).GroupJoin(articleRankings.AsQueryable(), x => x.Id, y => y.UserId, (x, y) => new
+           {
+               Id = x.Id,
+               ArticlesCount = x.ArticlesCount,
+               Rankings = y
+           }).Select(a => new
+           {
+               Id = a.Id,
+               ArticlesCount = a.ArticlesCount,
+               FavorsCount = a.Rankings.Count(x => x.DidIFavor == true),
+               LikesCount = a.Rankings.Count(x => x.DidILike == true),
+           }).GroupJoin(users, x => x.Id, y => y.Id, (x, y) => new
+           {
+               Id = x.Id,
+               ArticlesCount = x.ArticlesCount,
+               FavorsCount = x.FavorsCount,
+               LikesCount = x.LikesCount,
+               Users = y
+           }).Select(a => new ProfileDetails
+           {
+               LikesCount = a.LikesCount,
+               ArticlesCount = a.ArticlesCount,
+               FavorsCount = a.FavorsCount,
+               User = a.Users.First()
+           });
+            return await query.FirstOrDefaultAsync();
+        }
+
         #endregion
 
 
@@ -262,27 +421,6 @@ namespace JunsBlog.Models.Services
             await commentRankings.ReplaceOneAsync(s => s.Id == ranking.Id, ranking, new ReplaceOptions { IsUpsert = true });
             return ranking;
         }
-        #endregion
-
-
-        //#region Details
-
-        //private class ArticleWithRankings : ArticleDetails
-        //{
-        //   public IEnumerable<ArticleRanking> Rankings { get; set; }
-        //}
-
-
-        //public async Task<CommentDetails> GetCommentDetialsAsync(string commentId, string currentUserId)
-        //{
-        //    var rankingDetails = await GetCommentRankingDetailsAsync(commentId, currentUserId);
-
-        //    var query = GenerateCommentsDetailsQuery();
-
-        //    var commentDetail = await query.Where(x => x.Id == commentId).FirstOrDefaultAsync();
-        //    commentDetail.Ranking = rankingDetails;
-        //    return commentDetail;
-        //}
 
         public async Task<CommentRankingDetails> GetCommentRankingDetailsAsync(string commentId, string userId)
         {
@@ -306,69 +444,7 @@ namespace JunsBlog.Models.Services
             return rankingResponse;
         }
 
-        //private IMongoQueryable<CommentDetails> GenerateCommentsDetailsQuery()
-        //{
-        //    var query = comments.AsQueryable().GroupJoin(comments.AsQueryable(), x => x.Id, y => y.ParentId, (x, y) => new { comment = x, childrenComments = y })
-        //                    .Select(a => new
-        //                    {
-        //                        Id = a.comment.Id,
-        //                        CommentText = a.comment.CommentText,
-        //                        UpdatedOn = a.comment.UpdatedOn,
-        //                        ArticleId = a.comment.ArticleId,
-        //                        ChildrenCommentsCount = a.childrenComments.Count(),
-        //                        ParentId = a.comment.ParentId,
-        //                        UserId = a.comment.UserId,
+        #endregion
 
-        //                    }).Join(users.AsQueryable(), x => x.UserId, y => y.Id, (x, y) => new CommentDetails
-        //                    {
-        //                        Id = x.Id,
-        //                        CommentText = x.CommentText,
-        //                        UpdatedOn = x.UpdatedOn,
-        //                        ArticleId = x.ArticleId,
-        //                        ChildrenCommentsCount = x.ChildrenCommentsCount,
-        //                        ParentId = x.ParentId,
-        //                        User = y
-        //                    });
-        //    return query;
-        //}
-
-
-
-        public async Task<ProfileDetails> GetProfileDetailsAsync(string currentUserId)
-        {
-            var query = users.AsQueryable().Where(x => x.Id == currentUserId).GroupJoin(articles.AsQueryable(), x => x.Id, y => y.AuthorId, (x, y) => new { UserId = x.Id, Articles = y, })
-           .Select(a => new
-           {
-               Id = a.UserId,
-               ArticlesCount = a.Articles.Count()
-           }).GroupJoin(articleRankings.AsQueryable(), x => x.Id, y => y.UserId, (x, y) => new
-           {
-               Id = x.Id,
-               ArticlesCount = x.ArticlesCount,
-               Rankings = y
-           }).Select(a => new
-           {
-               Id = a.Id,
-               ArticlesCount = a.ArticlesCount,
-               FavorsCount = a.Rankings.Count(x => x.DidIFavor == true),
-               LikesCount = a.Rankings.Count(x => x.DidILike == true),
-           }).GroupJoin(users, x => x.Id, y => y.Id, (x, y) => new
-           {
-               Id = x.Id,
-               ArticlesCount = x.ArticlesCount,
-               FavorsCount = x.FavorsCount,
-               LikesCount = x.LikesCount,
-               Users = y
-           }).Select(a => new ProfileDetails
-           {
-               LikesCount = a.LikesCount,
-               ArticlesCount = a.ArticlesCount,
-               FavorsCount = a.FavorsCount,
-               User = a.Users.First()
-           });
-            return await query.FirstOrDefaultAsync();
-        }
-
-        //#endregion
     }
 }
