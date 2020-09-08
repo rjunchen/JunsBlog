@@ -1,11 +1,11 @@
 <mat-toolbar class="header">
     <img class="logo link" src="./assets/logo.png" (click)="toggleSidebar()" />
-    <span class="app-title link" [routerLink]="['/']">Jun's Blog</span>
+    <span class="app-title link" [routerLink]="['/home']">Jun's Blog</span>
     <div class="action-button link mobile-button" (click)="goBack()">
       <mat-icon class="rotate180">forward</mat-icon>
       <span class="icon-label">back</span>
     </div>
-    <div class="action-button link mobile-button" [routerLink]="['/']" [routerLinkActive]="['is-active']">
+    <div class="action-button link mobile-button" [routerLink]="['/home']" [routerLinkActive]="['is-active']">
       <mat-icon>home</mat-icon>
       <span class="icon-label">Home</span>
     </div>

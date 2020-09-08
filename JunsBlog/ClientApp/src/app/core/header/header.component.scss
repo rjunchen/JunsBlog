@@ -34,6 +34,11 @@ $color-warn: #f44336;
     }
 }
 
+.is-active{
+    color: $color-warn;
+    outline: none;          
+}
+
 .action-button{
     margin: 0px 20px;
     display: flex;

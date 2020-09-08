@@ -86,6 +86,10 @@ namespace JunsBlog.Models.Services
 
         public async Task<ArticleDetails> GetArticleDetailsAsync(string articleId, string currentUserId)
         {
+            // Increase the view count by 1
+            var updateDef = Builders<Article>.Update.Inc(x => x.Views, 1);
+            await articles.UpdateOneAsync<Article>(x => x.Id == articleId, updateDef);
+
             var query = articles.AsQueryable().Where(x => x.Id == articleId).Join(users.AsQueryable(), x => x.AuthorId, y => y.Id, (x, y) => new { article = x, author = y })
                         .Select(a => new ArticleDetails
                         {
