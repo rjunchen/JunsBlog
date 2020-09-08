@@ -35,9 +35,13 @@ export class HeaderComponent implements OnInit {
     this.location.back();
   }
 
+  get isValidSearchKey(){
+    return this.searchKey.trim().length > 0;
+  }
+
   search(){
-    if(this.searchKey.length > 0)
-      this.router.navigateByUrl(`/search/${this.searchKey}`);
+    if(this.isValidSearchKey)
+      this.router.navigateByUrl(`/search/${this.searchKey.trim()}`);
     this.showMobileSearch = false;
   }
 

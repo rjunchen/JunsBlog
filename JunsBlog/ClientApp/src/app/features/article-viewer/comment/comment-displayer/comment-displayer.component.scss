@@ -1,16 +1,16 @@
-$color-orange: #f44336;
+$color-warn: #f44336;
 .comment-item-container {
     width: 100%;
     .user-details{
         margin-top: 5px;
-        .profileImage{
+        .profile-image{
             width: 30px;
             height: 30px;
             border-radius: 50%;
         }
 
         .chip-style {
-            background-color: $color-orange;
+            background-color: $color-warn;
             color: white;
             padding: 3px 8px;
             border-radius: 23px;
@@ -59,7 +59,7 @@ $color-orange: #f44336;
                 margin-right: 5px;
             }
             &:hover{
-                color: $color-orange;
+                color: $color-warn;
                 cursor: pointer;
             }
         }
@@ -72,7 +72,7 @@ $color-orange: #f44336;
     .comment-status{
         .rankingCounts{
             margin-right: 10px;
-            color: $color-orange;
+            color: $color-warn;
             font-weight: 500;
             vertical-align: baseline;
         }
@@ -80,10 +80,32 @@ $color-orange: #f44336;
             font-size: 20px;
             }
         .mat-success {
-            color: $color-orange;
+            color: $color-warn;
         }
         .mat-unrated {
             color: #999;
         }
+    }
+}
+
+.image-link{
+    &:hover{
+        cursor: pointer;
+    }
+    &:focus{
+        outline: none;
+    }
+}
+
+.link{
+    text-decoration: none;
+    color: black;
+
+    &:hover{
+        color: $color-warn;
+        cursor: pointer;
+    }
+    &:focus{
+        outline: none;
     }
 }

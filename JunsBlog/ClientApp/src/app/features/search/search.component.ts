@@ -17,12 +17,13 @@ export class SearchComponent implements OnInit, AfterViewInit {
       const searchKey = x.get("searchKey")
       let searchOption = new ArticleSearchPagingOption();
       searchOption.searchKey = searchKey;
-      this.articleService.SearchClicked(searchOption);
+      setTimeout(() => {
+        this.articleService.SearchClicked(searchOption);
+      }, 1);
      });
   }
 
   ngOnInit(): void {
   
   }
-
 }

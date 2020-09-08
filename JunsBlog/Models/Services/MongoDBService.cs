@@ -141,9 +141,9 @@ namespace JunsBlog.Models.Services
             public IEnumerable<ArticleRanking> Rankings { get; set; }
         }
 
-        private IMongoQueryable<ArticleWithRankings> GenerateArticleDetailsQuery()
+        private IMongoQueryable<ArticleWithRankings> GenerateArticleDetailsQuery(IMongoQueryable<Article> query)
         {
-            var query = articles.AsQueryable().GroupJoin(comments.AsQueryable(), x => x.Id, y => y.ArticleId, (x, y) => new { article = x, comments = y })
+            return query.GroupJoin(comments.AsQueryable(), x => x.Id, y => y.ArticleId, (x, y) => new { article = x, comments = y })
                             .Select(a => new
                             {
                                 Id = a.article.Id,
@@ -191,47 +191,56 @@ namespace JunsBlog.Models.Services
                                 CommentsCount = x.CommentsCount,
                                 Rankings = y
                             });
-            return query;
         }
 
         public async Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options)
         {
-            var query = GenerateArticleDetailsQuery();
+            // Start with the articles collection
+            var query = articles.AsQueryable();
 
-            if (!string.IsNullOrEmpty(options.SearchKey)) query = query.Where(x => x.Content.ToLower().Contains(options.SearchKey.ToLower()));
+            // filter the search key
+            if(!string.IsNullOrEmpty(options.SearchKey)){
+                query = query.Where(x => x.Content.ToLower().Contains(options.SearchKey.ToLower()) 
+                        && x.Title.ToLower().Contains(options.SearchKey.ToLower()));
+            }
+
+            // Join the needed collections
+            var joinedQuery = GenerateArticleDetailsQuery(query);
+
+            switch (options.Filter)
+            {
+                case ArticleFilterEnum.MyArticles:
+                    joinedQuery = joinedQuery.Where(x => x.Author.Id == options.ProfilerId);
+                    break;
+                case ArticleFilterEnum.MyLikes:
+                    joinedQuery = joinedQuery.Where(x => x.Rankings.Any(x => x.DidILike == true && x.UserId == options.ProfilerId));
+                    break;
+                case ArticleFilterEnum.MyFavorites:
+                    joinedQuery = joinedQuery.Where(x => x.Rankings.Any(x => x.DidIFavor == true && x.UserId == options.ProfilerId));
+                    break;
+            }
 
             switch (options.SortBy)
             {
                 case SortByEnum.UpdatedOn:
                     if (options.SortOrder == SortOrderEnum.Ascending)
-                        query = query.OrderBy(x => x.UpdatedOn);
+                        joinedQuery = joinedQuery.OrderBy(x => x.UpdatedOn);
                     else
-                        query = query.OrderByDescending(x => x.UpdatedOn);
+                        joinedQuery = joinedQuery.OrderByDescending(x => x.UpdatedOn);
                     break;
                 case SortByEnum.Views:
                     if (options.SortOrder == SortOrderEnum.Ascending)
-                        query = query.OrderBy(x => x.Views);
+                        joinedQuery = joinedQuery.OrderBy(x => x.Views);
                     else
-                        query = query.OrderByDescending(x => x.Views);
+                        joinedQuery = joinedQuery.OrderByDescending(x => x.Views);
                     break;
             }
 
-            switch (options.Filter)
-            {
-                case ArticleFilterEnum.MyArticles:
-                    query = query.Where(x => x.Author.Id == options.ProfilerId);
-                    break;
-                case ArticleFilterEnum.MyLikes:
-                    query = query.Where(x => x.Rankings.Any(x => x.DidILike == true && x.UserId == options.ProfilerId));
-                    break;
-                case ArticleFilterEnum.MyFavorites:
-                    query = query.Where(x => x.Rankings.Any(x => x.DidIFavor == true && x.UserId == options.ProfilerId));
-                    break;
-            }
 
-            var docsCount = await query.CountAsync();
 
-            var documents = await query.Skip((options.CurrentPage - 1) * options.PageSize).Take(options.PageSize).ToListAsync();
+            var docsCount = await joinedQuery.CountAsync();
+
+            var documents = await joinedQuery.Skip((options.CurrentPage - 1) * options.PageSize).Take(options.PageSize).ToListAsync();
 
             var articleDetailsList = new List<ArticleDetails>();
 

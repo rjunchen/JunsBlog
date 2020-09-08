@@ -1,4 +1,4 @@
-$color-orange: #f44336;
+$color-warn: #f44336;
 
 .articles-container{
 
@@ -30,7 +30,7 @@ $color-orange: #f44336;
    
     .article-categories{
         .chip-style {
-            background-color: $color-orange;
+            background-color: $color-warn;
             color: white;
             padding: 3px 8px;
             border-radius: 23px;
@@ -58,7 +58,7 @@ $color-orange: #f44336;
     .article-status-block{
         padding-top: 6px;
         .mat-success {
-            color: $color-orange;
+            color: $color-warn;
         }
         
         .mat-unrated {        
@@ -77,7 +77,7 @@ $color-orange: #f44336;
     color: black;
 
     &:hover{
-        color: $color-orange;
+        color: $color-warn;
         cursor: pointer;
     }
     &:focus{

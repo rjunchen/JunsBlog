@@ -24,7 +24,7 @@
           <mat-icon>close</mat-icon>
         </button>
       </mat-form-field>
-      <div class="action-button link" [ngClass]="{'disabled-link': searchKey.length == 0}" (click)="search()">
+      <div class="action-button link" [ngClass]="{'disabled-link': !isValidSearchKey}" (click)="search()">
         <mat-icon>find_in_page</mat-icon> 
         <span class="icon-label">Search</span>
       </div>
@@ -56,7 +56,7 @@
         <mat-icon>close</mat-icon>
       </button>
     </mat-form-field>
-    <div class="action-button link search-button" [ngClass]="{'disabled-link': searchKey.length == 0}" (click)="search()">
+    <div class="action-button link search-button" [ngClass]="{'disabled-link': !isValidSearchKey}" (click)="search()">
       <mat-icon>search</mat-icon> 
     </div>
   </div>    

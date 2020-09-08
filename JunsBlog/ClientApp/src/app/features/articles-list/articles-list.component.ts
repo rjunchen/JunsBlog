@@ -25,29 +25,30 @@ export class ArticlesListComponent implements OnInit, OnDestroy {
   throttle = 300;
   scrollDistance = 1;
   scrollUpDistance = 2;
-  loading = false;
+  loading: boolean;
   noSearchResult: boolean;
   searchSubscription: Subscription;
 
   galleryOptions: NgxGalleryOptions[];
 
   constructor(private articleService: ArticleService, private auth: AuthenticationService, private alertService: AlertService) { }
+
   ngOnDestroy(): void {
     this.searchSubscription.unsubscribe();  //Leave the page doesn't unsubscribe by default, need manually unsubscribe it
   }
 
   ngOnInit(): void {
+    this.loading = false;
     this.currentUser = this.auth.getCurrentUser();
-    this.searchSubscription = this.articleService.onSearchClicked.subscribe(option=>{
-      this.search(option);
-    })
-
     if(this.loadOnInit){
       var searchOption = new ArticleSearchPagingOption();
       searchOption.profilerId = this.currentUser?.id;
       this.search(searchOption);
     }
      this.previewImageSetup();
+     this.searchSubscription = this.articleService.onSearchClicked.subscribe(option=>{
+      this.search(option);
+    });
   }
 
   search(option: ArticleSearchPagingOption){
