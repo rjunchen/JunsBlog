@@ -9,7 +9,27 @@
       <mat-icon>home</mat-icon>
       <span class="icon-label">Home</span>
     </div>
+
     <span class="spacer"></span>
+
+    <div class="action-button link search-mobile" (click)="toggleMobileSearch()">
+      <mat-icon>find_in_page</mat-icon> 
+      <span class="icon-label">Search</span>
+    </div>
+
+    <div fxLayout="row" class="search-group">
+      <mat-form-field class="search-field">
+        <input matInput type="search" placeholder="Search..." [(ngModel)]="searchKey">
+        <button mat-button *ngIf="searchKey" matSuffix mat-icon-button aria-label="Clear" (click)="searchKey=''">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+      <div class="action-button link" [ngClass]="{'disabled-link': searchKey.length == 0}" (click)="search()">
+        <mat-icon>find_in_page</mat-icon> 
+        <span class="icon-label">Search</span>
+      </div>
+    </div>
+
     <div class="action-button link" *ngIf="!currentUser" [routerLink]="['/login']" [routerLinkActive]="['is-active']">
         <mat-icon>login</mat-icon> 
         <span class="icon-label">Login</span>
@@ -26,3 +46,18 @@
         <img class="profile-image"  [src]="currentUser.image"/>
     </div>
 </mat-toolbar>
+
+<div *ngIf="showMobileSearch" class="search-control" fxLayout="column">
+  <div class="over-lay" (click)="toggleMobileSearch()"></div>
+  <div fxLayout="row" fxLayoutAlign="start end" class="search-group-mobile">
+    <mat-form-field class="search-field">
+      <input matInput type="search" placeholder="Search..." [(ngModel)]="searchKey">
+      <button mat-button *ngIf="searchKey" matSuffix mat-icon-button aria-label="Clear" (click)="searchKey=''">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+    <div class="action-button link search-button" [ngClass]="{'disabled-link': searchKey.length == 0}" (click)="search()">
+      <mat-icon>search</mat-icon> 
+    </div>
+  </div>    
+</div>

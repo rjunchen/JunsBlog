@@ -36,8 +36,6 @@ export class ArticlesListComponent implements OnInit, OnDestroy {
     this.searchSubscription.unsubscribe();  //Leave the page doesn't unsubscribe by default, need manually unsubscribe it
   }
 
-
-
   ngOnInit(): void {
     this.currentUser = this.auth.getCurrentUser();
     this.searchSubscription = this.articleService.onSearchClicked.subscribe(option=>{
