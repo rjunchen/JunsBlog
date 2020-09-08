@@ -7,15 +7,23 @@
         <div class="article-display-box">
             <div class="header-info-box">
                 <h1 class="article-title">{{article.title}}</h1>
-                <div class="article-stats-box">
+                <div class="article-stats-box" fxLayout="row" fxLayoutAlign="start center">
                     <img class="images profile-image image-link" routerLink="{{'/profile/' + article.author.id}}" [src]="article.author.image"/>
-                    <span class="link" routerLink="{{'/profile/' + article.author.id}}">{{article.author.name}}</span>
-                    <mat-icon class="view-icon">visibility</mat-icon>
-                    <span>{{article.views}}</span>
-                    <span>{{article.updatedOn | date:'short'}}</span>
-                    <button *ngIf="article.author.id == currentUser?.id" mat-icon-button (click)="edit()">
-                        <mat-icon>edit</mat-icon>Edit
-                    </button>
+                    <div fxLayout="column">
+                        <div>
+                            <span class="link" routerLink="{{'/profile/' + article.author.id}}">{{article.author.name}}</span>
+                            <span>{{article.updatedOn | date:'short'}}</span>
+                            <mat-icon matTooltip="Edit" *ngIf="article.author.id == currentUser?.id" class="link" (click)="edit()">edit</mat-icon>
+                        </div>
+                        <dvi>
+                            <mat-icon matTooltip="Views" class="view-icon">visibility</mat-icon>
+                            <span>{{article.views}}</span>
+                            
+                            <!-- <button *ngIf="article.author.id == currentUser?.id" mat-icon-button (click)="edit()">
+                                <mat-icon>edit</mat-icon>Edit
+                            </button> -->
+                        </dvi>
+                    </div>
                 </div>
             </div>
             <div class="article-categories">

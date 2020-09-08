@@ -32,6 +32,7 @@ namespace JunsBlog.Helpers
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(article.Content);
             var nodes = htmlDoc.DocumentNode.Descendants("img");
+            article.GalleryImages.Clear();
 
             foreach (var node in nodes)
             {

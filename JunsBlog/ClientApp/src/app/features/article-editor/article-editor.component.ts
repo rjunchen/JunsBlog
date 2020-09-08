@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { MatChipInputEvent } from '@angular/material/chips';
+import { MatChipInputEvent, MatChipList } from '@angular/material/chips';
 import { Article } from './../../models/article/article';
 import { ArticleService } from './../../services/article.service';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
@@ -8,7 +8,7 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import Quill from 'quill'
 import ImageResize from 'quill-image-resize-module'
 import { AlertService } from 'src/app/services/alert.service';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 Quill.register('modules/imageResize', ImageResize)
 
 export interface Category {
@@ -21,7 +21,7 @@ export interface Category {
   styleUrls: ['./article-editor.component.scss']
 })
 export class ArticleEditorComponent implements OnInit {
-
+  @ViewChild('chipList') chipList: MatChipList;
   modules = {}
 
   article: Article;
@@ -32,6 +32,7 @@ export class ArticleEditorComponent implements OnInit {
   addOnBlur = true;
   updateMode = false;
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
+  deepCopyCategories= [];
 
   constructor(private articleService: ArticleService, private router: Router, private route: ActivatedRoute,
     private alertService: AlertService, private fb: FormBuilder) {
@@ -43,7 +44,7 @@ export class ArticleEditorComponent implements OnInit {
           [{ 'color': [] }], 
           ['link', 'image', 'video'] 
         ]
-    }
+    };
    }
 
   ngOnInit(): void {
@@ -55,22 +56,62 @@ export class ArticleEditorComponent implements OnInit {
         this.updateMode = true;
         this.articleService.getArticle(articleId).subscribe( data=> {
           this.article = data;
+          this.createForm();
         }, err=>{
           this.alertService.alertHttpError(err);
         })
       }else{
         // create mode
         this.article = new Article();
+        this.createForm();
       }
     });
   }
 
-  cancel(){
-
+  createForm() {
+    this.deepCopyCategories = JSON.parse(JSON.stringify(this.article.categories));
+    this.articleForm = this.fb.group({
+      title: [ this.article.title, Validators.required],
+      abstract: [this.article.abstract, Validators.required],
+      content: [this.article.content, Validators.required],
+      isPrivate: [this.article.isPrivate, Validators.required],
+    })
   }
 
+  onBlurCategories(){
+    if(this.deepCopyCategories.length > 0)
+    {
+      this.chipList.errorState = false;
+    }   
+    else
+    {
+      this.chipList.errorState = true;
+    }
+  }
+
+  cancel(){
+    this.createForm();
+  }
+
+  get articleFormControl() {
+    return this.articleForm.controls;
+  }
   
+  canSubmit(){
+    if(this.chipList){
+      //this.chipList.errorState = true;
+    }
+   
+    return this.articleFormControl.title.valid && this.articleFormControl.abstract.valid 
+    && this.articleFormControl.content.valid && this.deepCopyCategories.length > 0;
+  }
+
   summit(){
+    this.article.title = this.articleFormControl.title.value;
+    this.article.abstract = this.articleFormControl.abstract.value;
+    this.article.content = this.articleFormControl.content.value;
+    this.article.categories = this.deepCopyCategories;
+    this.article.isPrivate = this.articleFormControl.isPrivate.value;
     this.articleService.saveArticle(this.article).subscribe( article=>{
       this.router.navigateByUrl(`/article/${article.id}`);
     }, err=>{
@@ -84,7 +125,8 @@ export class ArticleEditorComponent implements OnInit {
 
     // Add category
     if ((value || '').trim()) {
-      this.article.categories.push(value.trim());
+      this.deepCopyCategories.push(value.trim());
+      this.chipList.errorState = false;
     }
 
     // Reset the input value
@@ -94,9 +136,9 @@ export class ArticleEditorComponent implements OnInit {
   }
 
   remove(category: string): void {
-    const index = this.article.categories.indexOf(category);
+    const index = this.deepCopyCategories.indexOf(category);
     if (index >= 0) {
-      this.article.categories.splice(index, 1);
+      this.deepCopyCategories.splice(index, 1);
     }
   }
 
