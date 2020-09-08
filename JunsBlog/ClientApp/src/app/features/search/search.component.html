@@ -1,0 +1,15 @@
+<div class="search-container">
+
+    
+    <mat-button-toggle-group name="sortBy" aria-label="Sort By">
+        <mat-button-toggle value="CreatedOn">Most recent</mat-button-toggle>
+        <mat-button-toggle value="Views">Most views</mat-button-toggle>
+        <mat-button-toggle value="Favorites">Most favorites</mat-button-toggle>
+        <mat-button-toggle value="Likes">Most likes</mat-button-toggle>
+    </mat-button-toggle-group>
+      
+
+    <div class="article-list">
+        <app-articles-list [loadOnInit]="false" ></app-articles-list>
+    </div>
+</div>

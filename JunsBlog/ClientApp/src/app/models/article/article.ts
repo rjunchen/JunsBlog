@@ -9,5 +9,6 @@ export class Article {
 
     constructor(){
         this.categories = [];
-    }
+        this.isPrivate = false;
+    } 
 }

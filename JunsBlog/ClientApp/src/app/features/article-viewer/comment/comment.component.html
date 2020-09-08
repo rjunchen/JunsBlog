@@ -7,8 +7,6 @@
         <div class="comment-title" >
             <span>{{article.commentsCount}}</span><span>Comments</span>
         </div>
-    </div>
-    <div>
         <div class="comment-item" *ngFor="let comment of displayComments">
             <app-comment-displayer [comment]="comment"  [article]="article"></app-comment-displayer>
         </div>
