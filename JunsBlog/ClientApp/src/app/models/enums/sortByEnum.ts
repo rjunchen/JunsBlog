@@ -1,4 +1,7 @@
 export enum SortByEnum {
     CreatedOn,
-    Views
+    Views,
+    Likes,
+    Favors,
+    Dislikes
 }

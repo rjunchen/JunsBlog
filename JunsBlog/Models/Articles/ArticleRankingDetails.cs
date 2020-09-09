@@ -13,6 +13,7 @@ namespace JunsBlog.Models.Articles
         public bool DidIDislike { get; set; }
         public int DislikesCount { get; set; }
         public bool DidIFavor { get; set; }
+        public int FavorsCount { get; set; }
 
         public ArticleRankingDetails(string articleId, string userId, IEnumerable<ArticleRanking> rankings)
         {
@@ -20,7 +21,7 @@ namespace JunsBlog.Models.Articles
             {
                 if (item.DidIDislike) DislikesCount++;
                 if (item.DidILike) LikesCount++;
-                DidIFavor = item.DidIFavor;
+                if (item.DidIFavor) FavorsCount++;
 
                 if (item.UserId == userId)
                 {

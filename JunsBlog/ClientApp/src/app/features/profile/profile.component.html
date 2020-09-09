@@ -2,7 +2,7 @@
     <div *ngIf="!showEditor"  class="profile-info" fxLayout="row" fxLayoutAlign="start center">
         <div fxLayout="column" fxLayoutAlign="center center">
             <img class="profile-image"  [src]="profile.user.image"/>
-            <button mat-button color="primary" (click)="toggleProfileEditor()">Edit profile</button>
+            <button mat-button color="primary" *ngIf="canEdit()" (click)="toggleProfileEditor()">Edit profile</button>
         </div>  
         <div class="profile-details">
             <div>{{profile.user.name}}</div>

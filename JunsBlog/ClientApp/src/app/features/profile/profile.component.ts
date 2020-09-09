@@ -16,6 +16,7 @@ export class ProfileComponent implements OnInit {
   showEditor: boolean;
   currentUser: User;
   
+
   constructor(private auth: AuthenticationService, private route: ActivatedRoute, private alertService: AlertService) { }
 
   ngOnInit(): void {
@@ -39,5 +40,12 @@ export class ProfileComponent implements OnInit {
 
   toggleProfileEditor(){
     this.showEditor = !this.showEditor;
+  }
+
+  canEdit(){
+    if(this.currentUser && this.currentUser.id == this.profile.user.id)
+      return true;
+    else
+      return false;
   }
 }
