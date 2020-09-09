@@ -141,7 +141,7 @@ namespace JunsBlog.Models.Services
             public IEnumerable<ArticleRanking> Rankings { get; set; }
         }
 
-        private IMongoQueryable<ArticleWithRankings> GenerateArticleDetailsQuery(IMongoQueryable<Article> query)
+        private IMongoQueryable<ArticleWithRankings> GenerateArticleDetailsQuery(IMongoQueryable<Article> query, string profilerId)
         {
             return query.GroupJoin(comments.AsQueryable(), x => x.Id, y => y.ArticleId, (x, y) => new { article = x, comments = y })
                             .Select(a => new
@@ -189,8 +189,11 @@ namespace JunsBlog.Models.Services
                                 GalleryImages = x.GalleryImages,
                                 Author = x.Author,
                                 CommentsCount = x.CommentsCount,
-                                Rankings = y
-                            });
+                                Rankings = y,
+                                Likes = y.Count(a => a.DidILike),
+                                Dislikes  = y.Count(a => a.DidIDislike),
+                                Favors = y.Count(a => a.DidIFavor)
+                            }); ;
         }
 
         public async Task<ArticleSearchPagingResult> SearchArticlesAsyc(ArticleSearchPagingOption options)
@@ -201,11 +204,11 @@ namespace JunsBlog.Models.Services
             // filter the search key
             if(!string.IsNullOrEmpty(options.SearchKey)){
                 query = query.Where(x => x.Content.ToLower().Contains(options.SearchKey.ToLower()) 
-                        && x.Title.ToLower().Contains(options.SearchKey.ToLower()));
+                        || x.Title.ToLower().Contains(options.SearchKey.ToLower()));
             }
 
             // Join the needed collections
-            var joinedQuery = GenerateArticleDetailsQuery(query);
+            var joinedQuery = GenerateArticleDetailsQuery(query, options.ProfilerId);
 
             switch (options.Filter)
             {
@@ -234,9 +237,19 @@ namespace JunsBlog.Models.Services
                     else
                         joinedQuery = joinedQuery.OrderByDescending(x => x.Views);
                     break;
+                case SortByEnum.Likes:
+                    if (options.SortOrder == SortOrderEnum.Ascending)
+                        joinedQuery = joinedQuery.OrderBy(x => x.Likes);
+                    else
+                        joinedQuery = joinedQuery.OrderByDescending(x => x.Likes);
+                    break;
+                case SortByEnum.Favors:
+                    if (options.SortOrder == SortOrderEnum.Ascending)
+                        joinedQuery = joinedQuery.OrderBy(x => x.Favors);
+                    else
+                        joinedQuery = joinedQuery.OrderByDescending(x => x.Favors);
+                    break;
             }
-
-
 
             var docsCount = await joinedQuery.CountAsync();
 
@@ -262,6 +275,7 @@ namespace JunsBlog.Models.Services
                     GalleryImages = item.GalleryImages,
                     Author = item.Author,
                     CommentsCount = item.CommentsCount,
+
                     Ranking = new ArticleRankingDetails(item.Id, options.ProfilerId, item.Rankings)
                 };
                 articleDetailsList.Add(articleDetails);

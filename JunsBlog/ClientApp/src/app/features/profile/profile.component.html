@@ -1,21 +1,43 @@
 <div class="profile-container" *ngIf="profile">
-    <div *ngIf="!showEditor"  class="profile-info" fxLayout="row" fxLayoutAlign="start center">
-        <div fxLayout="column" fxLayoutAlign="center center">
-            <img class="profile-image"  [src]="profile.user.image"/>
-            <button mat-button color="primary" (click)="toggleProfileEditor()">Edit profile</button>
-        </div>  
-        <div class="profile-details">
-            <div>{{profile.user.name}}</div>
-            <div class="grey-text">{{profile.user.email}}</div>
-            <div class="grey-text">Joined: {{profile.user.createdOn | date:'shortDate'}}</div>
-            <div class="grey-text">{{profile.user.role}}</div>
-        </div>     
+    <div class="profiler">
+        <div *ngIf="!showEditor"  class="profile-info" fxLayout="row" fxLayoutAlign="start center">
+            <div fxLayout="column" fxLayoutAlign="center center">
+                <img class="profile-image"  [src]="profile.user.image"/>
+                <button mat-button color="primary" *ngIf="isAuthorized()" (click)="toggleProfileEditor()">Edit profile</button>
+            </div>  
+            <div class="profile-details">
+                <div>{{profile.user.name}}</div>
+                <div class="grey-text">{{profile.user.email}}</div>
+                <div class="grey-text">Joined: {{profile.user.createdOn | date:'shortDate'}}</div>
+                <div class="grey-text">{{profile.user.role}}</div>
+            </div>     
+        </div>
+    
+        <app-profile-editor *ngIf="showEditor" class="profile-editor" [user]="profile.user" (onEditorExit)="showEditor = false"></app-profile-editor>
+    </div>
+ 
+    <div class="profile-summary">
+        <div class="my-list">
+            <div class="list-item" fxLayout="row" [ngClass]="{'active': selectedTab == 'myArticles'}" (click)="showMyArticles()">
+                <mat-icon>article</mat-icon><span>Articles</span><span fxFlex></span><span class="item-count">{{profile.articlesCount}}</span>
+            </div>
+            <div class="list-item" fxLayout="row" [ngClass]="{'active': selectedTab == 'myLikes'}" (click)="showMyLikes()">
+                <mat-icon>thumb_up</mat-icon><span>Likes</span><span fxFlex></span><span class="item-count">{{profile.likesCount}}</span>
+            </div>
+            <div class="list-item" fxLayout="row" [ngClass]="{'active': selectedTab == 'myFavorites'}" (click)="showMyFavorites()">
+                <mat-icon>favorite</mat-icon><span>Favorite</span><span fxFlex></span><span class="item-count">{{profile.favorsCount}}</span>
+            </div>
+            <div class="spacer"></div>
+            <div class="list-item" *ngIf="isAuthorized()" [ngClass]="{'active': selectedTab == 'settings'}" (click)="showSettings()">
+                <mat-icon>settings</mat-icon><span>Settings</span>
+            </div>
+            <div class="list-item" *ngIf="isAuthorized()" (click)="logout()">
+                <mat-icon>exit_to_app</mat-icon><span>Sign out</span>
+            </div>
+        </div>
     </div>
 
-    <app-profile-editor *ngIf="showEditor" class="profile-editor" [user]="profile.user" (onEditorExit)="showEditor = false"></app-profile-editor>
-
-    <div class="profile-summary">
-        what is that
-        <button mat-stroked-button color="primary" (click)="logout()">Sing out</button>
+    <div class="list-content">
+        <app-articles-list [loadOnInit]="false"></app-articles-list>
     </div>
 </div>

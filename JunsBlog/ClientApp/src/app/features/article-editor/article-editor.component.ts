@@ -33,6 +33,7 @@ export class ArticleEditorComponent implements OnInit {
   updateMode = false;
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
   deepCopyCategories= [];
+  isProcessing: boolean;
 
   constructor(private articleService: ArticleService, private router: Router, private route: ActivatedRoute,
     private alertService: AlertService, private fb: FormBuilder) {
@@ -54,10 +55,13 @@ export class ArticleEditorComponent implements OnInit {
       if(articleId){
         // Update mode
         this.updateMode = true;
+        this.isProcessing = true;
         this.articleService.getArticle(articleId).subscribe( data=> {
+          this.isProcessing = false;
           this.article = data;
           this.createForm();
         }, err=>{
+          this.isProcessing = false;
           this.alertService.alertHttpError(err);
         })
       }else{
@@ -91,6 +95,7 @@ export class ArticleEditorComponent implements OnInit {
 
   cancel(){
     this.createForm();
+    this.chipList.errorState = false;
   }
 
   get articleFormControl() {
@@ -98,10 +103,6 @@ export class ArticleEditorComponent implements OnInit {
   }
   
   canSubmit(){
-    if(this.chipList){
-      //this.chipList.errorState = true;
-    }
-   
     return this.articleFormControl.title.valid && this.articleFormControl.abstract.valid 
     && this.articleFormControl.content.valid && this.deepCopyCategories.length > 0;
   }
@@ -112,9 +113,12 @@ export class ArticleEditorComponent implements OnInit {
     this.article.content = this.articleFormControl.content.value;
     this.article.categories = this.deepCopyCategories;
     this.article.isPrivate = this.articleFormControl.isPrivate.value;
+    this.isProcessing = true;
     this.articleService.saveArticle(this.article).subscribe( article=>{
+      this.isProcessing = false;
       this.router.navigateByUrl(`/article/${article.id}`);
     }, err=>{
+      this.isProcessing = false;
        this.alertService.alertHttpError(err);
     })
   }

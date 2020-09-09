@@ -8,6 +8,9 @@ namespace JunsBlog.Models.Enums
     public enum SortByEnum
     {
         UpdatedOn,
-        Views,
+        Views, 
+        Likes,
+        Favors,
+        Dislikes,
     }
 }

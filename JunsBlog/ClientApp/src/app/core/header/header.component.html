@@ -19,7 +19,7 @@
 
     <div fxLayout="row" class="search-group">
       <mat-form-field class="search-field">
-        <input matInput type="search" placeholder="Search..." [(ngModel)]="searchKey">
+        <input matInput type="search" placeholder="Search..." (keyup.enter)="search()" autocomplete="off" [(ngModel)]="searchKey">
         <button mat-button *ngIf="searchKey" matSuffix mat-icon-button aria-label="Clear" (click)="searchKey=''">
           <mat-icon>close</mat-icon>
         </button>
@@ -51,7 +51,7 @@
   <div class="over-lay" (click)="toggleMobileSearch()"></div>
   <div fxLayout="row" fxLayoutAlign="start end" class="search-group-mobile">
     <mat-form-field class="search-field">
-      <input matInput type="search" placeholder="Search..." [(ngModel)]="searchKey">
+      <input matInput type="search" autocomplete="off" placeholder="Search..." (keyup.enter)="search()" [(ngModel)]="searchKey">
       <button mat-button *ngIf="searchKey" matSuffix mat-icon-button aria-label="Clear" (click)="searchKey=''">
         <mat-icon>close</mat-icon>
       </button>

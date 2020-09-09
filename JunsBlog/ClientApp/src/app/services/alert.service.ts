@@ -52,7 +52,10 @@ export class AlertService {
         this.warning(err.error.message);
       else
         this.warning(err.error);
-    } else {
+    }else if(err.status === 504){
+      this.error('Unable connect to the server, please try again later');
+    }
+    else {
       this.error('Unknown error occurred, please try again later');
       console.log(err);
     }

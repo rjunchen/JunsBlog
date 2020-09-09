@@ -1,6 +1,12 @@
+$color-warn: #f44336;
+
+.profile-container{
+    margin: 20px;
+}
 
 .profile-info{
     padding: 15px;
+    margin-bottom: 15px;;
     .profile-image{
         width: 100px;
         height: 100px;
@@ -11,7 +17,83 @@
     }    
 }
 
+.profiler{
+    background-color: white;
+}
+
 .grey-text{
     color: #999;
 }
 
+.active{
+    background-color: $color-warn !important;
+    color: white;
+    &:hover{
+        color: white !important;
+    }
+    .item-count{
+        background-color:transparent !important;
+    }
+}
+
+.margin-top{
+    margin-top: 8px;
+}
+
+.spacer{
+    margin: 5px;
+    display: flex;
+    flex: 1 1 auto;
+}
+
+.my-list{
+    display: flex;
+    flex-direction: row;
+    .list-item{
+        display: flex;
+        align-items: center;
+        width: 200px;
+        height: 50px;
+        background-color: white;
+        box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
+        .mat-icon{
+            margin-left: 15px;
+        }
+         &:hover{
+            color: $color-warn;
+            cursor: pointer;
+        }
+        span{
+            margin-left: 5px;
+        } 
+        .item-count{
+           background-color: rgb(3, 169, 244);
+            color: white;
+            margin-right: 15px;
+            padding: 0px 8px;
+            box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
+            border-radius: 20%;
+        }
+    }
+}
+
+.list-content{
+    margin-top: 15px;
+}
+
+@media only screen and (max-width: 768px){
+    .profile-container{ 
+        margin: 0px;
+        .my-list{
+            width: 100%;
+            flex-direction: column;
+            .list-item{
+                width: 100%;
+            }
+        } 
+    }
+    .spacer{
+        margin: 5px;
+        display: inline;
+    }
+}

@@ -1,6 +1,11 @@
 <div class="profile-editor-container">
     <div class="profile-info" fxLayout="row" fxLayoutAlign="start top">
-        <img class="profile-image"  [src]="avatarSrc"/>
+        <div class="avatar-box">
+            <img class="profile-image"  [src]="avatarSrc"/>
+            <div class="overlay" fxLayoutAlign="center center" *ngIf="uploading">
+                <mat-spinner color="warn"></mat-spinner>
+            </div>
+        </div>       
         <div class="profile-details">
             <form class="user-info-form" [formGroup]="userForm" fxLayout="column">
                 <mat-form-field class="display-name-field" >

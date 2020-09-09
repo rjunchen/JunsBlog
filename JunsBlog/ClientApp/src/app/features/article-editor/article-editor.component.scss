@@ -22,8 +22,16 @@
     caret-color: rgb(244, 67, 54);
 }
 
+.overlay{
+    margin-top: 20px;
+    z-index: 900;
+    background-color: transparent;
+}
+
+
 @media only screen and (max-width: 768px){
     .editor-container{
         margin: 0px;
+        margin-bottom: 10px;
     }
 }
