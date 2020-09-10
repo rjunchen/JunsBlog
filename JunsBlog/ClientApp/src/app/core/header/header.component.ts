@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent implements OnInit {
-
+  title: string = 'Jun\'s Blog';
   currentUser: User;
   searchKey: string;
   showMobileSearch: boolean;

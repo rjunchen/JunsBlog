@@ -20,16 +20,18 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'ClientApp'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('ClientApp');
-  });
-
-  it('should render title', () => {
+  it('should render app-header', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
-    const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('.content span').textContent).toContain('ClientApp app is running!');
+    const compiled: HTMLElement = fixture.nativeElement;
+    expect(compiled.getElementsByTagName('app-header')[0]).toBeTruthy();
+    expect(compiled.querySelector('.page-content router-outlet')).toBeTruthy();
+  });
+
+  it('should render router-outlet', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    const compiled: HTMLElement = fixture.nativeElement;
+    expect(compiled.querySelector('.page-content router-outlet')).toBeTruthy();
   });
 });

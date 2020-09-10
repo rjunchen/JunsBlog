@@ -8,7 +8,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CoreModule } from './core/core.module'
 import { InterceptorService } from './services/interceptor.service'
 import { QuillModule } from 'ngx-quill';
-
+import {APP_BASE_HREF} from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -25,6 +25,9 @@ import { QuillModule } from 'ngx-quill';
       provide: HTTP_INTERCEPTORS,
       useClass: InterceptorService,
       multi: true
+    },
+    {
+      provide: APP_BASE_HREF, useValue: '/'
     }
   ],
   bootstrap: [AppComponent]
