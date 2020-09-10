@@ -16,7 +16,6 @@ namespace JunsBlog.Test.Mockups
     public class DatabaseServiceFake : IDatabaseService
     {
         private readonly List<User> users;
-        private readonly List<UserToken> userTokens;
         private readonly List<Article> articles;
         private readonly List<ArticleRanking> articleRankings;
         private readonly List<CommentRanking> commentRankings;
@@ -24,7 +23,6 @@ namespace JunsBlog.Test.Mockups
         public DatabaseServiceFake()
         {
             users = new List<User>();
-            userTokens = new List<UserToken>();
             articles = new List<Article>();
             articleRankings = new List<ArticleRanking>();
             commentRankings = new List<CommentRanking>();
@@ -47,22 +45,6 @@ namespace JunsBlog.Test.Mockups
             user.UpdatedOn = DateTime.UtcNow;
             return await Task.Run(() => {
                 return users.ReplaceOne(user);
-            });
-        }
-        #endregion
-
-
-        #region UserTokens
-        public async Task<UserToken> GetUserTokenAsync(string userId)
-        {
-            return await Task.Run(() => userTokens.Find(x => x.UserId == userId));
-        }
-
-        public async Task<UserToken> SaveUserTokenAsync(UserToken userToken)
-        {
-            userToken.UpdatedOn = DateTime.UtcNow;
-            return await Task.Run(() => {
-                return userTokens.ReplaceOne(userToken);
             });
         }
         #endregion
@@ -153,7 +135,7 @@ namespace JunsBlog.Test.Mockups
         #endregion
 
 
-        public async Task<ArticleDetails> GetArticleDetailsAsync(string articleId)
+        public async Task<ArticleDetails> GetArticleDetailsAsync(string articleId, string currentUserId)
         {
             return await Task.Run(async () => {
                 var article = articles.FirstOrDefault(x => x.Id == articleId);
@@ -165,7 +147,6 @@ namespace JunsBlog.Test.Mockups
                     Title = article.Title,
                     Abstract = article.Abstract,
                     Content = article.Content,
-                    CoverImage = article.CoverImage,
                     CreatedOn = article.CreatedOn,
                     UpdatedOn = article.UpdatedOn,
                     Id = article.Id,
@@ -202,12 +183,12 @@ namespace JunsBlog.Test.Mockups
             });
         }
 
-        private async Task<CommentRankingDetails> GetCommentRankingDetailsAsync(string commentId, string userId)
+        public async Task<CommentRankingDetails> GetCommentRankingDetailsAsync(string commentId, string userId)
         {
             return await Task.Run( () => {
                 var rankings = commentRankings.Where(x => x.CommentId == commentId);
 
-                var rankingResponse = new CommentRankingDetails() { CommentId = commentId };
+                var rankingResponse = new CommentRankingDetails();
 
                 foreach (var item in rankings)
                 {
@@ -239,6 +220,25 @@ namespace JunsBlog.Test.Mockups
         public Task<ProfileDetails> GetProfileDetailsAsync(string currentUserId)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<ArticleBasicInfo> GetArticleBasicInfoAsync(string articleId)
+        {
+            return await Task.Run(() => {
+                var x = articles.FirstOrDefault(s => s.Id == articleId);
+
+                if (x == null) return null;
+
+                return new ArticleBasicInfo()
+                {
+                    Id = x.Id,
+                    Title = x.Title,
+                    Abstract = x.Abstract,
+                    Categories = x.Categories,
+                    Content = x.Content,
+                    IsPrivate = x.IsPrivate
+                };
+            });       
         }
     }
 }
