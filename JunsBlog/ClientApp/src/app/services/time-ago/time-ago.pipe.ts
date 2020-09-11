@@ -13,8 +13,8 @@ export class TimeAgoPipe implements PipeTransform {
       }
 
       const intervals = {
-        'year': 60 * 60 * 24 * 7 * 365,
-        'month': 60 * 60 * 24 * 7 * 30,
+        'year': 60 * 60 * 24 * 365,
+        'month': 60 * 60 * 24 * 30,
         'week': 60 * 60 * 24 * 7,
         'day': 60 * 60 * 24,
         'hour': 60 * 60,

@@ -21,7 +21,7 @@ export class AuthenticationService {
     try{
       this.token = localStorage.getItem('accessToken');
       this.currentUser = JSON.parse(localStorage.getItem('user'));
-    }catch{
+    }catch(err){
       this.logout();
     }
    }
@@ -46,6 +46,7 @@ export class AuthenticationService {
 
   public logout(){
     this.currentUser = null;
+    this.token = null;
     window.localStorage.removeItem('accessToken');
     window.localStorage.removeItem('user');
     this.onUserInfoUpdated.emit(null);

@@ -5,7 +5,7 @@ import { AppModule } from 'src/app/app.module';
 
 
 
-fdescribe('ArticleEditorComponent', () => {
+describe('ArticleEditorComponent', () => {
   // let component: ArticleEditorComponent;
   // let fixture: ComponentFixture<ArticleEditorComponent>;
 
