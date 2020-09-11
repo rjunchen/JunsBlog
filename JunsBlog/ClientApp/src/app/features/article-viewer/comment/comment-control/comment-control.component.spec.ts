@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CommentControlComponent } from './comment-control.component';
+import { AppModule } from 'src/app/app.module';
+import { ArticleViewerModule } from '../../article-viewer.module';
 
 describe('CommentControlComponent', () => {
   let component: CommentControlComponent;
@@ -8,7 +10,8 @@ describe('CommentControlComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CommentControlComponent ]
+      declarations: [ CommentControlComponent ],
+      imports:[AppModule, ArticleViewerModule]
     })
     .compileComponents();
   }));

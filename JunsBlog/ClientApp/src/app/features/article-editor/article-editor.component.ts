@@ -7,9 +7,11 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
 
 import Quill from 'quill'
 import ImageResize from 'quill-image-resize-module'
+Quill.register('modules/imageResize', ImageResize)
+
 import { AlertService } from 'src/app/services/alert.service';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
-Quill.register('modules/imageResize', ImageResize)
+
 
 export interface Category {
   name: string;

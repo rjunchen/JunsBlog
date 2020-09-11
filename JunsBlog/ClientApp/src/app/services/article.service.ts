@@ -25,22 +25,22 @@ export class ArticleService {
   }
 
   public getArticle(articleId: string): Observable<Article>{
-    return this.http.get(`/api/article/get?articleId=${articleId}`).pipe(map(data => { return <Article>data}));
+    return this.http.get<Article>(`/api/article/get?articleId=${articleId}`);
   }
 
   getArticleDetails(articleId: string): Observable<ArticleDetails> {
-    return this.http.get(`/api/article/details/get?articleId=${articleId}`).pipe(map(data => { return <ArticleDetails>data}));
+    return this.http.get<ArticleDetails>(`/api/article/details/get?articleId=${articleId}`);
   }
 
   public rankArticle(articleId: string, rank: RankEnum): Observable<ArticleRankingDetails>{
-    return this.http.post('/api/article/rank', { articleId, rank }).pipe(map(data => { return <ArticleRankingDetails>data}));
+    return this.http.post<ArticleRankingDetails>('/api/article/rank', { articleId, rank });
   }
 
   public getArticleRankingDetails(articleId: string): Observable<ArticleRankingDetails>{
-    return this.http.get(`/api/article/rank?articleId=${articleId}`).pipe(map(data => { return <ArticleRankingDetails>data}));
+    return this.http.get<ArticleRankingDetails>(`/api/article/rank?articleId=${articleId}`);
   }
  
   public searchArticle(option: ArticleSearchPagingOption) : Observable<ArticleSearchPagingResult> {
-    return this.http.post('/api/article/search', option).pipe(map(data => { return <ArticleSearchPagingResult>data}));
+    return this.http.post<ArticleSearchPagingResult>('/api/article/search', option);
   }
 }

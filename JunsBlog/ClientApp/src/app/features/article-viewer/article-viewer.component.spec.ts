@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ArticleViewerComponent } from './article-viewer.component';
+import { AppModule } from 'src/app/app.module';
 
 describe('ArticleViewerComponent', () => {
   let component: ArticleViewerComponent;
@@ -8,7 +9,8 @@ describe('ArticleViewerComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ArticleViewerComponent ]
+      declarations: [ ArticleViewerComponent ],
+      imports:[AppModule]
     })
     .compileComponents();
   }));

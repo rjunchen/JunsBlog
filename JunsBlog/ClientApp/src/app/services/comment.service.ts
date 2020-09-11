@@ -18,7 +18,7 @@ export class CommentService {
   constructor(private http: HttpClient) { }
 
   public replyArticle(commentRequest: CommentRequest): Observable<CommentDetails> {
-    return this.http.post('/api/comment/reply', commentRequest).pipe(map(data => { return <CommentDetails>data}));
+    return this.http.post<CommentDetails>('/api/comment/reply', commentRequest);
   }
 
   public showCommentControl(request: CommentRequest){
@@ -30,10 +30,10 @@ export class CommentService {
   }
 
   public searchComments(option: CommentSearchPagingOption) : Observable<CommentSearchPagingResult> {
-    return this.http.post('/api/comment/search', option).pipe(map(data => { return <CommentSearchPagingResult>data}));
+    return this.http.post<CommentSearchPagingResult>('/api/comment/search', option);
   }
 
   public rankComment(rankRequest: CommentRankingRequest): Observable<CommentRankingDetails>{
-    return this.http.post('/api/comment/rank', rankRequest).pipe(map(data => { return <CommentRankingDetails>data}));
+    return this.http.post<CommentRankingDetails>('/api/comment/rank', rankRequest);
   }
 }
