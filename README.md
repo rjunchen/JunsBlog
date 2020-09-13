@@ -3,6 +3,8 @@ Juns Blog is blog web application, it is built with .NetCore, Angular 10 and Mon
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.0.7.
 
+The [JunsBlog](https://junsblog.azurewebsites.net/home) Angular app is currently hosted in Microsoft Azure
+
 # Currently main features of the blog web application
 - User can register accounts
 - User can authenticate with registered accounts or with social media accounts
