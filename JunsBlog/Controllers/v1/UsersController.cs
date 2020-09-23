@@ -13,9 +13,9 @@ using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace JunsBlog.Controllers
+namespace JunsBlog.Controllers.v1
 {
-    [Route("api")]
+    [Route("api/user")]
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -34,8 +34,19 @@ namespace JunsBlog.Controllers
             userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             this.logger = logger;
         }
-       
+
+
+        /// <summary>
+        /// Authenticate user
+        /// </summary>
+        /// <param name="model">Authentication info</param>
+        /// <response code="200">User Authenticated</response>
+        /// <response code="400">User missing login information</response>
+        /// <response code="500">Oops! Can't authenticate user right now</response>
         [HttpPost("authenticate")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> Authenticate(AuthenticateRequest model)
         {
             try
@@ -62,7 +73,18 @@ namespace JunsBlog.Controllers
             }      
         }
 
-        [HttpPost("register")]  
+
+        /// <summary>
+        /// Register new user
+        /// </summary>
+        /// <param name="model">Registration info</param>
+        /// <response code="200">User Registered</response>
+        /// <response code="400">User missing registration information</response>
+        /// <response code="500">Oops! Can't register new user right now</response>
+        [HttpPost("register")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> Register(RegisterRequest model)
         {
             try
@@ -90,8 +112,17 @@ namespace JunsBlog.Controllers
             }        
         }
 
-
+        /// <summary>
+        /// Reset password
+        /// </summary>
+        /// <param name="model">Reset password info</param>
+        /// <response code="200">Password reset successfully</response>
+        /// <response code="400">Incomplete password reset info</response>
+        /// <response code="500">Oops! Can't reset password right now</response>
         [HttpPost("reset/password")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> ResetPassword(PasswordResetRequest model)
         {
             try
@@ -120,6 +151,16 @@ namespace JunsBlog.Controllers
             }  
         }
 
+        /// <summary>
+        /// Verify email has associated account
+        /// </summary>
+        /// <param name="email">Email that associated with account</param>
+        /// <response code="200">Email verified</response>
+        /// <response code="400">Invalid email</response>
+        /// <response code="500">Oops! Can't verify email right now</response>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         [HttpGet("reset/verifyEmail")]
         public async Task<IActionResult> VerifyResetEmail(string email)
         {
@@ -129,7 +170,7 @@ namespace JunsBlog.Controllers
 
                 var user = await databaseService.GetUserByEmailAsync(email);
 
-                if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "Invalid or expired reset token");
+                if (user == null) return StatusCode(StatusCodes.Status400BadRequest, "Invalid email");
 
                 user.ResetToken = new ResetToken();
 
@@ -146,7 +187,17 @@ namespace JunsBlog.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Verify reset token
+        /// </summary>
+        /// <param name="email">Email that associated with account</param>
+        /// <param name="token">Reset token</param>
+        /// <response code="200">Token verified</response>
+        /// <response code="400">Invalid or expired reset token</response>
+        /// <response code="500">Oops! Can't verify reset token right now</response>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         [HttpGet("reset/verifyToken")]
         public async Task<IActionResult> VerifyResetToken(string email, string token)
         {
@@ -170,7 +221,16 @@ namespace JunsBlog.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Get User profile
+        /// </summary>
+        /// <param name="userId">User Id</param>
+        /// <response code="200">User profile retrieved</response>
+        /// <response code="400">Missing User Id</response>
+        /// <response code="500">Oops! Can't get user profile right now</response>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         [HttpGet("profile")]
         public async Task<IActionResult> GetProfile(string userId)
         {
@@ -191,6 +251,17 @@ namespace JunsBlog.Controllers
             }
         }
 
+
+        /// <summary>
+        /// Update User profile
+        /// </summary>
+        /// <param name="model">User profile data</param>
+        /// <response code="200">User profile updated</response>
+        /// <response code="400">Incomplete user information</response>
+        /// <response code="500">Oops! Can't update user profile right now</response>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         [HttpPost("profile/update")]
         public async Task<IActionResult> UpdateProfile(UserBasicInfo model)
         {

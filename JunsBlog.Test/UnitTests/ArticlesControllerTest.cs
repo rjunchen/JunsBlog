@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using JunsBlog.Controllers;
+using JunsBlog.Controllers.v1;
 using JunsBlog.Entities;
 using JunsBlog.Models.Articles;
 using JunsBlog.Models.Authentication;

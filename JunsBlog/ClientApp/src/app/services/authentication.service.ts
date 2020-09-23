@@ -27,7 +27,7 @@ export class AuthenticationService {
    }
 
   public register(email: string, password: string, name: string): Observable<boolean>{
-    return this.http.post<AuthResponse>('/api/register', {email, password, name, image: this.defaultAvatarUrl }).pipe(map(data=>{
+    return this.http.post<AuthResponse>('/api/user/register', {email, password, name, image: this.defaultAvatarUrl }).pipe(map(data=>{
       if(data){
         this.saveToken(data);
       }
@@ -36,7 +36,7 @@ export class AuthenticationService {
   }
 
   public login(formData): Observable<boolean> {
-    return this.http.post<AuthResponse>('/api/authenticate', formData).pipe(map(data=>{
+    return this.http.post<AuthResponse>('/api/user/authenticate', formData).pipe(map(data=>{
       if(data){
         this.saveToken(data);
       }
@@ -62,7 +62,7 @@ export class AuthenticationService {
   }
 
   public getAuthenticationInfo(accessToken: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>('/api/auth/info',{accessToken}).pipe(map(data => {
+    return this.http.post<AuthResponse>('/api/user/auth/info',{accessToken}).pipe(map(data => {
       if(data){
         this.saveToken(data);
       }
@@ -73,7 +73,7 @@ export class AuthenticationService {
   public getGoogleAuthUrl(): Observable<string> {
     if(this.googleAuthUrl)
       return of(this.googleAuthUrl);
-    return this.http.get('/api/auth/google/url',{responseType: 'text'}).pipe(map((data: string) => {
+    return this.http.get('/api/user/auth/google/url',{responseType: 'text'}).pipe(map((data: string) => {
        this.googleAuthUrl = data;
        return data;
      }));
@@ -98,11 +98,11 @@ export class AuthenticationService {
   }
 
   public getProfile(userId: string): Observable<Profile>{
-    return this.http.get<Profile>(`/api/profile?userId=${userId}`);
+    return this.http.get<Profile>(`/api/user/profile?userId=${userId}`);
   }
 
   public updateProfile(id: string, name: string, email: string, image: string): Observable<User> {
-    return this.http.post<User>(`/api/profile/update`, { id, name, email, image }).pipe(map(user  => {
+    return this.http.post<User>(`/api/user/profile/update`, { id, name, email, image }).pipe(map(user  => {
       this.currentUser = user;
       localStorage.setItem('user', JSON.stringify(user));
        this.onUserInfoUpdated.emit(user);
@@ -111,15 +111,15 @@ export class AuthenticationService {
   }
 
   public sendResetToken(email: string){
-    return this.http.get(`/api/reset/verifyEmail?email=${email}`);
+    return this.http.get(`/api/user/reset/verifyEmail?email=${email}`);
   }
 
   public verifyToken(email: string, token: string){
-    return this.http.get(`/api/reset/verifyToken?email=${email}&token=${token}`);
+    return this.http.get(`/api/user/reset/verifyToken?email=${email}&token=${token}`);
   }
 
   public resetPassword(email: string, password: string, resetToken: string ){
-    return this.http.post('/api/reset/password', {email, password, resetToken});
+    return this.http.post('/api/user/reset/password', {email, password, resetToken});
   }
 
 }
