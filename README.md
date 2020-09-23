@@ -5,6 +5,8 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 The [JunsBlog](https://junsblog.azurewebsites.net/home) Angular app is currently hosted in Microsoft Azure
 
+The [JunsBlog APIs](https://junsblog.azurewebsites.net/swagger) JunsBlog APIs
+
 # Currently main features of the blog web application
 - User can register accounts
 - User can authenticate with registered accounts or with social media accounts
@@ -17,6 +19,7 @@ The [JunsBlog](https://junsblog.azurewebsites.net/home) Angular app is currently
 - User can view and update user profile
 - User can post articles with pictures or videos as well as text. 
 - User can search article with keyword
+- Articles search with pagination
 - Articles can display total view, total likes
 - Article keeps track if a user have been liked, disliked and favored the article itself
 
@@ -28,16 +31,19 @@ The [JunsBlog](https://junsblog.azurewebsites.net/home) Angular app is currently
 
 # Main node packages and technologies that used within the application
 - Angular Material UI - application UI framework
+- Angular Lazy loading
 - ngx-infinite-scroll - combine use with mongoose pagination library to allow contents to be loaded when needed for better performance
 - ngx-quill - rich text editor 
 - quill-image-resize-module - resizing image in the quill text editor
 - ngx-gallery-9 - display images
 - ngx-image-cropper - crop image for the avatar
+- Swagger
+
 
 # Requirements for fully running this application locally
 - Visual studio 2019
 - Node.js and mongoDB need to be installed on the computer 
-- Create Google developer account to get the client_id and client_secret for google OAuth
+- Create Google developer account to get the client_id and client_secret for Google OAuth
 - Setup and email account for email notification
 - Fill in the settings in the appsetting.json
 

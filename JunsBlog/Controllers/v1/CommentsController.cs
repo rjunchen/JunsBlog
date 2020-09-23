@@ -31,6 +31,16 @@ namespace JunsBlog.Controllers.v1
         }
 
 
+        /// <summary>
+        /// Post comment
+        /// </summary>
+        /// <param name="model">Comment info</param>
+        /// <response code="200">Comment posted successfully</response>
+        /// <response code="400">Invalid comment info</response>
+        /// <response code="500">Oops! Can't post comment right now</response>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         [Authorize(Roles = Role.User)]
         [HttpPost("reply")]
         public async Task<IActionResult> PostComment(CommentRequest model)
@@ -63,6 +73,16 @@ namespace JunsBlog.Controllers.v1
             }
         }
 
+
+        /// <summary>
+        /// Search comments
+        /// </summary>
+        /// <param name="options">Comment search options</param>
+        /// <response code="200">Retrieved comments successfully</response>
+        /// <response code="500">Oops! Can't search comments right now</response>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         [HttpPost("search")]
         public async Task<IActionResult> SearchComments(CommentSearchPagingOption options)
         {
@@ -79,6 +99,17 @@ namespace JunsBlog.Controllers.v1
             }
         }
 
+
+        /// <summary>
+        /// Rank comment
+        /// </summary>
+        /// <param name="model">Comment ranking info</param>
+        /// <response code="200">Comment ranked successfully</response>
+        /// <response code="400">Invalid comment ranking info</response>
+        /// <response code="500">Oops! Can't rank comment right now</response>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         [Authorize(Roles = Role.User)]
         [HttpPost("rank")]
         public async Task<IActionResult> RankComments(CommentRankingRequest model)

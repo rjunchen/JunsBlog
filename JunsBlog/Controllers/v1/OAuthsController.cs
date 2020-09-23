@@ -91,6 +91,17 @@ namespace JunsBlog.Controllers.v1
             return null;
         }
 
+
+        /// <summary>
+        /// Google Authentication
+        /// </summary>
+        /// <param name="code">Google authentication code</param>
+        /// <response code="200">Authenticated successfully</response>
+        /// <response code="400">Invalid code</response>
+        /// <response code="500">Oops! Can't authenticate right now</response>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         [HttpGet("google/signin")]
         public async Task<IActionResult> GoogleSingin(string code)
         {
@@ -122,6 +133,14 @@ namespace JunsBlog.Controllers.v1
             }
         }
 
+
+        /// <summary>
+        /// Get Google Authentication url
+        /// </summary>
+        /// <response code="200">Retrieved authentication url successfully</response>
+        /// <response code="500">Oops! Can't Google authentication url right now</response>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(500)]
         [HttpGet("google/url")]
         public IActionResult GoogleUrl()
         {
@@ -150,7 +169,15 @@ namespace JunsBlog.Controllers.v1
             }
         }
 
-
+        /// <summary>
+        /// Get Google Authentication info
+        /// </summary>
+        /// <param name="request">Google authentication info</param>
+        /// <response code="200">Retrieved authentication info successfully</response>
+        /// <response code="500">Oops! Can't get authentication info right now</response>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         [HttpPost("info")]
         public async Task<IActionResult> GetAuthenticationInfo(AuthInfoRequest request)
         {

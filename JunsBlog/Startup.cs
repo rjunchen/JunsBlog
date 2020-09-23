@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System.IO;
 using System.Net.Http;
 using System.Text;
 
@@ -42,6 +43,12 @@ namespace JunsBlog
                 // If the client hasn't specified the API version in the request, use the default API version number 
                 config.AssumeDefaultVersionWhenUnspecified = true;
             });
+
+            services.AddSwaggerGen(x => {
+                var filePath = Path.Combine(System.AppContext.BaseDirectory, "JunsBlog.xml");
+                x.IncludeXmlComments(filePath);
+            }
+           );
 
             services.AddControllersWithViews();
             // In production, the Angular files will be served from this directory
@@ -109,6 +116,13 @@ namespace JunsBlog
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(x =>
+            {
+                x.SwaggerEndpoint("/swagger/v1/swagger.json", "JunsBlog API V1");
+            });
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
