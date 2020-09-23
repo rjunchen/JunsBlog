@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 
-namespace JunsBlog.Controllers
+namespace JunsBlog.Controllers.v1
 {
     [Route("api/article")]
     [ApiController]
@@ -30,6 +30,16 @@ namespace JunsBlog.Controllers
         }
 
 
+        /// <summary>
+        /// Get article basic info
+        /// </summary>
+        /// <param name="articleId">Article Id</param>
+        /// <response code="200">Retrieved article successfully</response>
+        /// <response code="400">Invalid article Id or article doesn't exist</response>
+        /// <response code="500">Oops! Can't get article right now</response>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         [HttpGet("get")]
         public async Task<IActionResult> GetArticleBasicInfo(string articleId)
         {
@@ -51,6 +61,17 @@ namespace JunsBlog.Controllers
             }
         }
 
+
+        /// <summary>
+        /// Save article
+        /// </summary>
+        /// <param name="aricleModel">Article info</param>
+        /// <response code="200">Saved article successfully</response>
+        /// <response code="400">Invalid article</response>
+        /// <response code="500">Oops! Can't save article right now</response>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         [Authorize(Roles = Role.User)]
         [HttpPost("save")]
         public async Task<IActionResult> SaveArticle(ArticleBasicInfo aricleModel)
@@ -92,7 +113,16 @@ namespace JunsBlog.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Get article details
+        /// </summary>
+        /// <param name="articleId">Article Id</param>
+        /// <response code="200">Retrieved article details successfully</response>
+        /// <response code="400">Invalid article Id</response>
+        /// <response code="500">Oops! Can't get article details right now</response>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         [HttpGet("details/get")]
         public async Task<IActionResult> GetArticleDetails(string articleId)
         {
@@ -112,6 +142,17 @@ namespace JunsBlog.Controllers
             }
         }
 
+
+        /// <summary>
+        /// Search articles
+        /// </summary>
+        /// <param name="options">Article search options</param>
+        /// <response code="200">Retrieved articles successfully</response>
+        /// <response code="400">ProfileId is not specified in the search options</response>
+        /// <response code="500">Oops! Can't search articles right now</response>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         [HttpPost("Search")]
         public async Task<IActionResult> SearchArticles(ArticleSearchPagingOption options)
         {
@@ -132,6 +173,17 @@ namespace JunsBlog.Controllers
             }
         }
 
+
+        /// <summary>
+        /// Rank article
+        /// </summary>
+        /// <param name="model">Article ranking info</param>
+        /// <response code="200">Ranked article successfully</response>
+        /// <response code="400">Invalid article ranking info</response>
+        /// <response code="500">Oops! Can't rank article right now</response>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         [Authorize(Roles = Role.User)]
         [HttpPost("rank")]
         public async Task<IActionResult> RankArticle(ArticleRankingRequest model)
@@ -174,6 +226,17 @@ namespace JunsBlog.Controllers
             }
         }
 
+
+        /// <summary>
+        /// Get article ranking details
+        /// </summary>
+        /// <param name="articleId">Article Id</param>
+        /// <response code="200">Retrieved article ranking details successfully</response>
+        /// <response code="400">Article Id is missing</response>
+        /// <response code="500">Oops! Can't get article ranking details right now</response>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         [HttpGet("rank")]
         public async Task<IActionResult> GetArticleRanking(string articleId)
         {
