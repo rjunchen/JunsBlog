@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace JunsBlog.Controllers
+namespace JunsBlog.Controllers.v1
 {
     [Route("api/auth")]
     [ApiController]

@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 
-namespace JunsBlog.Controllers
+namespace JunsBlog.Controllers.v1
 {
     [Route("api/article")]
     [ApiController]

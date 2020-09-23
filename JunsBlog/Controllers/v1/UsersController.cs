@@ -13,9 +13,9 @@ using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace JunsBlog.Controllers
+namespace JunsBlog.Controllers.v1
 {
-    [Route("api")]
+    [Route("api/user")]
     [ApiController]
     public class UsersController : ControllerBase
     {

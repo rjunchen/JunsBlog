@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace JunsBlog.Controllers
+namespace JunsBlog.Controllers.v1
 {
     [Route("api/comment")]
     [ApiController]
