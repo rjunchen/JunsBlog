@@ -29,10 +29,12 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log('init url');
     this.auth.getGoogleAuthUrl().subscribe( x=>{
+      console.log(x);
       this.googleAuthUrl = x;
     }, err =>{
-      
+      console.log(err);
     })
   }
 
