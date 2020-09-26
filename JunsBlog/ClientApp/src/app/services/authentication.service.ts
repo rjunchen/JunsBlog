@@ -62,7 +62,7 @@ export class AuthenticationService {
   }
 
   public getAuthenticationInfo(accessToken: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>('/api/user/auth/info',{accessToken}).pipe(map(data => {
+    return this.http.post<AuthResponse>('/api/auth/info',{accessToken}).pipe(map(data => {
       if(data){
         this.saveToken(data);
       }
@@ -73,7 +73,7 @@ export class AuthenticationService {
   public getGoogleAuthUrl(): Observable<string> {
     if(this.googleAuthUrl)
       return of(this.googleAuthUrl);
-    return this.http.get('/api/user/auth/google/url',{responseType: 'text'}).pipe(map((data: string) => {
+    return this.http.get('/api/auth/google/url',{responseType: 'text'}).pipe(map((data: string) => {
        this.googleAuthUrl = data;
        return data;
      }));
