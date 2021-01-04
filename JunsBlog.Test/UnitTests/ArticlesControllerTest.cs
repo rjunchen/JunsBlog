@@ -68,7 +68,7 @@ namespace JunsBlog.Test.UnitTests
             var notificationServiceFake = new NotificationServiceFake();
             var databaseService = new DatabaseServiceFake();
 
-            var requestModel = new RegisterRequest() { Email = "Test@gmail.com", Name = "Tester", Password = "1234589" };
+            var requestModel = new RegisterRequest() { Email = "Test@gmail.com", Name = "Tester", Password = "12345111" };
             var user = new User(requestModel)
             {
                 Id = ObjectId.GenerateNewId().ToString()
